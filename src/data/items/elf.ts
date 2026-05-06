@@ -1,0 +1,156 @@
+import { Archetype, ItemTier, ItemSlot, ItemCategory, StatType, ThreatTag } from '../../types/enums'
+import type { ItemDef } from '../../types/items'
+
+export const elfItems: ItemDef[] = [
+  // ═══════════════════════════════════════ T1 (3 items) ═══════════════════════════════════════
+
+  {
+    id: 'elf_item_plasma_shortbow',
+    name: 'Plasma Shortbow',
+    tier: ItemTier.T1,
+    slot: ItemSlot.PAWS,
+    category: ItemCategory.WEAPON,
+    archetype: Archetype.ELF,
+    cost: 30,
+    description: 'A compact bow that looses bolts of ionized plasma. Graceful, swift, searing.',
+    effects: [{ strMult: 1.2 }, { statBonus: { [StatType.AGI]: 2 } }],
+  },
+  {
+    id: 'elf_item_crystal_circlet',
+    name: 'Crystal Circlet',
+    tier: ItemTier.T1,
+    slot: ItemSlot.HEAD,
+    category: ItemCategory.ARMOR,
+    archetype: Archetype.ELF,
+    cost: 25,
+    description: 'A circlet of living crystal grown in a zero-garden. Sings faintly under starlight.',
+    effects: [{ resistance: { tag: ThreatTag.CRYSTALLINE, value: 8 } }],
+  },
+  {
+    id: 'elf_item_starfarer_coin',
+    name: 'Starfarer Coin',
+    tier: ItemTier.T1,
+    slot: ItemSlot.ARTIFACT,
+    category: ItemCategory.TRINKET,
+    archetype: Archetype.ELF,
+    cost: 30,
+    description: 'An ancient coin minted on a world long since consumed by its star. It lands on edges that do not exist. Believed to attract wealth across the void.',
+    effects: [{ statBonus: { [StatType.LCK]: 4 } }],
+  },
+
+  // ═══════════════════════════════════════ T2 (4 items) ═══════════════════════════════════════
+
+  {
+    id: 'elf_item_plasma_longbow',
+    name: 'Plasma Longbow',
+    tier: ItemTier.T2,
+    slot: ItemSlot.PAWS,
+    category: ItemCategory.WEAPON,
+    archetype: Archetype.ELF,
+    cost: 55,
+    description: 'An elegant longbow carved from crystalline driftwood. Plasma arrows scream across the void.',
+    effects: [{ strMult: 1.4 }, { statBonus: { [StatType.AGI]: 3 } }],
+  },
+  {
+    id: 'elf_item_crystalline_robe',
+    name: 'Crystalline Robe',
+    tier: ItemTier.T2,
+    slot: ItemSlot.BODY,
+    category: ItemCategory.ARMOR,
+    archetype: Archetype.ELF,
+    cost: 50,
+    description: 'A robe woven from interlocking crystal filaments. Flows like silk, stops like diamond.',
+    effects: [{ resistance: { tag: ThreatTag.EVASIVE, value: 12 } }],
+  },
+  {
+    id: 'elf_item_ancient_ledger',
+    name: 'Ancient Ledger',
+    tier: ItemTier.T2,
+    slot: ItemSlot.ARTIFACT,
+    category: ItemCategory.TRINKET,
+    archetype: Archetype.ELF,
+    cost: 60,
+    description: 'A crystalline ledger recording millennia of star-faring commerce. The numbers still update in your favour.',
+    effects: [{ statBonus: { [StatType.LCK]: 5, [StatType.INT]: 2 } }],
+  },
+  {
+    id: 'elf_item_crystal_prism_module',
+    name: 'Crystal Prism Module',
+    tier: ItemTier.T2,
+    slot: ItemSlot.ARTIFACT,
+    category: ItemCategory.ABILITY,
+    archetype: Archetype.ELF,
+    cost: 65,
+    description: 'A prism that splits starlight into offensive spectra. Each colour a different kind of regret for the target.',
+    effects: [{ grantsAbility: 'elf_ab_crystal_prism' }],
+  },
+
+  // ═══════════════════════════════════════ T3 (3 items) ═══════════════════════════════════════
+
+  {
+    id: 'elf_item_plasmalight_recurve',
+    name: 'Plasmalight Recurve',
+    tier: ItemTier.T3,
+    slot: ItemSlot.PAWS,
+    category: ItemCategory.WEAPON,
+    archetype: Archetype.ELF,
+    cost: 100,
+    description: 'A recurve bow strung with plasmalight. Each shot bends around obstacles with predatory grace.',
+    effects: [{ strMult: 1.6 }, { statBonus: { [StatType.AGI]: 4, [StatType.LCK]: 2 } }],
+  },
+  {
+    id: 'elf_item_starlight_diadem',
+    name: 'Starlight Diadem',
+    tier: ItemTier.T3,
+    slot: ItemSlot.HEAD,
+    category: ItemCategory.ARMOR,
+    archetype: Archetype.ELF,
+    cost: 95,
+    description: 'A diadem set with captured starlight in crystal lattice. Fortune favours the adorned.',
+    effects: [
+      { resistance: { tag: ThreatTag.EVASIVE, value: 15 } },
+      { statBonus: { [StatType.LCK]: 4 } },
+    ],
+  },
+  {
+    id: 'elf_item_graceful_wind_charm',
+    name: 'Graceful Wind Charm',
+    tier: ItemTier.T3,
+    slot: ItemSlot.ARTIFACT,
+    category: ItemCategory.TRINKET,
+    archetype: Archetype.ELF,
+    cost: 105,
+    description: 'A charm that catches solar wind and weaves it into motion. You move before thought completes.',
+    effects: [{ statBonus: { [StatType.AGI]: 7, [StatType.STA]: 2 } }],
+  },
+
+  // ═══════════════════════════════════════ T4 (2 items) ═══════════════════════════════════════
+
+  {
+    id: 'elf_item_ancient_plasmalight_bow',
+    name: 'Ancient Plasmalight Bow',
+    tier: ItemTier.T4,
+    slot: ItemSlot.PAWS,
+    category: ItemCategory.WEAPON,
+    archetype: Archetype.ELF,
+    cost: 250,
+    description: 'A bow that predates the current star cycle. Its plasma has cooled to a perfect, patient heat. Fires bolts of pure crystallised intent.',
+    effects: [{ strMult: 2.2 }, { flatBonus: 12 }],
+    statRequirements: { [StatType.AGI]: 22 },
+  },
+  {
+    id: 'elf_item_nexus_weave_robe',
+    name: 'Nexus-Weave Robe',
+    tier: ItemTier.T4,
+    slot: ItemSlot.BODY,
+    category: ItemCategory.ARMOR,
+    archetype: Archetype.ELF,
+    cost: 220,
+    description: 'A robe woven at the nexus of six trade routes. Threaded with the fortunes of a thousand captains. Luck seeps from every fibre.',
+    effects: [
+      { resistance: { tag: ThreatTag.EVASIVE, value: 20 } },
+      { resistance: { tag: ThreatTag.CRYSTALLINE, value: 15 } },
+      { statBonus: { [StatType.LCK]: 5 } },
+    ],
+  },
+]
