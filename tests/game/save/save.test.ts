@@ -222,59 +222,68 @@ describe('createCompletedRun', () => {
 describe('parseShareString', () => {
   it('parses a valid share string correctly', () => {
     const result = parseShareString('ANTIGRAV/SPRGK-ABCDEFGH/012Z')
-    expect(result).not.toBeNull()
-    expect(result!.archetype).toBe(Archetype.SPORGK)
-    expect(result!.seed).toBe('ABCDEFGH')
-    expect(result!.draftSeq).toBe('012Z')
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.archetype).toBe(Archetype.SPORGK)
+      expect(result.data.seed).toBe('ABCDEFGH')
+      expect(result.data.draftSeq).toBe('012Z')
+    }
   })
 
   it('parses ELF archetype', () => {
     const result = parseShareString('ANTIGRAV/ELF-12345678/ABC')
-    expect(result).not.toBeNull()
-    expect(result!.archetype).toBe(Archetype.ELF)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.archetype).toBe(Archetype.ELF)
+    }
   })
 
   it('parses VAMP archetype', () => {
     const result = parseShareString('ANTIGRAV/VAMP-SEED1234/XYZ')
-    expect(result).not.toBeNull()
-    expect(result!.archetype).toBe(Archetype.VAMPIRE)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.data.archetype).toBe(Archetype.VAMPIRE)
+    }
   })
 
-  it('returns null for non-ANTIGRAV tag', () => {
+  it('returns error for non-ANTIGRAV tag', () => {
     const result = parseShareString('OTHER/SPRGK-SEED/DRAFT')
-    expect(result).toBeNull()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.kind).toBe('malformed')
   })
 
-  it('returns null for missing segments', () => {
-    expect(parseShareString('ANTIGRAV/SPRGK-SEED')).toBeNull()
-    expect(parseShareString('ANTIGRAV')).toBeNull()
-    expect(parseShareString('')).toBeNull()
+  it('returns error for missing segments', () => {
+    expect(parseShareString('ANTIGRAV/SPRGK-SEED').ok).toBe(false)
+    expect(parseShareString('ANTIGRAV').ok).toBe(false)
   })
 
-  it('returns null for unknown archetype abbreviation', () => {
+  it('returns error for unknown archetype abbreviation', () => {
     const result = parseShareString('ANTIGRAV/XXXX-SEED1234/DRAFT')
-    expect(result).toBeNull()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.kind).toBe('invalid_archetype')
   })
 
-  it('returns null for missing separator in segment 2', () => {
+  it('returns error for missing separator in segment 2', () => {
     const result = parseShareString('ANTIGRAV/SPRGKABCDEFGH/DRAFT')
-    expect(result).toBeNull()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.kind).toBe('malformed')
   })
 
-  it('returns null for empty seed', () => {
+  it('returns error for empty seed', () => {
     const result = parseShareString('ANTIGRAV/SPRGK-/DRAFT')
-    expect(result).toBeNull()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error.kind).toBe('invalid_seed')
   })
 
-  it('returns null for null/undefined input', () => {
-    expect(parseShareString(null as any)).toBeNull()
-    expect(parseShareString(undefined as any)).toBeNull()
+  it('returns error for null/undefined input', () => {
+    expect(parseShareString(null as any).ok).toBe(false)
+    expect(parseShareString(undefined as any).ok).toBe(false)
   })
 
   it('preserves draft sequence with multiple slashes', () => {
     const result = parseShareString('ANTIGRAV/ELF-SEED1234/DRAFT/EXTRA')
-    expect(result).not.toBeNull()
-    expect(result!.draftSeq).toBe('DRAFT/EXTRA')
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.data.draftSeq).toBe('DRAFT/EXTRA')
   })
 })
 

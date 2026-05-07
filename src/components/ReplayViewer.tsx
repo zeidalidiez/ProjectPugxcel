@@ -29,11 +29,12 @@ export default function ReplayViewer({ shareString, onBack }: ReplayViewerProps)
     replaying.current = true
 
     try {
-      const parsed = parseShareString(shareString.trim())
-      if (!parsed) {
-        setError('Invalid share string format')
+      const result = parseShareString(shareString.trim())
+      if (!result.ok) {
+        setError(result.error.message)
         return
       }
+      const parsed = result.data
 
       const archMap: Record<string, Archetype> = {
         SPRGK: Archetype.SPORGK,

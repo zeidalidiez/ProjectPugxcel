@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useGameStore } from '../store'
 import { Archetype } from '../types/enums'
 import { useSeed } from '../hooks/useSeed'
-import { parseShareString } from '../game/save/deserialize'
+import { parseShareString, messageForError } from '../game/save/deserialize'
 import CodexModal from './CodexModal'
 
 const ARCHETYPES = [
@@ -47,13 +47,13 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
   }
 
   function handleReplay() {
-    const parsed = parseShareString(shareInput.trim())
-    if (!parsed) {
-      setShareError('Invalid share string')
+    const result = parseShareString(shareInput.trim())
+    if (!result.ok) {
+      setShareError(messageForError(result.error))
       return
     }
     const validArches = ['SPRGK', 'ELF', 'VAMP']
-    if (!validArches.includes(parsed.archetype)) {
+    if (!validArches.includes(result.data.archetype)) {
       setShareError('Unknown archetype in share string')
       return
     }

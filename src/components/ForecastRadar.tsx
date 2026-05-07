@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useGameStore } from '../store'
 import { calculateThreshold } from '../game/economy/threshold'
-import type { Encounter } from '../types/encounters'
 
 const THREAT_LABELS: Record<string, string> = {
   ARMORED: 'ARMORED',
@@ -19,7 +18,7 @@ export default function ForecastRadar() {
   const encounters = useGameStore((s) => s.run?.encounters)
   const turn = useGameStore((s) => s.run?.turn)
   const uncertaintyMode = useGameStore((s) => s.settings.uncertaintyMode)
-  const [hoveredEncounter, setHoveredEncounter] = useState<Encounter | null>(null)
+  const [hoveredTurn, setHoveredTurn] = useState<number | null>(null)
 
   if (turn === undefined) return null
   const isPrep = turn <= PREP_TURNS
@@ -54,8 +53,19 @@ export default function ForecastRadar() {
         return (
           <div
             key={t}
-            onMouseEnter={() => isBoss ? setHoveredEncounter(enc) : null}
-            onMouseLeave={() => setHoveredEncounter(null)}
+            tabIndex={isBoss ? 0 : -1}
+            role={isBoss ? 'button' : undefined}
+            aria-describedby={isBoss ? `boss-tooltip-${t}` : undefined}
+            onMouseEnter={() => isBoss ? setHoveredTurn(t) : null}
+            onMouseLeave={() => setHoveredTurn(null)}
+            onFocus={() => setHoveredTurn(t)}
+            onBlur={() => setHoveredTurn(null)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setHoveredTurn(null)
+                ;(e.currentTarget as HTMLElement).blur()
+              }
+            }}
             className={`
               flex flex-col items-center px-2 py-1 rounded border min-w-16 cursor-default
               ${isCurrent ? 'border-terminal-accent bg-terminal-accent/10' : 'border-terminal-border bg-terminal-bg'}
@@ -79,36 +89,44 @@ export default function ForecastRadar() {
         )
       })}
 
-      {hoveredEncounter && (
-        <div className="absolute top-full left-0 mt-2 z-50 p-3 rounded border border-terminal-fail/50 bg-terminal-surface shadow-lg min-w-48">
-          <div className="text-terminal-fail text-xs font-bold uppercase tracking-wider mb-1">
-            {hoveredEncounter.enemyName}
-          </div>
-          <p className="text-terminal-text text-[10px] leading-snug mb-2 italic">
-            "{hoveredEncounter.flavorText}"
-          </p>
-          <div className="flex flex-col gap-0.5 text-[10px] font-mono">
-            <div className="flex justify-between">
-              <span className="text-terminal-text/60">Armor</span>
-              <span className="text-terminal-text-bright">{hoveredEncounter.armor}</span>
+      {(() => {
+        const hovered = hoveredTurn !== null ? encounters.find((_, i) => turn + i === hoveredTurn) : null
+        if (!hovered) return null
+        return (
+          <div
+            id={`boss-tooltip-${hoveredTurn}`}
+            role="tooltip"
+            className="absolute top-full left-0 mt-2 z-50 p-3 rounded border border-terminal-fail/50 bg-terminal-surface shadow-lg min-w-48"
+          >
+            <div className="text-terminal-fail text-xs font-bold uppercase tracking-wider mb-1">
+              {hovered.enemyName}
             </div>
-            <div className="flex justify-between">
-              <span className="text-terminal-text/60">Evasion</span>
-              <span className="text-terminal-text-bright">{Math.round(hoveredEncounter.evasion * 100)}%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-terminal-text/60">INT Resist</span>
-              <span className="text-terminal-text-bright">{Math.round(hoveredEncounter.intResist * 100)}%</span>
-            </div>
-            {hoveredEncounter.staminaDrain > 0 && (
+            <p className="text-terminal-text text-[10px] leading-snug mb-2 italic">
+              "{hovered.flavorText}"
+            </p>
+            <div className="flex flex-col gap-0.5 text-[10px] font-mono">
               <div className="flex justify-between">
-                <span className="text-terminal-text/60">Stamina Drain</span>
-                <span className="text-terminal-warn">{hoveredEncounter.staminaDrain}</span>
+                <span className="text-terminal-text/60">Armor</span>
+                <span className="text-terminal-text-bright">{hovered.armor}</span>
               </div>
-            )}
+              <div className="flex justify-between">
+                <span className="text-terminal-text/60">Evasion</span>
+                <span className="text-terminal-text-bright">{Math.round(hovered.evasion * 100)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-terminal-text/60">INT Resist</span>
+                <span className="text-terminal-text-bright">{Math.round(hovered.intResist * 100)}%</span>
+              </div>
+              {hovered.staminaDrain > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-terminal-text/60">Stamina Drain</span>
+                  <span className="text-terminal-warn">{hovered.staminaDrain}</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }

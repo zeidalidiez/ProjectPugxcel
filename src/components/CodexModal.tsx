@@ -1,5 +1,5 @@
 import { useGameStore } from '../store'
-import { getModifierById } from '../data/codex/modifiers'
+import { codexModifiers, type CodexModifier } from '../data/codex/modifiers'
 import { getAllChallenges } from '../data/codex/challenges'
 import { Archetype } from '../types/enums'
 
@@ -9,12 +9,28 @@ const ARCH_LABELS: Record<string, string> = {
   [Archetype.VAMPIRE]: 'Vampire',
 }
 
+function formatUnlockCondition(condition: CodexModifier['unlockCondition']): string {
+  const label = condition.archetype ? (ARCH_LABELS[condition.archetype] ?? condition.archetype).toLowerCase() : ''
+  switch (condition.type) {
+    case 'win_run':
+      return condition.archetype ? `> win a run as ${label}` : '> win any run'
+    case 'reach_turn':
+      return `> reach turn ${condition.value}`
+    case 'boss_kill':
+      return `> defeat ${condition.value} bosses`
+    case 'archetype_challenge':
+      return `> win as ${label} reaching turn ${condition.value}`
+    case 'no_gear_run':
+      return `> reach turn ${condition.value} with no gear ever equipped`
+    case 'stat_threshold':
+      return `> reach ${condition.value}+ total stats in any run`
+    default:
+      return '> ???'
+  }
+}
+
 export default function CodexModal({ onClose }: { onClose: () => void }) {
   const codex = useGameStore((s) => s.codex)
-
-  const unlockedMods = codex.unlockedModifiers
-    .map((id) => getModifierById(id))
-    .filter(Boolean)
 
   const challenges = getAllChallenges()
 
@@ -31,25 +47,41 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
 
         <div className="mb-6">
           <div className="text-terminal-accent text-xs uppercase tracking-widest mb-2">
-            Unlocked Modifiers ({unlockedMods.length}/20)
+            Modifiers ({codex.unlockedModifiers.length}/{codexModifiers.length})
           </div>
-          {unlockedMods.length === 0 ? (
-            <p className="text-terminal-text/50 text-xs">No modifiers unlocked yet. Complete runs to unlock them.</p>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {unlockedMods.map((mod) => (
-                mod && (
-                  <div key={mod.id} className="flex items-start gap-2 p-2 rounded border border-terminal-border bg-terminal-bg/50">
-                    <span className="text-terminal-accent text-xs mt-0.5">◆</span>
-                    <div>
-                      <div className="text-terminal-text-bright text-xs font-bold">{mod.name}</div>
-                      <div className="text-terminal-text/60 text-[10px]">{mod.description}</div>
-                    </div>
-                  </div>
-                )
-              ))}
-            </div>
-          )}
+          <div className="flex flex-col gap-1.5">
+            {codexModifiers.map((mod) => {
+              const unlocked = codex.unlockedModifiers.includes(mod.id)
+              return (
+                <div
+                  key={mod.id}
+                  className={`flex items-start gap-2 p-2 rounded border ${
+                    unlocked
+                      ? 'border-terminal-border bg-terminal-bg/50'
+                      : 'border-terminal-border/40 bg-terminal-bg/20 opacity-40'
+                  }`}
+                >
+                  {unlocked ? (
+                    <>
+                      <span className="text-terminal-accent text-xs mt-0.5">◆</span>
+                      <div>
+                        <div className="text-terminal-text-bright text-xs font-bold">{mod.name}</div>
+                        <div className="text-terminal-text/60 text-[10px]">{mod.description}</div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-terminal-text/30 text-xs mt-0.5">○</span>
+                      <div>
+                        <div className="text-terminal-text/50 text-xs font-bold">???</div>
+                        <div className="text-terminal-text/40 text-[10px] font-mono">{formatUnlockCondition(mod.unlockCondition)}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         <div className="mb-6">
