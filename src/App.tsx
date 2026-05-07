@@ -18,10 +18,23 @@ export default function App() {
   const init = useGameStore((s) => s.init)
   const reducedMotion = useReducedMotion()
   const [replayShare, setReplayShare] = useState<string | null>(null)
+  const run = useGameStore((s) => s.run)
   useFontScale()
 
   useKeyboardNav()
   useAudio()
+
+  // Archetype theming hook - this was the missing piece
+  useEffect(() => {
+    if (run?.archetype) {
+      document.documentElement.setAttribute('data-archetype', run.archetype)
+    } else {
+      document.documentElement.removeAttribute('data-archetype')
+    }
+    return () => {
+      document.documentElement.removeAttribute('data-archetype')
+    }
+  }, [run?.archetype])
 
   useEffect(() => {
     init()
