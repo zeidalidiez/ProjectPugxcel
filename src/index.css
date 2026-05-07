@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Base terminal theme */
 @theme {
   --color-terminal-bg: #0d0f14;
   --color-terminal-surface: #141820;
@@ -50,7 +51,7 @@ body {
   }
 }
 
-/* Archetype theme extensions - clean integration */
+/* Archetype theming core */
 :root {
   --accent-color: var(--color-terminal-accent);
 }
@@ -59,39 +60,65 @@ body {
   --accent-color: var(--color-terminal-sporgk);
 }
 
-[data-archetype="elf"] {
-  --accent-color: var(--color-terminal-elf);
+/* === SPORGK INDUSTRIAL / FIERY THEME - BROAD SELECTORS === */
+[data-archetype="sporgk"] {
+  --accent-color: #ff6b35;
 }
 
-[data-archetype="vampire"] {
-  --accent-color: var(--color-terminal-vampire);
+/* Strong visual changes */
+[data-archetype="sporgk"] .border-terminal-border {
+  border-color: #ff6b35 !important;
 }
 
-/* Sporgk industrial flair */
-[data-archetype="sporgk"] body {
-  background: radial-gradient(circle at center, #1a1208 0%, #0d0f14 100%);
+[data-archetype="sporgk"] .bg-terminal-accent,
+[data-archetype="sporgk"] button.bg-terminal-accent {
+  background-color: #ff6b35 !important;
 }
 
-[data-archetype="sporgk"] .constellation-node.available {
-  box-shadow: 0 0 15px 6px #ff6b35;
+[data-archetype="sporgk"] .text-terminal-accent {
+  color: #ff6b35 !important;
 }
 
-/* Scanlines */
-[data-archetype="sporgk"] .game-container::before {
+/* Background */
+[data-archetype="sporgk"] body,
+[data-archetype="sporgk"] #root {
+  background: radial-gradient(circle at 40% 20%, #3a1f0f 0%, #0d0f14 65%);
+}
+
+/* Constellation container */
+[data-archetype="sporgk"] .relative.flex-1.overflow-hidden {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 1px #ff6b35;
+}
+
+/* Purchasable nodes (the green ones in screenshot) */
+[data-archetype="sporgk"] button.border-terminal-pass {
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.5);
+  animation: sporgk-pulse 1.8s ease-in-out infinite alternate;
+}
+
+/* Ember glow on available nodes */
+@keyframes sporgk-pulse {
+  from { box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.4); }
+  to { box-shadow: 0 0 0 6px rgba(255, 107, 53, 0.7); }
+}
+
+/* Scanlines - applied to root */
+[data-archetype="sporgk"] #root::before {
   content: '';
   position: fixed;
   inset: 0;
+  pointer-events: none;
+  z-index: 9999;
   background: repeating-linear-gradient(
     0deg,
-    transparent,
-    transparent 2px,
-    rgba(255, 107, 53, 0.1) 2px,
-    rgba(255, 107, 53, 0.1) 4px
+    transparent 0px,
+    transparent 3px,
+    rgba(255, 107, 53, 0.15) 3px,
+    rgba(255, 107, 53, 0.15) 6px
   );
-  pointer-events: none;
-  z-index: 10;
-  animation: scanline-move 3s linear infinite;
-  opacity: 0.15;
+  animation: scanline-move 4s linear infinite;
+  opacity: 0.18;
 }
 
 @keyframes scanline-move {
