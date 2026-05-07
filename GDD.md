@@ -58,12 +58,22 @@ ability_total = sum of all abilities firing while STA permits, deterministic ord
 total         = raw_total + ability_total
 ```
 
-### Threshold curve (locked)
+### Threshold curve (rebalanced from playtest, supersedes earlier spec)
 
 ```
-threshold(turn) = floor(50 * 1.18 ^ (turn - 1))   // ~50 turn 1, ~1300 turn 20
+threshold(turn) = floor(20 * 1.18 ^ (turn - 1))   // ~20 turn 1, ~472 turn 20
 if turn % 5 == 0:  threshold *= 1.5               // boss multiplier
 ```
+
+| Turn | Threshold | Boss multiplier? |
+|---|---|---|
+| 1 | 20 | — |
+| 5 | 39 → **58** | yes |
+| 10 | 90 → **134** | yes |
+| 15 | 206 → **308** | yes |
+| 20 | 472 → **708** | yes (final) |
+
+**Why base 20, not 50:** The original GDD spec (`base 50`) made turn 1 unwinnable against realistic starting builds (~10 damage). Playtesting confirmed players couldn't build a meaningful character before being shoved into a fail state. Base 20 lets the early turns serve build-craft, with the curve still creating brutal late-game pressure. The water always rises; the entry point is just survivable.
 
 ### Resolution rules (locked, no exceptions)
 

@@ -12,9 +12,10 @@ function tierSlots(turn: number): ItemTier[] {
   return [ItemTier.T1, ItemTier.T2, ItemTier.T3, ItemTier.T4, null as unknown as ItemTier]
 }
 
-export function generateStore(rng: PRNG, turn: number, archetype: Archetype): string[] {
+export function generateStore(rng: PRNG, turn: number, archetype: Archetype, extraItems: ItemDef[] = []): string[] {
   const slots = tierSlots(turn)
-  const pool = getItemPool(archetype)
+  const basePool = getItemPool(archetype)
+  const pool = [...basePool, ...extraItems]
   const used = new Set<string>()
   const result: string[] = []
 

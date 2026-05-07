@@ -19,8 +19,9 @@ function distance(a: ConstellationNode, b: ConstellationNode): number {
   return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
-export function generateConstellation(rng: PRNG, archetype: Archetype): Constellation {
-  const pool = getNodePool(archetype)
+export function generateConstellation(rng: PRNG, archetype: Archetype, extraNodes: NodeDef[] = []): Constellation {
+  const basePool = getNodePool(archetype)
+  const pool = [...basePool, ...extraNodes]
   const defMap = new Map(pool.map((d) => [d.id, d]))
 
   const col0Nodes = pool.filter((n) => n.column === 0)

@@ -15,7 +15,7 @@ import { applyDiscount } from './game/economy/cost'
 import { generateEncounters } from './game/resolve/encounter'
 import { resolve } from './game/resolve/resolve'
 import { encodeShareString, createCompletedRun } from './game/save/serialize'
-import { checkCodexUnlocks } from './game/save/codex'
+import { checkCodexUnlocks, applyCodexModifiers } from './game/save/codex'
 import { loadFromDisk, saveCodex, saveSettings } from './game/save/storage'
 import { getItemById } from './data/items'
 import { getNodeById } from './data/nodes'
@@ -99,20 +99,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   startRun: (seed, archetype) => {
     const rng = createRNG(`${seed}_${archetype}`)
-    const constellation = generateConstellation(rng, archetype)
+    const codexEffects = applyCodexModifiers(archetype, get().codex.unlockedModifiers)
+    const constellation = generateConstellation(rng, archetype, codexEffects.extraNodes)
     const encounters = 1 <= PREP_TURNS ? [] : generateEncounters(rng, 1, 5)
 
     const startNodeId = constellation.startNodeId
     const startNode = constellation.nodes.get(startNodeId)
+
+    const baseStats = addStats({ ...STARTING_STATS[archetype] }, codexEffects.bonusStats)
 
     const run: RunState = {
       seed,
       archetype,
       turn: 1,
       phase: RunPhase.FORECAST,
-      stats: { ...STARTING_STATS[archetype] },
-      baseStats: { ...STARTING_STATS[archetype] },
-      gold: 80,
+      stats: { ...baseStats },
+      baseStats: { ...baseStats },
+      gold: 80 + codexEffects.bonusGold,
       constellation,
       draftedNodeIds: startNodeId ? [startNodeId] : [],
       inventory: [],
@@ -173,7 +176,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const run = get().run
     if (!run) return
     const rng = createRNG(`${run.seed}_${run.archetype}_t${run.turn}_s`)
-    const storeItems = generateStore(rng, run.turn, run.archetype)
+    const extraItems = applyCodexModifiers(run.archetype, get().codex.unlockedModifiers).extraItems
+    const storeItems = generateStore(rng, run.turn, run.archetype, extraItems)
     const drafts = 1 + run.extraNodeDrafts
     set({
       run: {
@@ -346,7 +350,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const completed = createCompletedRun(run)
     completed.shareString = shareString
 
-    const newUnlocks = checkCodexUnlocks(completed, get().codex)
+    const newUnlocks = checkCodexUnlocks(
+      completed,
+      get().codex,
+      run.stats,
+      run.inventory.length === 0,
+    )
     const newCodex: CodexState = {
       ...get().codex,
       completedRuns: [...get().codex.completedRuns, completed],

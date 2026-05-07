@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useGameStore } from '../store'
 import { Archetype } from '../types/enums'
 import { useSeed } from '../hooks/useSeed'
+import { parseShareString } from '../game/save/deserialize'
+import CodexModal from './CodexModal'
 
 const ARCHETYPES = [
   {
@@ -30,15 +32,33 @@ const ARCHETYPES = [
   },
 ]
 
-export default function ArchetypeSelect() {
+export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string) => void }) {
   const startRun = useGameStore((s) => s.startRun)
   const { dailySeed } = useSeed()
   const settings = useGameStore((s) => s.settings)
   const updateSettings = useGameStore((s) => s.updateSettings)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [codexOpen, setCodexOpen] = useState(false)
+  const [shareInput, setShareInput] = useState('')
+  const [shareError, setShareError] = useState('')
 
   function handleSelect(archetype: Archetype) {
     startRun(dailySeed, archetype)
+  }
+
+  function handleReplay() {
+    const parsed = parseShareString(shareInput.trim())
+    if (!parsed) {
+      setShareError('Invalid share string')
+      return
+    }
+    const validArches = ['SPRGK', 'ELF', 'VAMP']
+    if (!validArches.includes(parsed.archetype)) {
+      setShareError('Unknown archetype in share string')
+      return
+    }
+    setShareError('')
+    onReplay(shareInput.trim())
   }
 
   return (
@@ -76,6 +96,34 @@ export default function ArchetypeSelect() {
       <p className="text-terminal-text text-xs">
         Daily Seed: <span className="text-terminal-accent font-mono">{dailySeed}</span>
       </p>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={shareInput}
+          onChange={(e) => { setShareInput(e.target.value); setShareError('') }}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleReplay() }}
+          placeholder="Paste share string to replay..."
+          className="px-3 py-1.5 rounded border border-terminal-border bg-terminal-bg text-terminal-text-bright text-xs w-64 font-mono outline-none focus:border-terminal-accent"
+          aria-label="Share string input"
+        />
+        <button
+          onClick={handleReplay}
+          disabled={!shareInput.trim()}
+          className="px-3 py-1.5 rounded border border-terminal-accent text-terminal-accent text-xs hover:bg-terminal-accent/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        >
+          Replay
+        </button>
+      </div>
+      {shareError && <p className="text-terminal-fail text-xs">{shareError}</p>}
+
+      <button
+        onClick={() => setCodexOpen(true)}
+        className="absolute bottom-4 left-4 px-3 py-1.5 rounded border border-terminal-border text-terminal-text/60 text-xs hover:text-terminal-text-bright hover:border-terminal-accent transition-colors"
+        aria-label="Open Codex"
+      >
+        Codex
+      </button>
 
       <button
         onClick={() => setSettingsOpen(true)}
@@ -147,6 +195,7 @@ export default function ArchetypeSelect() {
           </div>
         </div>
       )}
+      {codexOpen && <CodexModal onClose={() => setCodexOpen(false)} />}
     </div>
   )
 }

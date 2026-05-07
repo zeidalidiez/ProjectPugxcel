@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useGameStore } from '../store'
+import { getModifierById } from '../data/codex/modifiers'
 
 export default function PostRunScreen() {
   const shareString = useGameStore((s) => s.run?.shareString)
@@ -9,9 +10,16 @@ export default function PostRunScreen() {
   const seed = useGameStore((s) => s.run?.seed)
   const resetRun = useGameStore((s) => s.resetRun)
   const saveBuild = useGameStore((s) => s.saveBuild)
+  const codex = useGameStore((s) => s.codex)
   const [copied, setCopied] = useState(false)
   const [buildName, setBuildName] = useState('')
   const [savingBuild, setSavingBuild] = useState(false)
+
+  const latestUnlock = useMemo(() => {
+    if (codex.unlockedModifiers.length === 0) return null
+    const last = codex.unlockedModifiers[codex.unlockedModifiers.length - 1]
+    return getModifierById(last)
+  }, [codex.unlockedModifiers])
 
   function handleCopy() {
     if (!shareString) return
@@ -23,7 +31,7 @@ export default function PostRunScreen() {
   return (
     <div className="h-full flex flex-col items-center justify-center gap-6" style={{ padding: '48px' }}>
       <div className={`text-6xl font-bold ${lastResult?.pass ? 'text-terminal-pass' : 'text-terminal-fail'}`}>
-        {lastResult?.pass ? 'PASS' : 'FAIL'}
+        {lastResult?.pass && turn !== undefined && turn >= 20 ? 'VICTORY' : lastResult?.pass ? 'PASS' : 'FAIL'}
       </div>
 
       <div className="flex flex-col gap-2 text-center">
@@ -51,6 +59,14 @@ export default function PostRunScreen() {
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
+        </div>
+      )}
+
+      {latestUnlock && (
+        <div className="px-4 py-3 rounded border border-terminal-accent bg-terminal-accent/10 max-w-md w-full text-center">
+          <div className="text-terminal-accent text-xs uppercase tracking-widest mb-1">Codex Unlocked</div>
+          <div className="text-terminal-text-bright text-sm font-bold">{latestUnlock.name}</div>
+          <div className="text-terminal-text text-xs">{latestUnlock.description}</div>
         </div>
       )}
 

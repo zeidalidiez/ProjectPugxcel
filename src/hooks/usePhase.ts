@@ -26,7 +26,11 @@ export function usePhase() {
         break
       case RunPhase.STINGER:
         if (run?.lastResult?.pass) {
-          advanceToForecast()
+          if (run.turn >= 20) {
+            endRun()
+          } else {
+            advanceToForecast()
+          }
         } else {
           endRun()
         }

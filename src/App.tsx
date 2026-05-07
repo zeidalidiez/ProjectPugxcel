@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useGameStore } from './store'
 import { RunPhase } from './types/enums'
 import { useKeyboardNav } from './hooks/useKeyboardNav'
@@ -9,6 +9,7 @@ import ArchetypeSelect from './components/ArchetypeSelect'
 import MainHUD from './components/MainHUD'
 import ExecuteTerminal from './components/ExecuteTerminal'
 import PostRunScreen from './components/PostRunScreen'
+import ReplayViewer from './components/ReplayViewer'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 export default function App() {
@@ -16,7 +17,8 @@ export default function App() {
   const initialized = useGameStore((s) => s.initialized)
   const init = useGameStore((s) => s.init)
   const reducedMotion = useReducedMotion()
-  const { style } = useFontScale()
+  const [replayShare, setReplayShare] = useState<string | null>(null)
+  useFontScale()
 
   useKeyboardNav()
   useAudio()
@@ -33,13 +35,20 @@ export default function App() {
     )
   }
 
+  if (replayShare) {
+    return (
+      <ErrorBoundary>
+        <ReplayViewer shareString={replayShare} onBack={() => setReplayShare(null)} />
+      </ErrorBoundary>
+    )
+  }
+
   return (
     <ErrorBoundary>
-      <div
-        className={`h-full ${reducedMotion ? 'motion-reduce' : ''}`}
-        style={style}
-      >
-        {phase === RunPhase.ARCHETYPE_SELECT && <ArchetypeSelect />}
+      <div className={`h-full ${reducedMotion ? 'motion-reduce' : ''}`}>
+        {phase === RunPhase.ARCHETYPE_SELECT && (
+          <ArchetypeSelect onReplay={setReplayShare} />
+        )}
         {(phase === RunPhase.FORECAST || phase === RunPhase.PAYOUT || phase === RunPhase.DRAFT) && <MainHUD />}
         {phase === RunPhase.STINGER && <ExecuteTerminal />}
         {phase === RunPhase.POST_RUN && <PostRunScreen />}
