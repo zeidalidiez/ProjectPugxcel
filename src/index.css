@@ -16,36 +16,14 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Archetype themes */
+[data-archetype="sporgk"] { --accent: #ff6b35; --glow: #ff6b35; }
+[data-archetype="elf"] { --accent: #38bdf8; --glow: #38bdf8; }
+[data-archetype="vampire"] { --accent: #c084fc; --glow: #c084fc; }
 
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
+/* Add scanlines, heavy glows, etc for each archetype */
 
 body {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 1.5;
   background: var(--color-terminal-bg);
-  color: var(--color-terminal-text);
-  -webkit-font-smoothing: antialiased;
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  /* ... */
 }
