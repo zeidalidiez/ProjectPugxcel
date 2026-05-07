@@ -15,6 +15,7 @@ export default function StoreModal() {
   return (
     <div className="flex flex-col gap-2 p-3 border border-terminal-border rounded bg-terminal-surface" role="region" aria-label="Store">
       <div className="text-terminal-text text-xs uppercase tracking-widest">Store</div>
+      <div className="text-terminal-text/30 text-[10px] font-mono mb-1">[Tab] to navigate items</div>
       <div className="grid grid-cols-5 gap-2">
         {storeItems.map((itemId) => {
           const def = getItemById(itemId)

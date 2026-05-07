@@ -6,6 +6,7 @@ import { applyDiscount } from '../game/economy/cost'
 import { StatType } from '../types/enums'
 import { STAT_LABELS } from '../types/stats'
 import type { ConstellationNode } from '../types/nodes'
+import { useAudio } from '../hooks/useAudio'
 
 export default function ConstellationViewport() {
   const constellation = useGameStore((s) => s.run?.constellation)
@@ -24,6 +25,8 @@ export default function ConstellationViewport() {
   const panning = useRef(false)
   const lastPos = useRef({ x: 0, y: 0 })
   const lastOffset = useRef({ x: 0, y: 0 })
+
+  const { playNodePurchase, playHover } = useAudio()
 
   const isDraft = phase === 'DRAFT'
 
@@ -147,10 +150,16 @@ export default function ConstellationViewport() {
                 onClick={(e) => {
                   if (canBuy) {
                     e.stopPropagation()
-                    purchaseNode(node.id)
+                    const success = purchaseNode(node.id)
+                    if (success) {
+                      playNodePurchase()
+                    }
                   }
                 }}
-                onPointerEnter={() => setHoveredNode(node)}
+                onPointerEnter={() => {
+                  setHoveredNode(node)
+                  playHover()
+                }}
                 onPointerLeave={() => setHoveredNode(null)}
                 disabled={!canBuy}
                 className={`

@@ -17,7 +17,7 @@ export default function StatPanel() {
   if (!stats || !baseStats) return null
 
   return (
-    <div className="flex flex-col gap-1 p-3 border border-terminal-border rounded bg-terminal-surface" role="region" aria-label="Player Stats">
+    <div className="flex flex-col gap-1 border border-terminal-border rounded bg-terminal-surface" style={{ padding: '14px' }} role="region" aria-label="Player Stats">
       <div className="text-terminal-text text-xs uppercase tracking-widest mb-2">Stats</div>
       {STAT_TYPE_VALUES.map((stat) => {
         const val = stats[stat]

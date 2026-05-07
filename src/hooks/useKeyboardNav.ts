@@ -1,30 +1,42 @@
 import { useEffect } from 'react'
 import { useGameStore } from '../store'
+import { RunPhase } from '../types/enums'
 
 export function useKeyboardNav() {
   const phase = useGameStore((s) => s.phase)
-  const advance = useGameStore((s) => s.advanceToForecast)
+  const advanceToPayout = useGameStore((s) => s.advanceToPayout)
+  const initDraft = useGameStore((s) => s.initDraft)
   const resetRun = useGameStore((s) => s.resetRun)
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        const active = document.activeElement
-        if (active && active !== document.body && active.tagName !== 'BODY') {
-          return
-        }
+      if (e.key !== 'Enter' && e.key !== ' ') return
+
+      const active = document.activeElement
+      const isInput = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.tagName === 'BUTTON')
+      if (isInput && active !== document.body) return
+
+      const currentPhase = useGameStore.getState().phase
+      const run = useGameStore.getState().run
+
+      if (currentPhase === RunPhase.ARCHETYPE_SELECT) return
+
+      if (currentPhase === RunPhase.POST_RUN && run?.runEnded) {
         e.preventDefault()
-        advance()
+        resetRun()
+        return
       }
-      if (e.key === 'Escape') {
-        const run = useGameStore.getState().run
-        if (run?.runEnded) {
-          resetRun()
-        }
+
+      if (currentPhase === RunPhase.FORECAST) {
+        e.preventDefault()
+        advanceToPayout()
+      } else if (currentPhase === RunPhase.PAYOUT) {
+        e.preventDefault()
+        initDraft()
       }
     }
 
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [phase, advance, resetRun])
+  }, [phase, advanceToPayout, initDraft, resetRun])
 }

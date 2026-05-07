@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { RunState } from './types/run'
-import type { CodexState, SettingsState } from './types/save'
+import type { CodexState, SettingsState, SavedBuild } from './types/save'
 import type { InventoryItem } from './types/items'
 import type { StatBlock } from './types/stats'
 import { RunPhase, Archetype, StatType } from './types/enums'
@@ -73,6 +73,7 @@ interface GameStore {
   getPurchasableNodeIds: () => string[]
   canAffordNode: (nodeId: string) => boolean
   canAffordItem: (itemId: string) => boolean
+  saveBuild: (name: string) => void
   hasDraftsRemaining: () => boolean
 }
 
@@ -276,6 +277,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     let newStats = { ...run.stats }
+
+    for (const eq of equipped) {
+      const oldDef = getItemById(eq.defId)
+      if (oldDef) {
+        for (const effect of oldDef.effects) {
+          if (effect.statBonus) {
+            for (const [statKey, val] of Object.entries(effect.statBonus)) {
+              newStats[statKey as StatType] = newStats[statKey as StatType] - val
+            }
+          }
+        }
+        if (oldDef.effects.some((e) => e.grantsAbility !== undefined)) {
+          const oldAbility = oldDef.effects.find((e) => e.grantsAbility)?.grantsAbility
+          if (oldAbility && !itemDef.effects.some((e) => e.grantsAbility === oldAbility)) {
+            newAbilities = newAbilities.filter((a) => a !== oldAbility)
+          }
+        }
+      }
+    }
+
     for (const effect of itemDef.effects) {
       if (effect.statBonus) {
         newStats = addStats(newStats, effect.statBonus)
@@ -390,6 +411,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!itemDef) return false
     const price = applyDiscount(itemDef.cost, run.stats[StatType.LCK])
     return run.gold >= price
+  },
+
+  saveBuild: (name) => {
+    const run = get().run
+    if (!run) return
+    const build: SavedBuild = {
+      name,
+      runId: `${run.seed}_${run.archetype}`,
+    }
+    const newCodex: CodexState = {
+      ...get().codex,
+      builds: [...get().codex.builds, build],
+    }
+    saveCodex(newCodex)
+    set({ codex: newCodex })
   },
 
   hasDraftsRemaining: () => {

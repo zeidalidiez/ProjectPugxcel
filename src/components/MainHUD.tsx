@@ -40,7 +40,7 @@ export default function MainHUD() {
   const activeIdx = phase ? PHASE_INDEX[phase] : -1
 
   return (
-    <div className="h-full flex flex-col gap-2 p-3">
+    <div className="h-full flex flex-col gap-2" style={{ padding: '24px' }}>
       <div className="flex items-center gap-3 px-4 py-3 rounded border border-terminal-border bg-terminal-surface">
         {isPrep && (
           <div className="bg-terminal-warn/20 text-terminal-warn text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mr-2">
@@ -73,7 +73,7 @@ export default function MainHUD() {
       </div>
 
       {phase && PHASE_HELP[phase as string] && (
-        <div className="text-terminal-accent text-xs font-mono px-1">
+        <div className="text-terminal-accent text-xs font-mono px-1" role="status">
           › {isPrep ? PHASE_HELP[phase as string].prep : PHASE_HELP[phase as string].encounter}
         </div>
       )}
@@ -103,28 +103,40 @@ export default function MainHUD() {
 
       <div className="border-t border-terminal-border pt-2">
         {phase === RunPhase.FORECAST && (
-          <button
-            onClick={() => useGameStore.getState().advanceToPayout()}
-            className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
-          >
-            Continue to Payout
-          </button>
+          <div>
+            <button
+              onClick={() => useGameStore.getState().advanceToPayout()}
+              className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
+              aria-label="Continue to Payout — press Enter or Space"
+            >
+              Continue to Payout
+            </button>
+            <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
+          </div>
         )}
         {phase === RunPhase.PAYOUT && (
-          <button
-            onClick={() => useGameStore.getState().initDraft()}
-            className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
-          >
-            Begin Drafting
-          </button>
+          <div>
+            <button
+              onClick={() => useGameStore.getState().initDraft()}
+              className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
+              aria-label="Begin Drafting — press Enter or Space"
+            >
+              Begin Drafting
+            </button>
+            <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
+          </div>
         )}
         {isDraft && isPrep && (
-          <button
-            onClick={() => useGameStore.getState().advanceToForecast()}
-            className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-warn text-black hover:bg-terminal-warn/80 transition-colors"
-          >
-            Advance to Next Turn
-          </button>
+          <div>
+            <button
+              onClick={() => useGameStore.getState().advanceToForecast()}
+              className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-warn text-black hover:bg-terminal-warn/80 transition-colors"
+              aria-label="Advance to Next Turn — press Enter or Space"
+            >
+              Advance to Next Turn
+            </button>
+            <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
+          </div>
         )}
         {isDraft && !isPrep && <ExecuteButton />}
       </div>

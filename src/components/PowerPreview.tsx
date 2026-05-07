@@ -65,6 +65,11 @@ export default function PowerPreview() {
         <div
           className={`h-full rounded-full transition-all duration-300 ${pct >= 100 ? 'bg-terminal-pass' : pct >= 50 ? 'bg-terminal-warn' : 'bg-terminal-fail'}`}
           style={{ width: `${pct}%` }}
+          role="progressbar"
+          aria-valuenow={power.rawPower}
+          aria-valuemin={0}
+          aria-valuemax={threshold}
+          aria-label={`Power: ${power.rawPower} out of ${threshold}`}
         />
       </div>
 
