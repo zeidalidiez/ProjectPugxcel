@@ -18,6 +18,8 @@ export default function PowerPreview() {
   const phase = useGameStore((s) => s.run?.phase)
   const archetype = useGameStore((s) => s.run?.archetype)
 
+  const balanceWeights = useGameStore((s) => s.run?.balanceWeights)
+
   const power = useMemo(() => {
     if (!stats || !inventory || turn === undefined || !archetype) return null
     const primary = PRIMARY_STAT[archetype]
@@ -47,7 +49,7 @@ export default function PowerPreview() {
 
   if (!power || !stats || turn === undefined) return null
 
-  const threshold = calculateThreshold(turn)
+  const threshold = calculateThreshold(turn, balanceWeights)
   const pct = Math.min(100, (power.rawPower / threshold) * 100)
   const isDraft = phase === 'DRAFT'
   const chance = isDraft ? 'Current' : 'Last'

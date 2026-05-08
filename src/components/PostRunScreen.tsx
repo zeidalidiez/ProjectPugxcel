@@ -30,7 +30,7 @@ export default function PostRunScreen() {
 
   return (
     <div className="h-full flex flex-col items-center justify-center gap-6" style={{ padding: '48px' }}>
-      <div className={`text-6xl font-bold ${lastResult?.pass ? 'text-terminal-pass' : 'text-terminal-fail'}`}>
+      <div className={`text-6xl font-bold ${lastResult?.pass ? 'text-terminal-pass' : 'text-terminal-fail'}`} style={{ fontFamily: 'var(--font-display)' }}>
         {lastResult?.pass && turn !== undefined && turn >= 20 ? 'VICTORY' : lastResult?.pass ? 'PASS' : 'FAIL'}
       </div>
 

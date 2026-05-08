@@ -95,7 +95,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   initialized: false,
 
   selectedPresetId: DEFAULT_PRESET,
-  balanceWeights: PRESETS[DEFAULT_PRESET],
+  balanceWeights: PRESETS[DEFAULT_PRESET as keyof typeof PRESETS],
   lastCustomWeights: null,
 
   init: () => {
@@ -122,7 +122,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       set({
         selectedPresetId: presetId,
-        balanceWeights: PRESETS[presetId],
+        balanceWeights: PRESETS[presetId as keyof typeof PRESETS],
       })
     }
   },

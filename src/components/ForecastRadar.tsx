@@ -17,6 +17,7 @@ const PREP_TURNS = 0
 export default function ForecastRadar() {
   const encounters = useGameStore((s) => s.run?.encounters)
   const turn = useGameStore((s) => s.run?.turn)
+  const balanceWeights = useGameStore((s) => s.run?.balanceWeights)
   const uncertaintyMode = useGameStore((s) => s.settings.uncertaintyMode)
   const [hoveredTurn, setHoveredTurn] = useState<number | null>(null)
 
@@ -76,7 +77,7 @@ export default function ForecastRadar() {
               T{t}{isBoss ? ' BOSS' : ''}
             </span>
             <span className="text-terminal-text text-[10px]">
-              {calculateThreshold(t)}
+              {calculateThreshold(t, balanceWeights)}
             </span>
             <div className="flex gap-0.5 mt-0.5">
               {enc.threatTags.slice(0, 2).map((tag) => (

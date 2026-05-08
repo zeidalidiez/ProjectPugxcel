@@ -13,24 +13,27 @@ const ARCHETYPES = [
     name: 'Sporgk',
     subtitle: 'The Asteroid Barbarian',
     description: 'Brutal raiders wielding rocket-greataxes. STR + STA. Brute force.',
-    color: 'bg-terminal-sporgk',
-    border: 'border-terminal-sporgk',
+    accentClass: 'bg-terminal-sporgk',
+    borderClass: 'border-terminal-sporgk',
+    bgTint: 'rgba(251, 146, 60, 0.08)',
   },
   {
     key: Archetype.ELF,
     name: 'Space Pug Elf',
     subtitle: 'The Crystalline Star-Farer',
     description: 'Graceful ancients on crystal galleons. AGI + LCK. Weak-then-exponential.',
-    color: 'bg-terminal-elf',
-    border: 'border-terminal-elf',
+    accentClass: 'bg-terminal-elf',
+    borderClass: 'border-terminal-elf',
+    bgTint: 'rgba(34, 211, 238, 0.08)',
   },
   {
     key: Archetype.VAMPIRE,
     name: 'Space Pug Vampire',
     subtitle: 'The Void Lord',
     description: 'Gothic undead in cathedral-ships. INT + STA. Synergy puzzle.',
-    color: 'bg-terminal-vampire',
-    border: 'border-terminal-vampire',
+    accentClass: 'bg-terminal-vampire',
+    borderClass: 'border-terminal-vampire',
+    bgTint: 'rgba(168, 85, 247, 0.08)',
   },
 ]
 
@@ -45,6 +48,7 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
   const [customPanelOpen, setCustomPanelOpen] = useState(false)
   const [shareInput, setShareInput] = useState('')
   const [shareError, setShareError] = useState('')
+  const [carouselIdx, setCarouselIdx] = useState(0)
 
   function handleSelect(archetype: Archetype) {
     startRun(dailySeed, archetype, balanceWeights)
@@ -68,7 +72,7 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
   return (
     <div className="h-full flex flex-col items-center justify-center gap-8 p-12 relative">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-terminal-text-bright tracking-widest mb-2">
+        <h1 className="text-4xl font-bold text-terminal-text-bright tracking-widest mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           PROJECT ANTIGRAVITY
         </h1>
         <p className="text-terminal-text text-sm">Choose your archetype</p>
@@ -76,26 +80,72 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
 
       <DifficultySelect onCustomClick={() => setCustomPanelOpen(true)} />
 
-      <div className="flex gap-6 max-w-4xl w-full justify-center flex-wrap">
-        {ARCHETYPES.map((arch) => (
+      <div className="flex items-center gap-4 max-w-xl w-full">
+        <button
+          onClick={() => setCarouselIdx((i) => (i - 1 + ARCHETYPES.length) % ARCHETYPES.length)}
+          className="w-10 h-10 flex items-center justify-center rounded border border-terminal-border text-terminal-text/60 hover:text-terminal-text-bright hover:border-terminal-accent transition-colors flex-shrink-0"
+          aria-label="Previous archetype"
+        >
+          ‹
+        </button>
+
+        {(() => {
+          const arch = ARCHETYPES[carouselIdx]
+          return (
+            <button
+              onClick={() => handleSelect(arch.key)}
+              onMouseEnter={() => document.documentElement.setAttribute('data-archetype', arch.key.toLowerCase())}
+              onMouseLeave={() => document.documentElement.removeAttribute('data-archetype')}
+              className="flex flex-col items-center text-center gap-5 rounded-lg border-2 border-terminal-border hover:border-terminal-accent transition-all flex-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-terminal-accent"
+              style={{ padding: '36px 28px', backgroundColor: arch.bgTint, borderColor: 'var(--accent)', borderWidth: '1px' }}
+              aria-label={`Select ${arch.name}`}
+            >
+              <div>
+                <div className="text-terminal-text-bright font-bold text-2xl" style={{ fontFamily: 'var(--font-display)' }}>{arch.name}</div>
+                <div className="text-terminal-text text-sm mt-1">{arch.subtitle}</div>
+              </div>
+              <p className="text-terminal-text text-sm leading-relaxed max-w-sm">{arch.description}</p>
+              <div className="flex gap-2">
+                {arch.key === Archetype.SPORGK && (
+                  <>
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(251,146,60,0.2)', color: '#fb923c' }}>STR</span>
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(251,146,60,0.2)', color: '#fb923c' }}>STA</span>
+                  </>
+                )}
+                {arch.key === Archetype.ELF && (
+                  <>
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(34,211,238,0.2)', color: '#22d3ee' }}>AGI</span>
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(34,211,238,0.2)', color: '#22d3ee' }}>LCK</span>
+                  </>
+                )}
+                {arch.key === Archetype.VAMPIRE && (
+                  <>
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>INT</span>
+                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>STA</span>
+                  </>
+                )}
+              </div>
+            </button>
+          )
+        })()}
+
+        <button
+          onClick={() => setCarouselIdx((i) => (i + 1) % ARCHETYPES.length)}
+          className="w-10 h-10 flex items-center justify-center rounded border border-terminal-border text-terminal-text/60 hover:text-terminal-text-bright hover:border-terminal-accent transition-colors flex-shrink-0"
+          aria-label="Next archetype"
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="flex gap-2">
+        {ARCHETYPES.map((_, i) => (
           <button
-            key={arch.key}
-            onClick={() => handleSelect(arch.key)}
-            className={`
-              flex flex-col items-center text-center gap-4 rounded-lg border-2 border-terminal-border
-              bg-terminal-surface hover:border-terminal-accent transition-colors
-              w-72 cursor-pointer focus-visible:ring-2 focus-visible:ring-terminal-accent
-            `}
-            style={{ padding: '28px' }}
-            aria-label={`Select ${arch.name}`}
-          >
-            <div className={`w-5 h-5 rounded-full ${arch.color} flex-shrink-0`} style={{ marginBottom: '4px' }} />
-            <div>
-              <div className="text-terminal-text-bright font-bold text-lg">{arch.name}</div>
-              <div className="text-terminal-text text-xs">{arch.subtitle}</div>
-            </div>
-            <p className="text-terminal-text text-sm leading-relaxed">{arch.description}</p>
-          </button>
+            key={i}
+            onClick={() => setCarouselIdx(i)}
+            className={`w-2 h-2 rounded-full transition-colors ${i === carouselIdx ? 'bg-terminal-accent' : 'bg-terminal-border'}`}
+            aria-label={`Go to archetype ${i + 1}`}
+          />
         ))}
       </div>
 

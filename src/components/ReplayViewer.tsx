@@ -6,10 +6,11 @@ import { purchaseNode } from '../game/constellation/purchase'
 import { generateEncounters } from '../game/resolve/encounter'
 import { resolve } from '../game/resolve/resolve'
 import { calculatePayout } from '../game/economy/payout'
-import { parseShareString } from '../game/save/deserialize'
+import { parseShareString, messageForError } from '../game/save/deserialize'
 import { EMPTY_STATS, addStats } from '../types/stats'
 import { Archetype, StatType, RunPhase } from '../types/enums'
 import type { RunState, CombatLogLine } from '../types/run'
+import { PRESETS } from '../data/balance-presets'
 
 interface ReplayViewerProps {
   shareString: string
@@ -31,7 +32,7 @@ export default function ReplayViewer({ shareString, onBack }: ReplayViewerProps)
     try {
       const result = parseShareString(shareString.trim())
       if (!result.ok) {
-        setError(result.error.message)
+        setError(messageForError(result.error))
         return
       }
       const parsed = result.data
@@ -120,6 +121,7 @@ export default function ReplayViewer({ shareString, onBack }: ReplayViewerProps)
           combatLog: [],
           lastResult: null,
           runEnded: false,
+          balanceWeights: PRESETS.normal,
           shareString: '',
         }
 

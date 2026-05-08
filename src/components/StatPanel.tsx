@@ -26,7 +26,7 @@ export default function StatPanel() {
         return (
           <div key={stat} className="flex items-center gap-2 text-sm" title={STAT_DESCRIPTIONS[stat]}>
             <span className="text-terminal-accent font-bold w-8">{STAT_LABELS[stat]}</span>
-            <span className="text-terminal-text-bright font-mono w-8 text-right">{val}</span>
+            <span className="text-terminal-text-bright font-mono w-8 text-right" style={{ fontFamily: 'var(--font-display)' }}>{val}</span>
             {gearBonus > 0 && (
               <span className="text-terminal-pass text-xs font-mono">+{gearBonus}</span>
             )}

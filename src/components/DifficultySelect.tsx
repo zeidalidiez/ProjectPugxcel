@@ -21,9 +21,9 @@ export default function DifficultySelect({ onCustomClick }: DifficultySelectProp
   }
 
   return (
-    <div className="flex flex-col items-center gap-2 w-full max-w-2xl">
-      <div className="text-terminal-text text-xs uppercase tracking-widest mb-1">Difficulty</div>
-      <div className="flex gap-2 flex-wrap justify-center">
+    <div className="flex flex-col items-center gap-2 w-full max-w-3xl">
+      <div className="text-terminal-text text-xs uppercase tracking-widest">Difficulty</div>
+      <div className="flex gap-1.5 w-full justify-center">
         {PRESET_IDS.map((id) => {
           const display = PRESET_DISPLAY[id]
           const isSelected = selectedPresetId === id
@@ -31,16 +31,18 @@ export default function DifficultySelect({ onCustomClick }: DifficultySelectProp
             <button
               key={id}
               onClick={() => handleSelect(id)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-2.5 rounded border text-xs transition-colors focus-visible:ring-2 focus-visible:ring-terminal-accent ${
+              className={`flex flex-col items-center justify-center gap-0.5 w-28 h-16 rounded border text-xs transition-colors focus-visible:ring-2 focus-visible:ring-terminal-accent ${
                 isSelected
-                  ? 'border-terminal-accent bg-terminal-accent/10 text-terminal-text-bright'
-                  : 'border-terminal-border bg-terminal-surface text-terminal-text hover:border-terminal-accent/60'
+                  ? 'border-terminal-accent bg-terminal-accent/15 text-terminal-text-bright shadow-[inset_0_0_12px_var(--accent-glow)]'
+                  : 'border-terminal-border bg-terminal-surface text-terminal-text hover:border-terminal-accent/40'
               }`}
               aria-pressed={isSelected}
-              aria-label={`Select ${display.label} difficulty`}
+              aria-label={`${display.label} difficulty`}
             >
-              <span className="font-bold tracking-wider">{display.label}</span>
-              <span className="text-terminal-text/60 text-[10px] leading-tight">{display.sub}</span>
+              <span className="font-bold tracking-wider" style={{ fontFamily: 'var(--font-display)', fontSize: '11px' }}>
+                {display.label.toUpperCase()}
+              </span>
+              <span className="text-terminal-text/50 text-[9px] leading-tight font-mono">{display.sub}</span>
             </button>
           )
         })}

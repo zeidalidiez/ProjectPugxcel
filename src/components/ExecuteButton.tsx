@@ -17,6 +17,7 @@ export default function ExecuteButton() {
             : 'bg-terminal-surface text-terminal-text/30 cursor-not-allowed'
           }
         `}
+        style={{ fontFamily: 'var(--font-display)' }}
         aria-label="Execute — press Enter or Space"
       >
         Execute

@@ -1,19 +1,21 @@
+@import "./styles/tokens.css";
 @import "tailwindcss";
 
 @theme {
-  --color-terminal-bg: #0d0f14;
-  --color-terminal-surface: #141820;
-  --color-terminal-border: #1e2430;
-  --color-terminal-text: #8b92a0;
-  --color-terminal-text-bright: #c8d0e0;
-  --color-terminal-accent: #7c8aff;
-  --color-terminal-pass: #4ade80;
-  --color-terminal-fail: #f87171;
-  --color-terminal-warn: #fbbf24;
-  --color-terminal-sporgk: #ff6b35;
-  --color-terminal-elf: #38bdf8;
-  --color-terminal-vampire: #c084fc;
+  --color-terminal-bg: var(--surface-0);
+  --color-terminal-surface: var(--surface-1);
+  --color-terminal-border: var(--border);
+  --color-terminal-text: var(--text-secondary);
+  --color-terminal-text-bright: var(--text-primary);
+  --color-terminal-accent: var(--accent);
+  --color-terminal-pass: var(--color-success);
+  --color-terminal-fail: var(--color-danger);
+  --color-terminal-warn: var(--color-warn);
+  --color-terminal-sporgk: #fb923c;
+  --color-terminal-elf: #22d3ee;
+  --color-terminal-vampire: #a855f7;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  --font-display: 'Major Mono Display', 'Courier New', monospace;
 }
 
 * {
@@ -32,8 +34,8 @@ body {
   font-family: var(--font-mono);
   font-size: 14px;
   line-height: 1.5;
-  background: var(--color-terminal-bg);
-  color: var(--color-terminal-text);
+  background: var(--surface-0);
+  color: var(--text-secondary);
   -webkit-font-smoothing: antialiased;
 }
 

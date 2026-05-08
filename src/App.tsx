@@ -16,6 +16,7 @@ export default function App() {
   const phase = useGameStore((s) => s.phase)
   const initialized = useGameStore((s) => s.initialized)
   const init = useGameStore((s) => s.init)
+  const archetype = useGameStore((s) => s.run?.archetype)
   const reducedMotion = useReducedMotion()
   const [replayShare, setReplayShare] = useState<string | null>(null)
   useFontScale()
@@ -26,6 +27,14 @@ export default function App() {
   useEffect(() => {
     init()
   }, [init])
+
+  useEffect(() => {
+    if (archetype) {
+      document.documentElement.setAttribute('data-archetype', archetype.toLowerCase())
+    } else {
+      document.documentElement.removeAttribute('data-archetype')
+    }
+  }, [archetype])
 
   if (!initialized) {
     return (

@@ -57,7 +57,7 @@ export function resolve(
   log.push(...abilityResult.lines)
 
   const total = damageResult.damage + abilityResult.totalDamage
-  const threshold = calculateThreshold(state.turn)
+  const threshold = calculateThreshold(state.turn, state.balanceWeights)
   const pass = total >= threshold
   const deficit = threshold - total
   const margin = (total - threshold) / threshold

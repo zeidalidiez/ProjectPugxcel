@@ -107,6 +107,7 @@ export default function MainHUD() {
             <button
               onClick={() => useGameStore.getState().advanceToPayout()}
               className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
+              style={{ fontFamily: 'var(--font-display)' }}
               aria-label="Continue to Payout — press Enter or Space"
             >
               Continue to Payout
@@ -119,6 +120,7 @@ export default function MainHUD() {
             <button
               onClick={() => useGameStore.getState().initDraft()}
               className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
+              style={{ fontFamily: 'var(--font-display)' }}
               aria-label="Begin Drafting — press Enter or Space"
             >
               Begin Drafting
@@ -131,6 +133,7 @@ export default function MainHUD() {
             <button
               onClick={() => useGameStore.getState().advanceToForecast()}
               className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-warn text-black hover:bg-terminal-warn/80 transition-colors"
+              style={{ fontFamily: 'var(--font-display)' }}
               aria-label="Advance to Next Turn — press Enter or Space"
             >
               Advance to Next Turn
