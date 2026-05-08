@@ -66,25 +66,29 @@ export function parseShareString(shareStr: string): ParseResult {
   let presetId: DifficultyPresetId = 'normal'
   let draftSeq: string
 
-  if (parts.length >= 4) {
+  // Strict preset code: 2 uppercase letters (EZ/NM/HD/NT or any future 2-letter code) OR CS-prefixed custom hash
+  const PRESET_CODE_RE = /^([A-Z]{2}|CS-[A-Z0-9]+)$/
+
+  if (parts.length >= 4 && PRESET_CODE_RE.test(parts[2])) {
     // New format: parts[2] = preset code, parts[3..] = draft seq
     const presetSegment = parts[2]
     draftSeq = parts.slice(3).join('/')
 
     if (presetSegment.startsWith('CS-')) {
-      // Custom weights — we can't recover full weights from hash alone, use normal as fallback
+      // Custom weights cannot be recovered from hash alone; use normal as fallback
       presetId = 'custom'
     } else {
       const resolved = REV_PRESET_CODE[presetSegment]
       if (resolved) {
         presetId = resolved
       } else {
-        // Unknown preset code — treat as normal (forward compat)
+        // Unknown 2-letter preset code (forward compat for future presets) — treat as normal
         presetId = 'normal'
       }
     }
   } else {
-    // Legacy 3-part format: parts[2] = draft seq, assume normal preset
+    // Legacy 3-part format OR segment 3 is not a valid preset code — treat as legacy.
+    // This is what allows draft sequences containing slashes (e.g. "DRAFT/EXTRA") to round-trip.
     draftSeq = parts.slice(2).join('/')
     presetId = 'normal'
   }
@@ -122,7 +126,6 @@ export function messageForError(error: DecodeError): string {
       return '> seed format unrecognized'
     case 'too_long':
       return `> share string too long (max ${error.max} characters)`
-    case 'invalid_draft':
-      return '> draft data corrupted'
+    case 'invalid_draft':*      return '> draft data corrupted'
   }
 }

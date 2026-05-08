@@ -103,7 +103,7 @@ export function encodeShareString(state: RunState): string {
   }
   const draftSeq = draftChars.join('')
 
-  const presetCode = resolvePresetCode(state.balanceWeights)
+  const presetCode = resolvePresetCode(state.balanceWeights ?? PRESETS.normal)
 
   return `ANTIGRAV/${arch}-${seed8}/${presetCode}/${draftSeq}`
 }
