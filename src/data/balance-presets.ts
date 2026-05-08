@@ -1,0 +1,66 @@
+import type { BalanceWeights, DifficultyPresetId } from '../types/balance'
+
+export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeights> = {
+  easy: {
+    curveType: 'linear',
+    curve: { base: 8, primarySlope: 5 },
+    bossMultiplier: 1.3,
+    finalBossMultiplier: 1.5,
+    itemPowerMultiplier: 1.15,
+    nodePowerMultiplier: 1.10,
+    structuralNodeAvailability: 1.0,
+    startingGoldMultiplier: 1.25,
+    perTurnPayoutMultiplier: 1.20,
+    luckEfficacyMultiplier: 1.10,
+    poolSizeMultiplier: 1.0,
+  },
+  normal: {
+    curveType: 'breakpoint',
+    curve: { base: 10, primarySlope: 6, secondarySlope: 9, breakpointTurn: 9 },
+    bossMultiplier: 1.5,
+    finalBossMultiplier: 1.8,
+    itemPowerMultiplier: 1.0,
+    nodePowerMultiplier: 1.0,
+    structuralNodeAvailability: 1.0,
+    startingGoldMultiplier: 1.0,
+    perTurnPayoutMultiplier: 1.0,
+    luckEfficacyMultiplier: 1.0,
+    poolSizeMultiplier: 1.0,
+  },
+  hard: {
+    curveType: 'breakpoint',
+    curve: { base: 12, primarySlope: 7, secondarySlope: 11, breakpointTurn: 8 },
+    bossMultiplier: 1.7,
+    finalBossMultiplier: 2.0,
+    itemPowerMultiplier: 0.90,
+    nodePowerMultiplier: 0.95,
+    structuralNodeAvailability: 1.0,
+    startingGoldMultiplier: 0.85,
+    perTurnPayoutMultiplier: 0.90,
+    luckEfficacyMultiplier: 1.0,
+    poolSizeMultiplier: 1.0,
+  },
+  nightmare: {
+    curveType: 'breakpoint',
+    curve: { base: 14, primarySlope: 8, secondarySlope: 13, breakpointTurn: 7 },
+    bossMultiplier: 1.85,
+    finalBossMultiplier: 2.3,
+    itemPowerMultiplier: 0.80,
+    nodePowerMultiplier: 0.85,
+    structuralNodeAvailability: 1.0,
+    startingGoldMultiplier: 0.70,
+    perTurnPayoutMultiplier: 0.80,
+    luckEfficacyMultiplier: 0.90,
+    poolSizeMultiplier: 0.85,
+  },
+}
+
+export const DEFAULT_PRESET: DifficultyPresetId = 'normal'
+
+export const PRESET_DISPLAY = {
+  easy:      { label: 'Easy',      sub: 'gentle ramp, generous economy' },
+  normal:    { label: 'Normal',    sub: 'the designed experience' },
+  hard:      { label: 'Hard',      sub: 'tight curve, scarce economy' },
+  nightmare: { label: 'Nightmare', sub: 'precision-only' },
+  custom:    { label: 'Custom',    sub: 'tweak everything yourself' },
+} as const
