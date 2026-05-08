@@ -1,0 +1,173 @@
+/* src/styles/tokens.css */
+/* Project Antigravity — Design Tokens v2 ("Astral Terminal v2") */
+
+@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Orbitron:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================================ */
+/*  Base — semantic palette, typography, spacing, motion       */
+/* ============================================================ */
+:root {
+  /* Surfaces */
+  --surface-0:        #0a0a0a;
+  --surface-1:        #141414;
+  --surface-2:        #1c1c1c;
+  --surface-3:        #262626;
+  --border:           #2a2a2a;
+  --border-strong:    #3f3f46;
+
+  /* Text */
+  --text-primary:     #e8e8e8;
+  --text-secondary:   #a1a1aa;
+  --text-tertiary:    #71717a;
+  --text-disabled:    #52525b;
+
+  /* Semantic colors — NEVER mix meanings */
+  --color-gold:       #facc15;   /* currency only */
+  --color-success:    #4ade80;   /* PASS / power / positive */
+  --color-danger:     #f87171;   /* FAIL / threats / boss warn */
+  --color-warn:       #fbbf24;   /* alerts */
+
+  /* Archetype accent — overridden per-archetype below */
+  --accent:            #fb923c;   /* defaults Sporgk */
+  --accent-soft:       #7c2d12;
+  --accent-glow:       rgba(251, 146, 60, 0.20);
+  --node-anchor-color: var(--accent);
+
+  /* Fonts */
+  --font-display:     'Major Mono Display', 'Courier New', monospace;
+  --font-display-alt: 'Orbitron', sans-serif;        /* use where MMD too narrow */
+  --font-mono:        'JetBrains Mono', 'IBM Plex Mono', monospace;
+  --font-body:        'Inter', system-ui, sans-serif;
+
+  /* Type scale */
+  --text-xs:    0.75rem;
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.25rem;
+  --text-xl:    1.5rem;
+  --text-2xl:   2rem;
+  --text-3xl:   2.5rem;
+  --text-display: 3.5rem;        /* hero / PASS-FAIL */
+
+  /* Spacing */
+  --space-1:    0.25rem;
+  --space-2:    0.5rem;
+  --space-3:    0.75rem;
+  --space-4:    1rem;
+  --space-5:    1.5rem;
+  --space-6:    2rem;
+  --space-8:    3rem;
+  --space-12:   4rem;
+
+  /* Radii — archetype overrides --radius-card */
+  --radius-none: 0;
+  --radius-sm:   2px;
+  --radius-md:   4px;
+  --radius-lg:   8px;
+  --radius-card: var(--radius-md);
+
+  /* Motion */
+  --motion-fast: 80ms;
+  --motion-base: 160ms;
+  --motion-slow: 320ms;
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadows / glow */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:   0 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 24px var(--accent-glow);
+
+  /* Constellation (Pixi consumes these as numbers) */
+  --node-radius:        14;
+  --node-anchor-radius: 22;
+  --node-line-color:        rgba(255, 255, 255, 0.12);
+  --node-line-color-active: rgba(255, 255, 255, 0.35);
+
+  /* Background mood (drift particle color/density) */
+  --background-mood-color:   #ffffff;
+  --background-mood-density: 0.04;
+}
+
+/* ============================================================ */
+/*  Archetype overrides — single attribute switches the theme  */
+/* ============================================================ */
+
+[data-archetype="sporgk"] {
+  --accent:                  #fb923c;
+  --accent-soft:             #7c2d12;
+  --accent-glow:             rgba(251, 146, 60, 0.20);
+  --radius-card:             var(--radius-none);   /* sharp 90° */
+  --background-mood-color:   #fb923c;
+  --background-mood-density: 0.06;
+}
+
+[data-archetype="elf"] {
+  --accent:                  #22d3ee;
+  --accent-soft:             #0e7490;
+  --accent-glow:             rgba(34, 211, 238, 0.20);
+  --radius-card:             var(--radius-sm);     /* 2px bevel */
+  --background-mood-color:   #22d3ee;
+  --background-mood-density: 0.04;
+}
+
+[data-archetype="vampire"] {
+  --accent:                  #a855f7;
+  --accent-soft:             #581c87;
+  --accent-glow:             rgba(168, 85, 247, 0.20);
+  --radius-card:             var(--radius-md);     /* 4px soft */
+  --background-mood-color:   #581c87;
+  --background-mood-density: 0.05;
+}
+
+/* ============================================================ */
+/*  Reduced motion                                             */
+/* ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================ */
+/*  Body baseline                                              */
+/* ============================================================ */
+body {
+  background-color: var(--surface-0);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.015) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+/* ============================================================ */
+/*  Tailwind v4 — expose tokens as Tailwind utilities          */
+/* ============================================================ */
+@theme {
+  --color-surface-0:      var(--surface-0);
+  --color-surface-1:      var(--surface-1);
+  --color-surface-2:      var(--surface-2);
+  --color-surface-3:      var(--surface-3);
+  --color-border:         var(--border);
+  --color-text:           var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-accent:         var(--accent);
+  --color-success:        var(--color-success);
+  --color-danger:         var(--color-danger);
+  --color-gold:           var(--color-gold);
+
+  --font-display:         var(--font-display);
+  --font-display-alt:     var(--font-display-alt);
+  --font-mono:            var(--font-mono);
+  --font-body:            var(--font-body);
+}
