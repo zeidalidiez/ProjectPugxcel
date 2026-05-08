@@ -5,6 +5,7 @@ import { computeDamage } from '../../../src/game/resolve/damage'
 import { fireAbilities, getMaxStamina } from '../../../src/game/resolve/abilities'
 import { resolve } from '../../../src/game/resolve/resolve'
 import { StatType, StingerVariant, ItemCategory, ItemSlot, ItemTier, Archetype, RunPhase } from '../../../src/types/enums'
+import { PRESETS } from '../../../src/data/balance-presets'
 import { EMPTY_STATS } from '../../../src/types/stats'
 import type { StatBlock } from '../../../src/types/stats'
 import type { ItemDef, InventoryItem } from '../../../src/types/items'
@@ -671,10 +672,15 @@ describe('resolve', () => {
   })
 
   it('<5% margin triggers BARELY_PASS', () => {
+    // Normal preset turn 9 threshold = 58 (breakpoint curve, non-boss).
+    // STR 60 -> damage 60, margin 2 -> 2/58 ≈ 3.4% which is under 5% -> BARELY_PASS.
+    // Earlier hard-coded values (turn 1, STR 20) assumed the legacy base-20 curve;
+    // that would now produce a comfortable PASS rather than a barely.
     const rng = createRNG('barely-pass')
     const state = makeRunState({
-      turn: 1,
-      stats: makeStats({ STR: 20, AGI: 0, STA: 0, LCK: 0 }),
+      turn: 9,
+      stats: makeStats({ STR: 60, AGI: 0, STA: 0, LCK: 0 }),
+      balanceWeights: PRESETS.normal,
     })
     const { result } = resolve(state, rng)
     expect(result.pass).toBe(true)
@@ -682,10 +688,12 @@ describe('resolve', () => {
   })
 
   it('<5% margin from below triggers BARELY_FAIL', () => {
+    // Normal preset turn 9 threshold = 58. STR 56 -> damage 56, deficit 2 -> 2/58 ≈ 3.4% -> BARELY_FAIL.
     const rng = createRNG('barely-fail')
     const state = makeRunState({
-      turn: 1,
-      stats: makeStats({ STR: 19, AGI: 0, STA: 0, LCK: 0 }),
+      turn: 9,
+      stats: makeStats({ STR: 56, AGI: 0, STA: 0, LCK: 0 }),
+      balanceWeights: PRESETS.normal,
     })
     const { result } = resolve(state, rng)
     expect(result.pass).toBe(false)

@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { calculateThreshold } from '../../../src/game/economy/threshold'
 import { calculatePayout } from '../../../src/game/economy/payout'
 import { applyDiscount } from '../../../src/game/economy/cost'
 import { generateStore, getStoreItems } from '../../../src/game/economy/store'
@@ -13,47 +12,10 @@ function isInteger(n: number): boolean {
   return Number.isInteger(n)
 }
 
-// ── Threshold ──
-
-describe('calculateThreshold', () => {
-    it('turn 1 = 20', () => {
-      expect(calculateThreshold(1)).toBe(20)
-    })
-
-    it('turn 5 (boss) is ~57', () => {
-      const t = calculateThreshold(5)
-      expect(t).toBe(57)
-    expect(isInteger(t)).toBe(true)
-  })
-
-    it('turn 20 (boss) matches formula', () => {
-      const t = calculateThreshold(20)
-      expect(t).toBeGreaterThan(500)
-      expect(t).toBeLessThan(1000)
-    expect(isInteger(t)).toBe(true)
-  })
-
-    it('non-boss turn: turn 3', () => {
-      const raw = Math.floor(20 * Math.pow(1.18, 2))
-      expect(calculateThreshold(3)).toBe(raw)
-    })
-
-    it('boss multiplier applied at turn % 5 === 0', () => {
-      const t5 = calculateThreshold(5)
-      const raw5 = Math.floor(20 * Math.pow(1.18, 4))
-      expect(t5).toBe(Math.floor(raw5 * 1.5))
-
-      const t10 = calculateThreshold(10)
-      const raw10 = Math.floor(20 * Math.pow(1.18, 9))
-      expect(t10).toBe(Math.floor(raw10 * 1.5))
-  })
-
-  it('no floating-point drift — returns integer', () => {
-    for (let turn = 1; turn <= 20; turn++) {
-      expect(isInteger(calculateThreshold(turn))).toBe(true)
-    }
-  })
-})
+// (Threshold tests moved to tests/game/balance/computeThreshold.test.ts —
+//  the new weights-based threshold function makes the old fixed-formula
+//  assertions obsolete. Coverage of integer output, boss multiplier, and
+//  curve shape is preserved there with explicit BalanceWeights.)
 
 // ── Payout ──
 
