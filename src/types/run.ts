@@ -3,6 +3,7 @@ import type { StatBlock } from './stats'
 import type { Constellation } from './nodes'
 import type { InventoryItem } from './items'
 import type { Encounter } from './encounters'
+import type { BalanceWeights } from './balance'
 
 export interface CombatLogLine {
   text: string
@@ -46,4 +47,7 @@ export interface RunState {
   runEnded: boolean
 
   shareString: string
+
+  /** Snapshot of the BalanceWeights active when this run was started. */
+  balanceWeights: BalanceWeights
 }

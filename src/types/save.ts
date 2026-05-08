@@ -1,4 +1,5 @@
 import type { Archetype } from './enums'
+import type { BalanceWeights, DifficultyPresetId } from './balance'
 
 export interface CompletedRun {
   id: string
@@ -34,9 +35,16 @@ export interface SettingsState {
   musicVolume: number
 }
 
+export interface MetaState {
+  selectedPresetId?: DifficultyPresetId
+  balanceWeights?: BalanceWeights
+  lastCustomWeights?: BalanceWeights | null
+}
+
 export interface SaveState {
   version: number
   run: unknown
   codex: CodexState
   settings: SettingsState
+  meta?: MetaState
 }

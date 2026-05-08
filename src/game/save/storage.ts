@@ -1,4 +1,4 @@
-import type { SaveState, CodexState, SettingsState } from '../../types/save'
+import type { SaveState, CodexState, SettingsState, MetaState } from '../../types/save'
 import { validateSave } from './schemas'
 
 const SAVE_KEY = 'antigravity_save'
@@ -72,4 +72,24 @@ export function saveSettings(settings: SettingsState): void {
 export function loadSettings(): SettingsState | null {
   const save = loadFromDisk()
   return save?.settings ?? null
+}
+
+export function saveMeta(meta: MetaState): void {
+  const existing = loadFromDisk()
+  if (existing) {
+    saveToDisk({ ...existing, meta: { ...existing.meta, ...meta } })
+  } else {
+    saveToDisk({
+      version: 1,
+      run: null,
+      codex: DEFAULT_CODEX,
+      settings: DEFAULT_SETTINGS,
+      meta,
+    })
+  }
+}
+
+export function loadMeta(): MetaState | null {
+  const save = loadFromDisk()
+  return save?.meta ?? null
 }

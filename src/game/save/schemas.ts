@@ -1,5 +1,6 @@
 import { z } from 'zod/v4'
 import { Archetype } from '../../types/enums'
+import { BalanceWeightsSchema } from '../../types/balance'
 
 const settingsSchema = z.object({
   fontSize: z.union([z.literal(100), z.literal(125), z.literal(150)]),
@@ -31,11 +32,18 @@ const codexSchema = z.object({
   })),
 })
 
+const metaSchema = z.object({
+  selectedPresetId: z.enum(['easy', 'normal', 'hard', 'nightmare', 'custom']).optional(),
+  balanceWeights: BalanceWeightsSchema.optional(),
+  lastCustomWeights: BalanceWeightsSchema.nullable().optional(),
+})
+
 export const saveSchema = z.object({
   version: z.number(),
   run: z.unknown(),
   codex: codexSchema,
   settings: settingsSchema,
+  meta: metaSchema.optional(),
 })
 
 export type ValidatedSave = z.infer<typeof saveSchema>

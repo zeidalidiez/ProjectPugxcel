@@ -3,6 +3,7 @@ import type { RunState } from './types/run'
 import type { CodexState, SettingsState, SavedBuild } from './types/save'
 import type { InventoryItem } from './types/items'
 import type { StatBlock } from './types/stats'
+import type { BalanceWeights, DifficultyPresetId } from './types/balance'
 import { RunPhase, Archetype, StatType } from './types/enums'
 import { EMPTY_STATS, addStats } from './types/stats'
 import { createRNG } from './game/rng/create'
@@ -19,6 +20,7 @@ import { checkCodexUnlocks, applyCodexModifiers } from './game/save/codex'
 import { loadFromDisk, saveCodex, saveSettings } from './game/save/storage'
 import { getItemById } from './data/items'
 import { getNodeById } from './data/nodes'
+import { PRESETS, DEFAULT_PRESET } from './data/balance-presets'
 
 const PREP_TURNS = 0
 
@@ -58,8 +60,16 @@ interface GameStore {
   settings: SettingsState
   initialized: boolean
 
+  /** Currently selected difficulty preset (persisted in MetaState) */
+  selectedPresetId: DifficultyPresetId
+  /** Currently active balance weights (from preset or custom) */
+  balanceWeights: BalanceWeights
+  /** Last used custom weights, preserved when switching back to custom */
+  lastCustomWeights: BalanceWeights | null
+
   init: () => void
-  startRun: (seed: string, archetype: Archetype) => void
+  startRun: (seed: string, archetype: Archetype, weights?: BalanceWeights) => void
+  setDifficulty: (presetId: DifficultyPresetId, customWeights?: BalanceWeights) => void
   advanceToForecast: () => void
   advanceToPayout: () => void
   initDraft: () => void
@@ -84,6 +94,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   initialized: false,
 
+  selectedPresetId: DEFAULT_PRESET,
+  balanceWeights: PRESETS[DEFAULT_PRESET],
+  lastCustomWeights: null,
+
   init: () => {
     const saved = loadFromDisk()
     if (saved) {
@@ -97,7 +111,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  startRun: (seed, archetype) => {
+  setDifficulty: (presetId, customWeights) => {
+    if (presetId === 'custom') {
+      const weights = customWeights ?? get().lastCustomWeights ?? PRESETS.normal
+      set({
+        selectedPresetId: 'custom',
+        balanceWeights: weights,
+        lastCustomWeights: weights,
+      })
+    } else {
+      set({
+        selectedPresetId: presetId,
+        balanceWeights: PRESETS[presetId],
+      })
+    }
+  },
+
+  startRun: (seed, archetype, weights) => {
+    const activeWeights = weights ?? get().balanceWeights
     const rng = createRNG(`${seed}_${archetype}`)
     const codexEffects = applyCodexModifiers(archetype, get().codex.unlockedModifiers)
     const constellation = generateConstellation(rng, archetype, codexEffects.extraNodes)
@@ -108,6 +139,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const baseStats = addStats({ ...STARTING_STATS[archetype] }, codexEffects.bonusStats)
 
+    const startingGold = Math.floor((80 + codexEffects.bonusGold) * activeWeights.startingGoldMultiplier)
+
     const run: RunState = {
       seed,
       archetype,
@@ -115,7 +148,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       phase: RunPhase.FORECAST,
       stats: { ...baseStats },
       baseStats: { ...baseStats },
-      gold: 80 + codexEffects.bonusGold,
+      gold: startingGold,
       constellation,
       draftedNodeIds: startNodeId ? [startNodeId] : [],
       inventory: [],
@@ -129,6 +162,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       lastResult: null,
       runEnded: false,
       shareString: '',
+      balanceWeights: activeWeights,
     }
 
     if (startNode && startNodeId) {
@@ -161,7 +195,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   advanceToPayout: () => {
     const run = get().run
     if (!run) return
-    const payout = calculatePayout(run.turn, run.stats[StatType.LCK])
+    const payout = calculatePayout(run.turn, run.stats[StatType.LCK], run.balanceWeights.perTurnPayoutMultiplier)
     set({
       run: {
         ...run,
@@ -177,7 +211,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!run) return
     const rng = createRNG(`${run.seed}_${run.archetype}_t${run.turn}_s`)
     const extraItems = applyCodexModifiers(run.archetype, get().codex.unlockedModifiers).extraItems
-    const storeItems = generateStore(rng, run.turn, run.archetype, extraItems)
+    const storeItems = generateStore(rng, run.turn, run.archetype, extraItems, run.balanceWeights.poolSizeMultiplier)
     const drafts = 1 + run.extraNodeDrafts
     set({
       run: {
