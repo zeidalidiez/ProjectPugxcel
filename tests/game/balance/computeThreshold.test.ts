@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { computeThreshold } from '../../src/game/balance/computeThreshold'
-import { PRESETS } from '../../src/data/balance-presets'
-import type { BalanceWeights } from '../../src/types/balance'
+import { computeThreshold } from '../../../src/game/balance/computeThreshold'
+import { PRESETS } from '../../../src/data/balance-presets'
+import type { BalanceWeights } from '../../../src/types/balance'
 
 describe('computeThreshold', () => {
   describe('linear curve', () => {

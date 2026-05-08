@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { calculatePayout } from '../../src/game/economy/payout'
-import { PRESETS } from '../../src/data/balance-presets'
+import { calculatePayout } from '../../../src/game/economy/payout'
+import { PRESETS } from '../../../src/data/balance-presets'
 
 describe('applyWeights economy integration', () => {
   describe('calculatePayout with perTurnPayoutMultiplier', () => {

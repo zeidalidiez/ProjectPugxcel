@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { parseShareString, resolveWeightsForParsedShare } from '../../src/game/save/deserialize'
-import { PRESETS } from '../../src/data/balance-presets'
+import { parseShareString, resolveWeightsForParsedShare } from '../../../src/game/save/deserialize'
+import { PRESETS } from '../../../src/data/balance-presets'
 
 describe('parseShareString', () => {
   describe('new format (4 parts with preset code)', () => {
