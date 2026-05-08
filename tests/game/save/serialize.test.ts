@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { parseShareString, resolveWeightsForParsedShare } from '../../../src/game/save/deserialize'
 import { PRESETS } from '../../../src/data/balance-presets'
+import { Archetype } from '../../../src/types/enums'
 
 describe('parseShareString', () => {
   describe('new format (4 parts with preset code)', () => {
@@ -8,7 +9,7 @@ describe('parseShareString', () => {
       const result = parseShareString('ANTIGRAV/ELF-ABCD1234/NM/012')
       expect(result.ok).toBe(true)
       if (result.ok) {
-        expect(result.data.archetype).toBe('elf')
+        expect(result.data.archetype).toBe(Archetype.ELF)
         expect(result.data.seed).toBe('ABCD1234')
         expect(result.data.draftSeq).toBe('012')
         expect(result.data.presetId).toBe('normal')
@@ -61,7 +62,7 @@ describe('parseShareString', () => {
       const result = parseShareString('ANTIGRAV/ELF-ABCD1234/012')
       expect(result.ok).toBe(true)
       if (result.ok) {
-        expect(result.data.archetype).toBe('elf')
+        expect(result.data.archetype).toBe(Archetype.ELF)
         expect(result.data.seed).toBe('ABCD1234')
         expect(result.data.draftSeq).toBe('012')
         expect(result.data.presetId).toBe('normal')
@@ -72,7 +73,7 @@ describe('parseShareString', () => {
       const result = parseShareString('ANTIGRAV/SPRGK-TESTTEST/0A1B')
       expect(result.ok).toBe(true)
       if (result.ok) {
-        expect(result.data.archetype).toBe('sporgk')
+        expect(result.data.archetype).toBe(Archetype.SPORGK)
       }
     })
 
@@ -80,7 +81,7 @@ describe('parseShareString', () => {
       const result = parseShareString('ANTIGRAV/VAMP-DEADBEE1/01234')
       expect(result.ok).toBe(true)
       if (result.ok) {
-        expect(result.data.archetype).toBe('vampire')
+        expect(result.data.archetype).toBe(Archetype.VAMPIRE)
       }
     })
   })

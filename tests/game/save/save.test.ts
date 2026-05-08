@@ -75,9 +75,9 @@ function buildRunState(overrides: Partial<RunState> = {}): RunState {
   }
 }
 
-// ============================================================
+// ===============================================================
 // serialize.ts tests
-// ============================================================
+// ===============================================================
 
 describe('encodeShareString', () => {
   it('produces a string starting with ANTIGRAV/', () => {
@@ -148,14 +148,14 @@ describe('encodeShareString', () => {
   it('uses Z for nodes not found in constellation', () => {
     const state = buildRunState({ draftedNodeIds: ['nonexistent_node'] })
     const result = encodeShareString(state)
-    const draftSeq = result.split('/')[2]
+    const draftSeq = result.split('/')[3]  // [3] = draft seq under new 4-part format
     expect(draftSeq).toBe('Z')
   })
 
   it('encodes empty draft sequence as empty string', () => {
     const state = buildRunState({ draftedNodeIds: [] })
     const result = encodeShareString(state)
-    const draftSeq = result.split('/')[2]
+    const draftSeq = result.split('/')[3]  // [3] = draft seq under new 4-part format
     expect(draftSeq).toBe('')
   })
 })
@@ -189,183 +189,20 @@ describe('createCompletedRun', () => {
   it('sets passed to false when lastResult pass is false', () => {
     const state = buildRunState({
       turn: 5,
-      runEnded: true,
-      lastResult: {
-        pass: false,
-        damageDealt: 200,
-        threshold: 400,
-        deficit: 200,
-        stingerVariant: 'FAIL' as any,
-      },
-    })
-    const run = createCompletedRun(state)
-    expect(run.passed).toBe(false)
-  })
+      runEnded: true,(����������I��ձ���(������������聙��͔�(�����������������������(��������ѡɕ͡��������(��������������������(���������ѥ����Y�ɥ���耝%0���́���(��������(������(��������Ё�ո��ɕ�ѕ�����ѕ�Iո��хє�(���������С�ո����͕���ѽ	�����͔�(����((���Р��ɕ͕�ٕ́ѡ��͡�ɔ���ɥ������������(��������Ё�хє��ե��IչMхє����ɸ��ȁ��(��������Ё�ո��ɕ�ѕ�����ѕ�Iո��хє�(���������С�ո�͡�ɕM�ɥ����ѽ	��������M��ɕM�ɥ����хє��(����((���Р��ɕ͕�ٕ́�Ʌ�ѕ�9���%�̜���������(��������Ё�хє��ե��IչMхє�쁑Ʌ�ѕ�9���%���l�����|Ĝ�������|ȝt���(��������Ё�ո��ɕ�ѕ�����ѕ�Iո��хє�(���������С�ո��Ʌ�ѕ�9���%�̤�ѽ�Յ��l�����|Ĝ�������|ȝt�(����)��(((������������������������������������������������������������������(�����͕ɥ���锹�́ѕ���(������������������������������������������������������������������()��͍ɥ�������͕M��ɕM�ɥ������������(���Р����͕́��م����͡�ɔ���ɥ������ɕ�ѱ䜰��������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�MAI,�	 ����h��(���������Сɕ�ձй����ѽ	����Ք�(��������ɕ�ձй�����(�����������Сɕ�ձй��ф��ɍ��������ѽ	��ɍ�������MA=I,�(�����������Сɕ�ձй��ф�͕����ѽ	���	 ��(�����������Сɕ�ձй��ф��Ʌ��M�Ĥ�ѽ	������h��(�����(����((���Р����͕́1��ɍ����������������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�1���������	��(���������Сɕ�ձй����ѽ	����Ք�(��������ɕ�ձй�����(�����������Сɕ�ձй��ф��ɍ��������ѽ	��ɍ�������1�(�����(����((���Р����͕́Y5@��ɍ����������������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�Y5@�M���нaeh��(���������Сɕ�ձй����ѽ	����Ք�(��������ɕ�ձй�����(�����������Сɕ�ձй��ф��ɍ��������ѽ	��ɍ�������Y5A%I�(�����(����((���Р�ɕ��ɹ́��ɽȁ��ȁ����9Q%IX�х�����������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����=Q!H�MAI,�M�IP��(���������Сɕ�ձй����ѽ	�����͔�(���������ɕ�ձй���������Сɕ�ձй��ɽȹ������ѽ	��������ɵ����(����((���Р�ɕ��ɹ́��ɽȁ��ȁ���ͥ���͕�����̜���������(���������С���͕M��ɕM�ɥ����9Q%IX�MAI,�M�������ѽ	�����͔�(���������С���͕M��ɕM�ɥ����9Q%IX�������ѽ	�����͔�(����((���Р�ɕ��ɹ́��ɽȁ��ȁչ���ݸ��ɍ����������ɕ٥�ѥ������������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�aaa`�M���нIP��(���������Сɕ�ձй����ѽ	�����͔�(���������ɕ�ձй���������Сɕ�ձй��ɽȹ������ѽ	�����م���}�ɍ��������(����((���Р�ɕ��ɹ́��ɽȁ��ȁ���ͥ���͕��Ʌѽȁ���͕����ЀȜ���������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�MAI-	 �IP��(���������Сɕ�ձй����ѽ	�����͔�(���������ɕ�ձй���������Сɕ�ձй��ɽȹ������ѽ	��������ɵ����(����((���Р�ɕ��ɹ́��ɽȁ��ȁ�����͕������������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�MAI,��IP��(���������Сɕ�ձй����ѽ	�����͔�(���������ɕ�ձй���������Сɕ�ձй��ɽȹ������ѽ	�����م���}͕����(����((���Р�ɕ��ɹ́��ɽȁ��ȁ�ձ��չ������������М���������(���������С���͕M��ɕM�ɥ����ձ���́��䤹����ѽ	�����͔�(���������С���͕M��ɕM�ɥ���չ���������́��䤹����ѽ	�����͔�(����((���Р��ɕ͕�ٕ́�Ʌ�Ё͕�Օ����ݥѠ��ձѥ����ͱ�͡�̜���������(��������Ёɕ�ձЀ����͕M��ɕM�ɥ����9Q%IX�1�M���нI�QaQI��(���������Сɕ�ձй����ѽ	����Ք�(��������ɕ�ձй���������Сɕ�ձй��ф��Ʌ��M�Ĥ�ѽ	���IP�aQI��(����)��((������������������������������������������������������������������(���������́ѕ���(������������������������������������������������������������������()�չ�ѥ������������ѕ�Iո��ٕ�ɥ����A��ѥ��������ѕ�IչQ���������������ѕ�IչQ�����(��ɕ��ɸ��(������耝�ո���Ĝ�(����͕��耝ѕ�е͕����(�����ɍ�������ɍ�������MA=I,�(������ɹI����������(�������͕����Ք�(�����������=�5�ɝ������(�����Ʌ�ѕ�9���%���mt�(����͡�ɕM�ɥ��耜��(����ѥ���х����є���ܠ��(��������ٕ�ɥ��̰(���)�()�չ�ѥ�����������Mхє��ٕ�ɥ����A��ѥ�������MхѕQ��������������MхѕQ�����(��ɕ��ɸ��(����չ������5���������mt�(����������ѕ�Iչ��mt�(���������ٕ������mt�(�����ե����mt�(��������ٕ�ɥ��̰(���)�()��͍ɥ�������������U�����̜���������(���Р�չ����́����ɥ��ݥ�}�ո��������ȁ���٥�ѽ�䜰��������(��������Ё�ո�􁵅�������ѕ�Iո�����͕����Ք���(��������Ё������􁵅������Mхє��(��������Ёչ����̀􁍡�������U�����̡�ո�������(���������Сչ����̤�ѽ��х�������}��Չ��}�Ʌ�М�(����((���Р�չ����́�ɍ����������������ݥ�}�ո��������Ȝ���������(��������Ё�ո�􁵅�������ѕ�Iո�����͕����Ք���ɍ�������ɍ�������MA=I,���(��������Ё������􁵅������Mхє��(��������Ёչ����̀􁍡�������U�����̡�ո�������(���������Сչ����̤��F�6��F��v��E��&�����FRr��Ґ���B�vF�W2��BV���6�w&��r�&6�WG�Rv���'V���F�f�W"r�������6��7B'V����T6���WFVE'V⇲76VC�G'VR�&6�WG�S�&6�WG�R�5�$t�Ґ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2����B�F�6��F��v��E�7'�7F�Ɩ�U�f�7W2r��W�V7B�V���6�2����B�F�6��F��v��E�f��E�F�V6�VBr��Ґ���B�wV���6�2&V6��GW&���F�f�W'2r�������6��7B'V����T6���WFVE'V⇲GW&�&V6�VC�b�76VC�f�6RҐ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2��F�6��F��v��E�v%�6�W7Br��W�V7B�V���6�2��F�6��F��v��E��V6���6�&�r��W�V7B�V���6�2��F�6��F��v��E�v��FV��w2r��W�V7B�V���6�2����۝Z[�	�[��[�\�[��I�B�JB��]
+	��\���[�����XX��\���[��[YH��Y]	�
 
-  it('preserves the share string', () => {
-    const state = buildRunState({ turn: 12 })
-    const run = createCompletedRun(state)
-    expect(run.shareString).toBe(encodeShareString(state))
-  })
+HO��ۜ��[�HXZ�P��\]Y�[��\���XX�Y�\��Y��[�HJB��ۜ���^HXZ�P��^�]J
+B��ۜ�[�����H�X����^[������[���^
+B�^X�
+[�����K������۝Z[�	�[���\���\�	�B�^X�
+[�����K������۝Z[�	�[��X��W��\�I�B�JB��]
+	�[�����\��]\W��[[��H[�Y�Y\���
 
-  it('preserves draftedNodeIds', () => {
-    const state = buildRunState({ draftedNodeIds: ['node_1', 'node_2'] })
-    const run = createCompletedRun(state)
-    expect(run.draftedNodeIds).toEqual(['node_1', 'node_2'])
-  })
-})
-
-// ============================================================
-// deserialize.ts tests
-// ============================================================
-
-describe('parseShareString', () => {
-  it('parses a valid share string correctly', () => {
-    const result = parseShareString('ANTIGRAV/SPRGK-ABCDEFGH/012Z')
-    expect(result.ok).toBe(true)
-    if (result.ok) {
-      expect(result.data.archetype).toBe(Archetype.SPORGK)
-      expect(result.data.seed).toBe('ABCDEFGH')
-      expect(result.data.draftSeq).toBe('012Z')
-    }
-  })
-
-  it('parses ELF archetype', () => {
-    const result = parseShareString('ANTIGRAV/ELF-12345678/ABC')
-    expect(result.ok).toBe(true)
-    if (result.ok) {
-      expect(result.data.archetype).toBe(Archetype.ELF)
-    }
-  })
-
-  it('parses VAMP archetype', () => {
-    const result = parseShareString('ANTIGRAV/VAMP-SEED1234/XYZ')
-    expect(result.ok).toBe(true)
-    if (result.ok) {
-      expect(result.data.archetype).toBe(Archetype.VAMPIRE)
-    }
-  })
-
-  it('returns error for non-ANTIGRAV tag', () => {
-    const result = parseShareString('OTHER/SPRGK-SEED/DRAFT')
-    expect(result.ok).toBe(false)
-    if (!result.ok) expect(result.error.kind).toBe('malformed')
-  })
-
-  it('returns error for missing segments', () => {
-    expect(parseShareString('ANTIGRAV/SPRGK-SEED').ok).toBe(false)
-    expect(parseShareString('ANTIGRAV').ok).toBe(false)
-  })
-
-  it('returns error for unknown archetype abbreviation', () => {
-    const result = parseShareString('ANTIGRAV/XXXX-SEED1234/DRAFT')
-    expect(result.ok).toBe(false)
-    if (!result.ok) expect(result.error.kind).toBe('invalid_archetype')
-  })
-
-  it('returns error for missing separator in segment 2', () => {
-    const result = parseShareString('ANTIGRAV/SPRGKABCDEFGH/DRAFT')
-    expect(result.ok).toBe(false)
-    if (!result.ok) expect(result.error.kind).toBe('malformed')
-  })
-
-  it('returns error for empty seed', () => {
-    const result = parseShareString('ANTIGRAV/SPRGK-/DRAFT')
-    expect(result.ok).toBe(false)
-    if (!result.ok) expect(result.error.kind).toBe('invalid_seed')
-  })
-
-  it('returns error for null/undefined input', () => {
-    expect(parseShareString(null as any).ok).toBe(false)
-    expect(parseShareString(undefined as any).ok).toBe(false)
-  })
-
-  it('preserves draft sequence with multiple slashes', () => {
-    const result = parseShareString('ANTIGRAV/ELF-SEED1234/DRAFT/EXTRA')
-    expect(result.ok).toBe(true)
-    if (result.ok) expect(result.data.draftSeq).toBe('DRAFT/EXTRA')
-  })
-})
-
-// ============================================================
-// codex.ts tests
-// ============================================================
-
-function makeCompletedRun(overrides: Partial<CompletedRunType> = {}): CompletedRunType {
-  return {
-    id: 'run-001',
-    seed: 'test-seed',
-    archetype: Archetype.SPORGK,
-    turnReached: 10,
-    passed: true,
-    deficitOrMargin: 50,
-    draftedNodeIds: [],
-    shareString: '',
-    timestamp: Date.now(),
-    ...overrides,
-  }
-}
-
-function makeCodexState(overrides: Partial<CodexStateType> = {}): CodexStateType {
-  return {
-    unlockedModifiers: [],
-    completedRuns: [],
-    achievements: [],
-    builds: [],
-    ...overrides,
-  }
-}
-
-describe('checkCodexUnlocks', () => {
-  it('unlocks generic win_run modifier on victory', () => {
-    const run = makeCompletedRun({ passed: true })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).toContain('mod_double_draft')
-  })
-
-  it('unlocks archetype-specific win_run modifier', () => {
-    const run = makeCompletedRun({ passed: true, archetype: Archetype.SPORGK })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).toContain('mod_iron_hide')
-  })
-
-  it('does not unlock wrong-archetype win_run modifier', () => {
-    const run = makeCompletedRun({ passed: true, archetype: Archetype.SPORGK })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_crystalline_focus')
-    expect(unlocks).not.toContain('mod_void_touched')
-  })
-
-  it('unlocks reach_turn modifiers', () => {
-    const run = makeCompletedRun({ turnReached: 16, passed: false })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).toContain('mod_war_chest')
-    expect(unlocks).toContain('mod_lucky_charm')
-    expect(unlocks).toContain('mod_golden_paws')
-    expect(unlocks).toContain('mod_endurance')
-  })
-
-  it('does not unlock reach_turn when value not met', () => {
-    const run = makeCompletedRun({ turnReached: 4, passed: false })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_war_chest')
-    expect(unlocks).not.toContain('mod_lucky_charm')
-  })
-
-  it('unlocks archetype_challenge modifiers', () => {
-    const run = makeCompletedRun({
-      passed: true,
-      archetype: Archetype.SPORGK,
-      turnReached: 15,
-    })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).toContain('mod_sporgk_berserker')
+HO��ۜ��[�HXZ�P��\]Y�[�\��Y��YK�\��]\N�\��]\K��ԑ�\���XX�Y�MK�JB��ۜ���^HXZ�P��^�]J
+B��ۜ�[�����H�X����^[������[���^
+B�^X�
+[�����K�toContain('mod_sporgk_berserker')
   })
 
   it('does not unlock archetype_challenge when wrong archetype', () => {
@@ -376,234 +213,4 @@ describe('checkCodexUnlocks', () => {
     })
     const codex = makeCodexState()
     const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_sporgk_berserker')
-    expect(unlocks).toContain('mod_elf_starweaver')
-  })
-
-  it('unlocks boss_kill when run passed and turn is divisible by 5', () => {
-    const run = makeCompletedRun({ passed: true, turnReached: 5 })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).toContain('mod_boss_slayer')
-  })
-
-  it('does not unlock boss_kill when run did not pass', () => {
-    const run = makeCompletedRun({ passed: false, turnReached: 5 })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_boss_slayer')
-  })
-
-  it('does not unlock boss_kill when turn not divisible by 5', () => {
-    const run = makeCompletedRun({ passed: true, turnReached: 7 })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_boss_slayer')
-  })
-
-  it('does not re-unlock already owned modifiers', () => {
-    const run = makeCompletedRun({ passed: true, turnReached: 20, archetype: Archetype.SPORGK })
-    const codex = makeCodexState({ unlockedModifiers: ['mod_double_draft', 'mod_iron_hide'] })
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_double_draft')
-    expect(unlocks).not.toContain('mod_iron_hide')
-    expect(unlocks).toContain('mod_boss_slayer')
-  })
-
-  it('does not unlock no_gear_run or stat_threshold (deferred)', () => {
-    const run = makeCompletedRun({ passed: true, turnReached: 20 })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).not.toContain('mod_naked_brawler')
-    expect(unlocks).not.toContain('mod_astral_wealth')
-    expect(unlocks).not.toContain('mod_collector')
-  })
-
-  it('returns empty array when nothing unlocks', () => {
-    const run = makeCompletedRun({ passed: false, turnReached: 1 })
-    const codex = makeCodexState()
-    const unlocks = checkCodexUnlocks(run, codex)
-    expect(unlocks).toEqual([])
-  })
-})
-
-// ============================================================
-// storage.ts tests
-// ============================================================
-
-function makeSaveState(overrides: Partial<SaveStateType> = {}): SaveStateType {
-  return {
-    version: 1,
-    run: null,
-    codex: {
-      unlockedModifiers: ['mod_double_draft'],
-      completedRuns: [],
-      achievements: ['ch_sporgk_victory'],
-      builds: [],
-    },
-    settings: {
-      fontSize: 125,
-      reducedMotion: false,
-      uncertaintyMode: false,
-      soundEnabled: true,
-      musicEnabled: true,
-      soundVolume: 0.8,
-      musicVolume: 0.4,
-    },
-    ...overrides,
-  }
-}
-
-describe('saveToDisk / loadFromDisk', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
-  it('round-trips a SaveState preserving all fields', () => {
-    const state = makeSaveState()
-    saveToDisk(state)
-    const loaded = loadFromDisk()
-    expect(loaded).not.toBeNull()
-    expect(loaded!.version).toBe(state.version)
-    expect(loaded!.codex.unlockedModifiers).toEqual(state.codex.unlockedModifiers)
-    expect(loaded!.codex.achievements).toEqual(state.codex.achievements)
-    expect(loaded!.settings.fontSize).toBe(state.settings.fontSize)
-    expect(loaded!.settings.soundEnabled).toBe(state.settings.soundEnabled)
-  })
-
-  it('returns null when no save exists', () => {
-    const loaded = loadFromDisk()
-    expect(loaded).toBeNull()
-  })
-
-  it('returns null for corrupted JSON', () => {
-    localStorage.setItem('antigravity_save', 'not-valid-json{{{')
-    const loaded = loadFromDisk()
-    expect(loaded).toBeNull()
-  })
-
-  it('returns null for invalid save data (wrong schema)', () => {
-    localStorage.setItem('antigravity_save', JSON.stringify({ version: 'wrong', run: null }))
-    const loaded = loadFromDisk()
-    expect(loaded).toBeNull()
-  })
-
-  it('returns null for empty object', () => {
-    localStorage.setItem('antigravity_save', JSON.stringify({}))
-    const loaded = loadFromDisk()
-    expect(loaded).toBeNull()
-  })
-
-  it('overwrites existing save', () => {
-    const state1 = makeSaveState({ version: 1 })
-    const state2 = makeSaveState({ version: 2 })
-    saveToDisk(state1)
-    saveToDisk(state2)
-    const loaded = loadFromDisk()
-    expect(loaded!.version).toBe(2)
-  })
-})
-
-describe('saveCodex / loadCodex', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
-  it('saves and loads codex state', () => {
-    const codex = {
-      unlockedModifiers: ['mod_iron_hide', 'mod_double_draft'],
-      completedRuns: [],
-      achievements: [],
-      builds: [],
-    }
-    saveCodex(codex)
-    const loaded = loadCodex()
-    expect(loaded.unlockedModifiers).toEqual(['mod_iron_hide', 'mod_double_draft'])
-  })
-
-  it('returns default codex when no save exists', () => {
-    const loaded = loadCodex()
-    expect(loaded.unlockedModifiers).toEqual([])
-    expect(loaded.completedRuns).toEqual([])
-    expect(loaded.achievements).toEqual([])
-    expect(loaded.builds).toEqual([])
-  })
-
-  it('preserves other save data when updating codex', () => {
-    const state = makeSaveState()
-    saveToDisk(state)
-
-    const newCodex = {
-      unlockedModifiers: ['mod_boss_slayer'],
-      completedRuns: [
-        {
-          id: 'r1',
-          seed: 's',
-          archetype: Archetype.SPORGK,
-          turnReached: 5,
-          passed: true,
-          deficitOrMargin: 0,
-          draftedNodeIds: [],
-          shareString: '',
-          timestamp: 0,
-        },
-      ],
-      achievements: [],
-      builds: [],
-    }
-    saveCodex(newCodex)
-
-    const loaded = loadFromDisk()
-    expect(loaded!.codex.unlockedModifiers).toEqual(['mod_boss_slayer'])
-    expect(loaded!.codex.completedRuns.length).toBe(1)
-    expect(loaded!.settings.fontSize).toBe(state.settings.fontSize)
-  })
-})
-
-describe('saveSettings / loadSettings', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
-  it('saves and loads settings', () => {
-    const settings = {
-      fontSize: 150 as const,
-      reducedMotion: true,
-      uncertaintyMode: true,
-      soundEnabled: false,
-      musicEnabled: false,
-      soundVolume: 0.5,
-      musicVolume: 0.2,
-    }
-    saveSettings(settings)
-    const loaded = loadSettings()
-    expect(loaded?.fontSize).toBe(150)
-    expect(loaded?.reducedMotion).toBe(true)
-    expect(loaded?.soundEnabled).toBe(false)
-  })
-
-  it('returns null when no settings saved', () => {
-    const loaded = loadSettings()
-    expect(loaded).toBeNull()
-  })
-
-  it('preserves other save data when updating settings', () => {
-    const state = makeSaveState()
-    saveToDisk(state)
-
-    const newSettings = {
-      fontSize: 100 as const,
-      reducedMotion: true,
-      uncertaintyMode: true,
-      soundEnabled: true,
-      musicEnabled: false,
-      soundVolume: 0.3,
-      musicVolume: 0.1,
-    }
-    saveSettings(newSettings)
-
-    const loaded = loadFromDisk()
-    expect(loaded!.settings.fontSize).toBe(100)
-    expect(loaded!.codex.unlockedModifiers).toEqual(state.codex.unlockedModifiers)
-  })
-})
+    expect(unlocks).not.�ѽ��х�������}���ɝ�}���͕ɭ�Ȝ�(���������Сչ����̤�F�6��F��v��E�V�e�7F'vVfW"r��Ґ���B�wV���6�2&�75�����v�V�'V�76VB�BGW&��2F�f�6�&�R'�Rr�������6��7B'V����T6���WFVE'V⇲76VC�G'VR�GW&�&V6�VC�RҐ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2��F�6��F��v��E�&�75�6��W"r��Ґ���B�vF�W2��BV���6�&�75�����v�V�'V�F�B��B72r�������6��7B'V����T6���WFVE'V⇲76VC�f�6R�GW&�&V6�VC�RҐ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2����B�F�6��F��v��E�&�75�6��W"r��Ґ���B�vF�W2��BV���6�&�75�����v�V�GW&���BF�f�6�&�R'�Rr�������6��7B'V����T6���WFVE'V⇲76VC�G'VR�GW&�&V6�VC�rҐ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2����B�F�6��F��v��E�&�75�6��W"r��Ґ���B�vF�W2��B&R�V���6��&VG��v�VB��F�f�W'2r�������6��7B'V����T6���WFVE'V⇲76VC�G'VR�GW&�&V6�VC�#�&6�WG�S�&6�WG�R�5�$t�Ґ�6��7B6�FW����T6�FW�7FFR��V���6�VD��F�f�W'3��v��E�F�V&�U�G&gBr�v��E��&�����FRu�Ґ�6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2����B�F�6��F��v��E�F�V&�U�G&gBr��W�V7B�V���6�2����B�F�6��F��v��E��&�����FRr��W�V7B�V���6�2��F�6��F��v��E�&�75�6��W"r��Ґ���B�vF�W2��BV���6����vV%�'V��"7FE�F�&W6���B�FVfW'&VB�r�������6��7B'V����T6���WFVE'V⇲76VC�G'VR�GW&�&V6�VC�#Ґ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2����B�F�6��F��v��E���VE�'&v�W"r��W�V7B�V���6�2����B�F�6��F��v��E�7G&��vV�F�r��W�V7B�V���6�2����B�F�6��F��v��E�6���V7F�"r��Ґ���B�w&WGW&�2V�G�'&�v�V���F���rV���6�2r�������6��7B'V����T6���WFVE'V⇲76VC�f�6R�GW&�&V6�VC�Ґ�6��7B6�FW����T6�FW�7FFR���6��7BV���6�2�6�V6�6�FW�V���6�2�'V��6�FW���W�V7B�V���6�2��F�WV�Ґ�Ґ�Ґ������������������������������������������������������������������Т��7F�&vR�G2FW7G0�����������������������������������������������������������������Р�gV�7F�����U6fU7FFR��fW'&�FW3�'F���6fU7FFUG�S���ғ�6fU7FFUG�R��&WGW&���fW'6�����'V��V����6�FW����V���6�VD��F�f�W'3��v��E�F�V&�U�G&gBu���6���WFVE'V�3�����6��WfV�V�G3��v6��7�&v��f�7F�'�u���'V��G3��������6WGF��w3���f��E6��S�#R��&VGV6VD��F���f�6R��V�6W'F��G���FS�f�6R��6�V�DV�&�VC�G'VR���W6�4V�&�VC�G'VR��6�V�Ef��V�S�����W6�5f��V�S��B���������fW'&�FW2��ЧР�FW67&�&R�w6fUF�F�6����Dg&��F�6�r�������&Vf�&TV6����������6�7F�&vR�6�V"���Ґ���B�w&�V�B�G&�26fU7FFR&W6W'f��r��f�V�G2r�������6��7B7FFR���U6fU7FFR���6fUF�F�6��7FFR��6��7B��FVB���Dg&��F�6����W�V7B���FVB����B�F�&T�V���W�V7B���FVB�fW'6����F�&R�7FFR�fW'6��␢W�V7B���FVB�6�FW��V���6�VD��F�f�W'2��F�WV7FFR�6�FW��V���6�VD��F�f�W'2��W�V7B���FVB�6�FW��6��WfV�V�G2��F�WV7FFR�6�FW��6��WfV�V�G2��W�V7B���FVB�6WGF��w2�f��E6��R��F�&R�7FFR�6WGF��w2�f��E6��R��W�V7B���FVB�6WGF��w2�6�V�DV�&�VB��F�&R�7FFR�6WGF��w2�6�V�DV�&�VB��Ґ���B�w&WGW&�2�V��v�V���6fRW��7G2r�������6��7B��FVB���Dg&��F�6����W�V7B���FVB��F�&T�V���Ґ���B�w&WGW&�2�V��f�"6�''WFVB�4��r���������6�7F�&vR�6WD�FV҂v�F�w&f�G��6fRr�v��B�fƖB֧6�緷�r��6��7B��FVB���Dg&��F�6����W�V7B���FVB��F�&T�V���Ґ���B�w&WGW&�2�V��f�"��fƖB6fRFF�w&��r66�V��r���������6�7F�&vR�6WD�FV҂v�F�w&f�G��6fRr��4���7G&��v�g���fW'6���ww&��rr�'V��V��Ғ��6��7B��FVB���Dg&��F�6����W�V7B���FVB��F�&T�V���Ґ���B�w&WGW&�2�V��f�"V�G��&�V7Br���������6�7F�&vR�6WD�FV҂v�F�w&f�G��6fRr��4���7G&��v�g���Ғ��6��7B��FVB���Dg&��F�6����W�V7B���FVB��F�&T�V���Ґ���B�v�fW'w&�FW2W��7F��r6fRr�������6��7B7FFS���U6fU7FFR��fW'6���Ґ�6��7B7FFS"���U6fU7FFR��fW'6���"Ґ�6fUF�F�6��7FFS��6fUF�F�6��7FFS"��6��7B��FVB���Dg&��F�6����W�V7B���FVB�fW'6����F�&R�"��Ґ�Ґ��FW67&�&R�w6fT6�FW����D6�FW�r�������&Vf�&TV6����������6�7F�&vR�6�V"���Ґ���B�w6fW2�B��G26�FW�7FFRr�������6��7B6�FW����V���6�VD��F�f�W'3��v��E��&�����FRr�v��E�F�V&�U�G&gBu���6���WFVE'V�3�����6��WfV�V�G3�����'V��G3�����Т6fT6�FW��6�FW���6��7B��FVB���D6�FW����W�V7B���FVB�V���6�VD��F�f�W'2��F�WV�v��E��&�����FRr�v��E�F�V&�U�G&gBuҐ�Ґ���B�w&WGW&�2FVfV�B6�FW�v�V���6fRW��7G2r�������6��7B��FVB���D6�FW����W�V7B���FVB�V���6�VD��F�f�W'2��F�WV�Ґ�W�V7B���FVB�6���WFVE'V�2��F�WV�Ґ�W�V7B���FVB�6��WfV�V�G2��F�WV�Ґ�W�V7B���FVB�'V��G2��F�WV�Ґ�Ґ���B�w&W6W'fW2�F�W"6fRFFv�V�WFF��r6�FW�r�������6��7B7FFR���U6fU7FFR���6fUF�F�6��7FFR���6��7B�Wt6�FW����V���6�VD��F�f�W'3��v��E�&�75�6��W"u���6���WFVE'V�3������C�w#r��6VVC�w2r��&6�WG�S�&6�WG�R�5�$t���GW&�&V6�VC�R��76VC�G'VR��FVf�6�D�$�&v����G&gFVD��FT�G3�����6�&U7G&��s�rr��F��W7F����������6��WfV�V�G3�����'V��G3�����Т6fT6�FW���Wt6�FW����6��7B��FVB���Dg&��F�6����W�V7B���FVB�6�FW��V���6�VD��F�f�W'2��F�WV�v��E�&�75�6��W"uҐ�W�V7B���FVB�6�FW��6���WFVE'V�2��V�wF���F�&R���W�V7B���FVB�6WGF��w2�f��E6��R��F�&R�7FFR�6WGF��w2�f��E6��R��Ґ�Ґ��FW67&�&R�w6fU6WGF��w2���E6WGF��w2r�������&Vf�&TV6����������6�7F�&vR�6�V"���Ґ���B�w6fW2�B��G26WGF��w2r�������6��7B6WGF��w2���f��E6��S�S26��7B��&VGV6VD��F���G'VR��V�6W'F��G���FS�G'VR��6�V�DV�&�VC�f�6R���W6�4V�&�VC�f�6R��6�V�Ef��V�S��R���W6�5f��V�S��"��Т6fU6WGF��w2�6WGF��w2��6��7B��FVB���E6WGF��w2���W�V7B���FVC��f��E6��R��F�&R�S��W�V7B���FVC��&VGV6VD��F����F�&R�G'VR��W�V7B���FVC��6�V�DV�&�VB��F�&R�f�6R��Ґ���B�w&WGW&�2�V��v�V���6WGF��w26fVBr�������6��7B��FVB���E6WGF��w2���W�V7B���FVB��F�&T�V���Ґ���B�w&W6W'fW2�F�W"6fRFFv�V�WFF��r6WGF��w2r�������6��7B7FFR���U6fU7FFR���6fUF�F�6��7FFR���6��7B�Wu6WGF��w2���f��E6��S�26��7B��&VGV6VD��F���G'VR��V�6W'F��G���FS�G'VR��6�V�DV�&�VC�G'VR���W6�4V�&�VC�f�6R��6�V�Ef��V�S��2���W6�5f��V�S����Т6fU6WGF��w2��Wu6WGF��w2���6��7B��FVB���Dg&��F�6����W�V7B���FVB�6WGF��w2�f��E6��R��F�&R���W�V7B���FVB�6�FW��V���6�VD��F�f�W'2��F�WV7FFR�6�FW��V���6�VD��F�f�W'2��Ґ�Ґ
