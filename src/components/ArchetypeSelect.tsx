@@ -4,6 +4,8 @@ import { Archetype } from '../types/enums'
 import { useSeed } from '../hooks/useSeed'
 import { parseShareString, messageForError } from '../game/save/deserialize'
 import CodexModal from './CodexModal'
+import DifficultySelect from './DifficultySelect'
+import CustomDifficultyPanel from './CustomDifficultyPanel'
 
 const ARCHETYPES = [
   {
@@ -37,13 +39,15 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
   const { dailySeed } = useSeed()
   const settings = useGameStore((s) => s.settings)
   const updateSettings = useGameStore((s) => s.updateSettings)
+  const balanceWeights = useGameStore((s) => s.balanceWeights)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [codexOpen, setCodexOpen] = useState(false)
+  const [customPanelOpen, setCustomPanelOpen] = useState(false)
   const [shareInput, setShareInput] = useState('')
   const [shareError, setShareError] = useState('')
 
   function handleSelect(archetype: Archetype) {
-    startRun(dailySeed, archetype)
+    startRun(dailySeed, archetype, balanceWeights)
   }
 
   function handleReplay() {
@@ -69,6 +73,8 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
         </h1>
         <p className="text-terminal-text text-sm">Choose your archetype</p>
       </div>
+
+      <DifficultySelect onCustomClick={() => setCustomPanelOpen(true)} />
 
       <div className="flex gap-6 max-w-4xl w-full justify-center flex-wrap">
         {ARCHETYPES.map((arch) => (
@@ -196,6 +202,7 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
         </div>
       )}
       {codexOpen && <CodexModal onClose={() => setCodexOpen(false)} />}
+      {customPanelOpen && <CustomDifficultyPanel onClose={() => setCustomPanelOpen(false)} />}
     </div>
   )
 }
