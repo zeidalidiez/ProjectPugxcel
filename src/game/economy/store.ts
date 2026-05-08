@@ -12,7 +12,13 @@ function tierSlots(turn: number): ItemTier[] {
   return [ItemTier.T1, ItemTier.T2, ItemTier.T3, ItemTier.T4, null as unknown as ItemTier]
 }
 
-export function generateStore(rng: PRNG, turn: number, archetype: Archetype, extraItems: ItemDef[] = []): string[] {
+export function generateStore(
+  rng: PRNG,
+  turn: number,
+  archetype: Archetype,
+  extraItems: ItemDef[] = [],
+  poolSizeMultiplier = 1.0,
+): string[] {
   const slots = tierSlots(turn)
   const basePool = getItemPool(archetype)
   const pool = [...basePool, ...extraItems]
@@ -30,7 +36,8 @@ export function generateStore(rng: PRNG, turn: number, archetype: Archetype, ext
     result.push(picked.id)
   }
 
-  return result.slice(0, 5)
+  const maxItems = Math.max(1, Math.round(5 * poolSizeMultiplier))
+  return result.slice(0, maxItems)
 }
 
 export function getStoreItems(storeItemIds: string[], _archetype: Archetype): ItemDef[] {

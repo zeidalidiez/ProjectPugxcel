@@ -1,7 +1,8 @@
-export function calculateThreshold(turn: number): number {
-  const threshold = Math.floor(20 * Math.pow(1.18, turn - 1))
-  if (turn % 5 === 0) {
-    return Math.floor(threshold * 1.5)
-  }
-  return threshold
+import type { BalanceWeights } from '../../types/balance'
+import { computeThreshold } from '../balance/computeThreshold'
+import { PRESETS } from '../../data/balance-presets'
+
+/** Legacy wrapper: uses normal-preset weights for backwards-compatible callers. */
+export function calculateThreshold(turn: number, weights?: BalanceWeights): number {
+  return computeThreshold(turn, weights ?? PRESETS.normal)
 }

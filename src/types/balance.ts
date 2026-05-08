@@ -1,35 +1,49 @@
-aW1wb3J0IHsgeiB9IGZyb20gJ3pvZC92NCcKCmV4cG9ydCB0eXBlIEN1cnZl
-VHlwZSA9ICdsaW5lYXInIHwgJ2JyZWFrcG9pbnQnIHwgJ3F1YWRyYXRpYycK
-CmV4cG9ydCB0eXBlIERpZmZpY3VsdHlQcmVzZXRJZCA9ICdlYXN5JyB8ICdu
-b3JtYWwnIHwgJ2hhcmQnIHwgJ25pZ2h0bWFyZScgfCAnY3VzdG9tJwoKZXhw
-b3J0IGludGVyZmFjZSBDdXJ2ZVBhcmFtcyB7CiAgYmFzZTogbnVtYmVyCiAg
-cHJpbWFyeVNsb3BlOiBudW1iZXIKICBzZWNvbmRhcnlTbG9wZT86IG51bWJl
-ciAgIC8vIGJyZWFrcG9pbnQgb25seQogIGJyZWFrcG9pbnRUdXJuPzogbnVt
-YmVyICAgLy8gYnJlYWtwb2ludCBvbmx5CiAgcXVhZHJhdGljQ29lZmY/OiBu
-dW1iZXIgICAvLyBxdWFkcmF0aWMgb25seQp9CgpleHBvcnQgaW50ZXJmYWNl
-IEJhbGFuY2VXZWlnaHRzIHsKICBjdXJ2ZVR5cGU6IEN1cnZlVHlwZQogIGN1
-cnZlOiBDdXJ2ZVBhcmFtcwogIGJvc3NNdWx0aXBsaWVyOiBudW1iZXIKICBm
-aW5hbEJvc3NNdWx0aXBsaWVyOiBudW1iZXIKICBpdGVtUG93ZXJNdWx0aXBs
-aWVyOiBudW1iZXIKICBub2RlUG93ZXJNdWx0aXBsaWVyOiBudW1iZXIKICBz
-dHJ1Y3R1cmFsTm9kZUF2YWlsYWJpbGl0eTogbnVtYmVyCiAgc3RhcnRpbmdH
-b2xkTXVsdGlwbGllcjogbnVtYmVyCiAgcGVyVHVyblBheW91dE11bHRpcGxp
-ZXI6IG51bWJlcgogIGx1Y2tFZmZpY2FjeU11bHRpcGxpZXI6IG51bWJlcgog
-IHBvb2xTaXplTXVsdGlwbGllcjogbnVtYmVyCn0KCmNvbnN0IEN1cnZlUGFy
-YW1zU2NoZW1hID0gei5vYmplY3QoewogIGJhc2U6IHoubnVtYmVyKCkubWlu
-KDApLAogIHByaW1hcnlTbG9wZTogei5udW1iZXIoKSwKICBzZWNvbmRhcnlT
-bG9wZTogei5udW1iZXIoKS5vcHRpb25hbCgpLAogIGJyZWFrcG9pbnRUdXJu
-OiB6Lm51bWJlcigpLm9wdGlvbmFsKCksCiAgcXVhZHJhdGljQ29lZmY6IHou
-bnVtYmVyKCkub3B0aW9uYWwoKSwKfSkKCmV4cG9ydCBjb25zdCBCYWxhbmNl
-V2VpZ2h0c1NjaGVtYSA9IHoub2JqZWN0KHsKICBjdXJ2ZVR5cGU6IHouZW51
-bShbJ2xpbmVhcicsICdicmVha3BvaW50JywgJ3F1YWRyYXRpYyddKSwKICBj
-dXJ2ZTogQ3VydmVQYXJhbXNTY2hlbWEsCiAgYm9zc011bHRpcGxpZXI6IHou
-bnVtYmVyKCkubWluKDApLm1heCg1KSwKICBmaW5hbEJvc3NNdWx0aXBsaWVy
-OiB6Lm51bWJlcigpLm1pbigwKS5tYXgoNSksCiAgaXRlbVBvd2VyTXVsdGlw
-bGllcjogei5udW1iZXIoKS5taW4oMCkubWF4KDUpLAogIG5vZGVQb3dlck11
-bHRpcGxpZXI6IHoubnVtYmVyKCkubWluKDApLm1heCg1KSwKICBzdHJ1Y3R1
-cmFsTm9kZUF2YWlsYWJpbGl0eTogei5udW1iZXIoKS5taW4oMCkubWF4KDUp
-LAogIHN0YXJ0aW5nR29sZE11bHRpcGxpZXI6IHoubnVtYmVyKCkubWluKDEp
-Lm1heCg1KSwKICBwZXJUdXJuUGF5b3V0TXVsdGlwbGllcjogei5udW1iZXIo
-KS5taW4oMCkubWF4KDUpLAogIGx1Y2tFZmZpY2FjeU11bHRpcGxpZXI6IHou
-bnVtYmVyKCkubWluKDApLm1heCg1KSwKICBwb29sU2l6ZU11bHRpcGxpZXI6
-IHoubnVtYmVyKCkubWluKDApLm1heCg1KSwKfSkK
+import { z } from 'zod/v4'
+
+export type CurveType = 'linear' | 'breakpoint' | 'quadratic'
+
+export type DifficultyPresetId = 'easy' | 'normal' | 'hard' | 'nightmare' | 'custom'
+
+export interface CurveParams {
+  base: number
+  primarySlope: number
+  secondarySlope?: number   // breakpoint only
+  breakpointTurn?: number   // breakpoint only
+  quadraticCoeff?: number   // quadratic only
+}
+
+export interface BalanceWeights {
+  curveType: CurveType
+  curve: CurveParams
+  bossMultiplier: number
+  finalBossMultiplier: number
+  itemPowerMultiplier: number
+  nodePowerMultiplier: number
+  structuralNodeAvailability: number
+  startingGoldMultiplier: number
+  perTurnPayoutMultiplier: number
+  luckEfficacyMultiplier: number
+  poolSizeMultiplier: number
+}
+
+const CurveParamsSchema = z.object({
+  base: z.number(),
+  primarySlope: z.number(),
+  secondarySlope: z.number().optional(),
+  breakpointTurn: z.number().optional(),
+  quadraticCoeff: z.number().optional(),
+})
+
+export const BalanceWeightsSchema = z.object({
+  curveType: z.enum(['linear', 'breakpoint', 'quadratic']),
+  curve: CurveParamsSchema,
+  bossMultiplier: z.number().min(1).max(5),
+  finalBossMultiplier: z.number().min(1).max(5),
+  itemPowerMultiplier: z.number().min(0).max(5),
+  nodePowerMultiplier: z.number().min(0).max(5),
+  structuralNodeAvailability: z.number().min(0).max(5),
+  startingGoldMultiplier: z.number().min(0).max(5),
+  perTurnPayoutMultiplier: z.number().min(0).max(5),
+  luckEfficacyMultiplier: z.number().min(0).max(5),
+  poolSizeMultiplier: z.number().min(0).max(5),
+})
