@@ -126,6 +126,7 @@ export function messageForError(error: DecodeError): string {
       return '> seed format unrecognized'
     case 'too_long':
       return `> share string too long (max ${error.max} characters)`
-    case 'invalid_draft':*      return '> draft data corrupted'
+    case 'invalid_draft':
+      return '> draft data corrupted'
   }
 }
