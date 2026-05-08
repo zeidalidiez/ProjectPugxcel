@@ -1,7 +1,9 @@
 import type { RunState } from '../../types/run'
 import type { CompletedRun } from '../../types/save'
+import type { DifficultyPresetId, BalanceWeights } from '../../types/balance'
 import { Archetype } from '../../types/enums'
 import type { ConstellationNode } from '../../types/nodes'
+import { PRESETS } from '../../data/balance-presets'
 
 const ARCH_MAP: Record<string, string> = {
   [Archetype.SPORGK]: 'SPRGK',
@@ -10,6 +12,13 @@ const ARCH_MAP: Record<string, string> = {
 }
 
 const BASE36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+const PRESET_CODE: Record<Exclude<DifficultyPresetId, 'custom'>, string> = {
+  easy: 'EZ',
+  normal: 'NM',
+  hard: 'HD',
+  nightmare: 'NT',
+}
 
 function toBase36(n: number): string {
   if (n < 0 || n >= 36) return 'Z'
@@ -27,6 +36,53 @@ function getSortedNodeList(nodes: Map<string, ConstellationNode>): Constellation
 
 function getNodeIndex(nodeId: string, sortedNodes: ConstellationNode[]): number {
   return sortedNodes.findIndex((n) => n.id === nodeId)
+}
+
+/**
+ * Produce a short, stable 4-char hash of a BalanceWeights object for the
+ * custom preset code (CS-XXXX). The hash is deterministic for the same weights.
+ */
+function hashWeights(weights: BalanceWeights): string {
+  const str = [
+    weights.curveType,
+    weights.curve.base,
+    weights.curve.primarySlope,
+    weights.curve.secondarySlope ?? 0,
+    weights.curve.breakpointTurn ?? 0,
+    weights.curve.quadraticCoeff ?? 0,
+    weights.bossMultiplier,
+    weights.finalBossMultiplier,
+    weights.itemPowerMultiplier,
+    weights.nodePowerMultiplier,
+    weights.startingGoldMultiplier,
+    weights.perTurnPayoutMultiplier,
+    weights.luckEfficacyMultiplier,
+    weights.poolSizeMultiplier,
+  ].join(',')
+
+  // djb2-style hash truncated to 4 base-36 chars
+  let h = 5381
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) + h) ^ str.charCodeAt(i)
+    h = h >>> 0 // keep unsigned 32-bit
+  }
+  const chars: string[] = []
+  for (let i = 0; i < 4; i++) {
+    chars.push(BASE36[h % 36])
+    h = Math.floor(h / 36)
+  }
+  return chars.join('')
+}
+
+/** Determine which preset code matches the given weights, or 'CS-XXXX' for custom. */
+function resolvePresetCode(weights: BalanceWeights): string {
+  for (const [id, code] of Object.entries(PRESET_CODE) as [Exclude<DifficultyPresetId, 'custom'>, string][]) {
+    const preset = PRESETS[id]
+    if (JSON.stringify(preset) === JSON.stringify(weights)) {
+      return code
+    }
+  }
+  return `CS-${hashWeights(weights)}`
 }
 
 export function encodeShareString(state: RunState): string {
@@ -47,7 +103,9 @@ export function encodeShareString(state: RunState): string {
   }
   const draftSeq = draftChars.join('')
 
-  return `ANTIGRAV/${arch}-${seed8}/${draftSeq}`
+  const presetCode = resolvePresetCode(state.balanceWeights)
+
+  return `ANTIGRAV/${arch}-${seed8}/${presetCode}/${draftSeq}`
 }
 
 export function createCompletedRun(state: RunState): CompletedRun {

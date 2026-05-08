@@ -1,4 +1,6 @@
 import { Archetype, ARCHETYPE_VALUES } from '../../types/enums'
+import type { DifficultyPresetId } from '../../types/balance'
+import { PRESETS } from '../../data/balance-presets'
 
 const REV_ARCH_MAP: Record<string, string> = {
   SPRGK: Archetype.SPORGK,
@@ -6,10 +8,18 @@ const REV_ARCH_MAP: Record<string, string> = {
   VAMP: Archetype.VAMPIRE,
 }
 
+const REV_PRESET_CODE: Record<string, Exclude<DifficultyPresetId, 'custom'>> = {
+  EZ: 'easy',
+  NM: 'normal',
+  HD: 'hard',
+  NT: 'nightmare',
+}
+
 export interface ParsedShare {
   archetype: string
   seed: string
   draftSeq: string
+  presetId: DifficultyPresetId
 }
 
 export type DecodeError =
@@ -51,7 +61,33 @@ export function parseShareString(shareStr: string): ParseResult {
     return { ok: false, error: { kind: 'invalid_archetype', archetype: archAbbr } }
   }
 
-  const draftSeq = parts.slice(2).join('/')
+  // Determine if new format (4 parts: ANTIGRAV/ARCH-SEED/PRESET/DRAFT)
+  // or legacy format (3 parts: ANTIGRAV/ARCH-SEED/DRAFT)
+  let presetId: DifficultyPresetId = 'normal'
+  let draftSeq: string
+
+  if (parts.length >= 4) {
+    // New format: parts[2] = preset code, parts[3..] = draft seq
+    const presetSegment = parts[2]
+    draftSeq = parts.slice(3).join('/')
+
+    if (presetSegment.startsWith('CS-')) {
+      // Custom weights — we can't recover full weights from hash alone, use normal as fallback
+      presetId = 'custom'
+    } else {
+      const resolved = REV_PRESET_CODE[presetSegment]
+      if (resolved) {
+        presetId = resolved
+      } else {
+        // Unknown preset code — treat as normal (forward compat)
+        presetId = 'normal'
+      }
+    }
+  } else {
+    // Legacy 3-part format: parts[2] = draft seq, assume normal preset
+    draftSeq = parts.slice(2).join('/')
+    presetId = 'normal'
+  }
 
   if (draftSeq.length > 40) {
     return { ok: false, error: { kind: 'too_long', length: draftSeq.length, max: 40 } }
@@ -63,8 +99,17 @@ export function parseShareString(shareStr: string): ParseResult {
       archetype,
       seed: seed8,
       draftSeq,
+      presetId,
     },
   }
+}
+
+/** Resolve the BalanceWeights for a parsed share result. */
+export function resolveWeightsForParsedShare(parsed: ParsedShare) {
+  if (parsed.presetId === 'custom') {
+    return PRESETS.normal // best fallback for custom when weights can't be recovered
+  }
+  return PRESETS[parsed.presetId as Exclude<DifficultyPresetId, 'custom'>]
 }
 
 export function messageForError(error: DecodeError): string {
