@@ -37,7 +37,7 @@ The weights system is data-driven — see `src/data/balance-presets.ts`. Players
 - Howler.js for audio
 - Vitest for unit tests
 
-## Getting started
+## Getting started  
 
 ```bash
 npm install
