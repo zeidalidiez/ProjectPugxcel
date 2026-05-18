@@ -40,7 +40,7 @@ export default function StatPanel() {
         return (
           <div key={stat} className="flex items-center gap-2 text-sm" title={STAT_DESCRIPTIONS[stat]}>
             <span
-              className={`font-bold w-8 rounded px-1 ${
+              className={`font-bold w-8 rounded px-1 whitespace-nowrap ${
                 isPrimary
                   ? 'text-black'
                   : isSecondary
@@ -61,7 +61,9 @@ export default function StatPanel() {
               }}
             >
               {STAT_LABELS[stat]}
-              {isPrimary ? ' ★' : isSecondary ? ' ☆' : ''}
+              {(isPrimary || isSecondary) && (
+                <span className="text-[8px] align-super">{isPrimary ? '★' : '☆'}</span>
+              )}
             </span>
             <span className="text-terminal-text-bright font-mono w-8 text-right" style={{ fontFamily: 'var(--font-display)' }}>{val}</span>
             {gearBonus > 0 && (

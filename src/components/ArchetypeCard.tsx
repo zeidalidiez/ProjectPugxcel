@@ -20,12 +20,29 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
   const flavor = loadArchetypeFlavor(arch.key)
   const primary = flavor.primaryStat
   const secondary = flavor.secondaryStat
+  const theme = flavor.theme
+
+  function applyTheme() {
+    if (!theme) return
+    for (const [key, value] of Object.entries(theme)) {
+      document.documentElement.style.setProperty(key, value)
+    }
+    document.documentElement.setAttribute('data-archetype', arch.key.toLowerCase())
+  }
+
+  function clearTheme() {
+    if (!theme) return
+    for (const key of Object.keys(theme)) {
+      document.documentElement.style.removeProperty(key)
+    }
+    document.documentElement.removeAttribute('data-archetype')
+  }
 
   return (
     <button
       onClick={() => onSelect(arch.key)}
-      onMouseEnter={() => document.documentElement.setAttribute('data-archetype', arch.key.toLowerCase())}
-      onMouseLeave={() => document.documentElement.removeAttribute('data-archetype')}
+      onMouseEnter={applyTheme}
+      onMouseLeave={clearTheme}
       className="flex flex-col items-center text-center gap-5 rounded-lg border-2 border-terminal-border hover:border-terminal-accent transition-all flex-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-terminal-accent"
       style={{
         padding: '36px 28px',
