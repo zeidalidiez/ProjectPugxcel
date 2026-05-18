@@ -36,7 +36,7 @@ export default function MainHUD() {
   const phase = useGameStore((s) => s.run?.phase)
   const turn = useGameStore((s) => s.run?.turn)
   const [showLeftPanel, setShowLeftPanel] = useState(false)
-  const [showRightPanel, setShowRightPanel] = useState(false)
+  const [showLog, setShowLog] = useState(false)
 
   const isDraft = phase === RunPhase.DRAFT
   const isPrep = turn !== undefined && turn <= PREP_TURNS
@@ -82,17 +82,29 @@ export default function MainHUD() {
       )}
 
       <div className="flex items-center justify-between border-b border-terminal-border pb-2">
-        <ForecastRadar />
-        <GoldDisplay />
+        <div className="flex items-center gap-3">
+          <ForecastRadar />
+          <ThreatHeatmap />
+        </div>
+        <div className="flex items-center gap-3">
+          <GoldDisplay />
+          <button
+            onClick={() => setShowLog(!showLog)}
+            className={`px-3 py-1 rounded border text-xs font-mono transition-colors ${
+              showLog
+                ? 'bg-terminal-accent/20 border-terminal-accent text-terminal-accent'
+                : 'border-terminal-border text-terminal-text/60 hover:text-terminal-text hover:border-terminal-text/40'
+            }`}
+            aria-pressed={showLog}
+          >
+            Log
+          </button>
+        </div>
       </div>
-      <ThreatHeatmap />
 
       <div className="sm:hidden flex gap-2 mb-2">
         <button onClick={() => setShowLeftPanel(!showLeftPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
           {showLeftPanel ? 'Hide Stats' : 'Stats'}
-        </button>
-        <button onClick={() => setShowRightPanel(!showRightPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
-          {showRightPanel ? 'Hide Log' : 'Log'}
         </button>
       </div>
 
@@ -103,14 +115,16 @@ export default function MainHUD() {
           <PowerPreview />
         </div>
 
-        <div className="flex-1 flex flex-col gap-2 min-w-0">
+        <div className="flex-1 flex flex-col gap-2 min-w-0 relative">
           <ConstellationViewport />
           {isDraft && <StoreModal />}
+          {showLog && (
+            <div className="absolute top-2 right-2 z-50">
+              <TurnHistory onClose={() => setShowLog(false)} />
+            </div>
+          )}
         </div>
 
-        <div className={`w-64 shrink-0 ${showRightPanel ? 'block' : 'hidden'} sm:block`}>
-          <TurnHistory />
-        </div>
       </div>
 
       <div className="border-t border-terminal-border pt-2">
