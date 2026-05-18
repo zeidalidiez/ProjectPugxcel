@@ -1,7 +1,7 @@
 /* src/styles/tokens.css */
 /* Project Antigravity — Design Tokens v2 ("Astral Terminal v2") */
 
-@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Orbitron:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Orbitron:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ============================================================ */
 /*  Base — semantic palette, typography, spacing, motion       */
@@ -34,7 +34,7 @@
   --node-anchor-color: var(--accent);
 
   /* Fonts */
-  --font-display:     'Major Mono Display', 'Courier New', monospace;
+  --font-display:     'Bungee', 'Courier New', monospace;
   --font-display-alt: 'Orbitron', sans-serif;        /* use where MMD too narrow */
   --font-mono:        'JetBrains Mono', 'IBM Plex Mono', monospace;
   --font-body:        'Inter', system-ui, sans-serif;

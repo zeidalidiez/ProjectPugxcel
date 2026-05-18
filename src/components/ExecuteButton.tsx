@@ -22,7 +22,7 @@ export default function ExecuteButton() {
       >
         Execute
       </button>
-      {isDraft && <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>}
+      {isDraft && <div className="text-terminal-accent/50 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>}
     </div>
   )
 }

@@ -183,7 +183,7 @@ export default function MainHUD() {
             >
               Begin Drafting
             </button>
-            <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
+            <div className="text-terminal-accent/50 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
           </div>
         )}
         {phase === RunPhase.PAYOUT && (
@@ -196,7 +196,7 @@ export default function MainHUD() {
             >
               Begin Drafting
             </button>
-            <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
+            <div className="text-terminal-accent/50 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
           </div>
         )}
         {isDraft && isPrep && (
@@ -209,7 +209,7 @@ export default function MainHUD() {
             >
               Advance to Next Turn
             </button>
-            <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
+            <div className="text-terminal-accent/50 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
           </div>
         )}
         {isDraft && !isPrep && <ExecuteButton />}
