@@ -1,4 +1,5 @@
 import { Archetype } from '../types/enums'
+import { loadArchetypeFlavor } from '../data/nodes'
 
 export interface ArchetypeCardData {
   key: Archetype
@@ -16,13 +17,22 @@ interface ArchetypeCardProps {
 }
 
 export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
+  const flavor = loadArchetypeFlavor(arch.key)
+  const primary = flavor.primaryStat
+  const secondary = flavor.secondaryStat
+
   return (
     <button
       onClick={() => onSelect(arch.key)}
       onMouseEnter={() => document.documentElement.setAttribute('data-archetype', arch.key.toLowerCase())}
       onMouseLeave={() => document.documentElement.removeAttribute('data-archetype')}
       className="flex flex-col items-center text-center gap-5 rounded-lg border-2 border-terminal-border hover:border-terminal-accent transition-all flex-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-terminal-accent"
-      style={{ padding: '36px 28px', backgroundColor: arch.bgTint, borderColor: 'var(--accent)', borderWidth: '1px' }}
+      style={{
+        padding: '36px 28px',
+        backgroundColor: 'var(--accent-soft, rgba(251,146,60,0.08))',
+        borderColor: 'var(--accent, #fb923c)',
+        borderWidth: '1px',
+      }}
       aria-label={`Select ${arch.name}`}
     >
       <div>
@@ -31,24 +41,26 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
       </div>
       <p className="text-terminal-text text-sm leading-relaxed max-w-sm">{arch.description}</p>
       <div className="flex gap-2">
-        {arch.key === Archetype.SPORGK && (
-          <>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(251,146,60,0.2)', color: '#fb923c' }}>STR</span>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(251,146,60,0.2)', color: '#fb923c' }}>STA</span>
-          </>
-        )}
-        {arch.key === Archetype.ELF && (
-          <>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(34,211,238,0.2)', color: '#22d3ee' }}>AGI</span>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(34,211,238,0.2)', color: '#22d3ee' }}>LCK</span>
-          </>
-        )}
-        {arch.key === Archetype.VAMPIRE && (
-          <>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>INT</span>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>STA</span>
-          </>
-        )}
+        <span
+          className="px-3 py-1 rounded-full text-xs font-mono font-bold"
+          style={{
+            backgroundColor: 'var(--accent, #fb923c)',
+            color: '#000',
+            boxShadow: '0 0 14px var(--accent-glow, rgba(251,176,60,0.55))',
+          }}
+        >
+          {primary}
+        </span>
+        <span
+          className="px-3 py-1 rounded-full text-xs font-mono font-bold"
+          style={{
+            backgroundColor: 'var(--accent-soft, rgba(251,146,60,0.18))',
+            color: 'var(--accent, #fb923c)',
+            boxShadow: '0 0 6px var(--accent-glow, rgba(251,176,60,0.25))',
+          }}
+        >
+          {secondary}
+        </span>
       </div>
     </button>
   )
