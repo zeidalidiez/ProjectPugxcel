@@ -15,6 +15,7 @@ dist-ssr
 # Agent tooling
 .agents/
 skills-lock.json
+Grok.MD
 
 # Editor directories and files
 .vscode/*

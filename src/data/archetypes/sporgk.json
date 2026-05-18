@@ -40,5 +40,13 @@
     { "kind": "ANTI_SYNERGY", "count": 2, "ppBonus": 2.5 },
     { "kind": "THRESHOLD", "condition": "turn", "value": 10, "ppBonus": 2.0 },
     { "kind": "HYBRID_BRIDGE", "count": 2, "ppBonus": 2.0 }
-  ]
+  ],
+  "theme": {
+    "--accent": "#fb923c",
+    "--accent-soft": "#7c2d12",
+    "--accent-glow": "rgba(251, 146, 60, 0.20)",
+    "--radius-card": "0",
+    "--background-mood-color": "#fb923c",
+    "--background-mood-density": "0.06"
+  }
 }

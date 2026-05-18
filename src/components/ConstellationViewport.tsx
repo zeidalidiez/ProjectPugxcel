@@ -117,7 +117,7 @@ export default function ConstellationViewport() {
 
   return (
     <div
-      className="relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none"
+      className="relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none p-4"
       role="region"
       aria-label="Constellation"
     >
@@ -146,6 +146,11 @@ export default function ConstellationViewport() {
             }}
             viewBox={`${minX} ${minY} ${svgW} ${svgH}`}
           >
+            <defs>
+              <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="var(--color-terminal-accent)" floodOpacity="0.5" />
+              </filter>
+            </defs>
             {nodes.flatMap((node) =>
               node.edges.map((targetId) => {
                 const target = constellation.nodes.get(targetId)
@@ -158,9 +163,10 @@ export default function ConstellationViewport() {
                     y1={node.y}
                     x2={target.x}
                     y2={target.y}
-                    stroke={purchased ? 'var(--color-terminal-accent)' : '#1e2d44'}
+                    stroke={purchased ? 'var(--color-terminal-accent)' : 'var(--color-terminal-border)'}
                     strokeWidth={purchased ? 3.5 : 0.8}
                     strokeLinecap="round"
+                    filter={purchased ? 'url(#nodeGlow)' : undefined}
                   />
                 )
               }),
@@ -205,7 +211,11 @@ export default function ConstellationViewport() {
                   ${purchasable && !purchased && !locked && !affordable ? 'border-terminal-warn/50 bg-terminal-surface text-terminal-text/50 cursor-not-allowed' : ''}
                   ${!purchasable && !purchased && !locked ? 'border-terminal-border bg-terminal-bg/80 text-terminal-text/40' : ''}
                 `}
-                style={{ left: node.x, top: node.y }}
+                style={{
+                  left: node.x,
+                  top: node.y,
+                  boxShadow: purchased ? '0 0 12px var(--accent-glow)' : undefined,
+                }}
                 aria-label={`${def.name}: ${def.description}. Cost: ${price}g`}
               >
                 {def.isAnchor ? '★' : '·'}

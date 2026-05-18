@@ -90,37 +90,6 @@
 }
 
 /* ============================================================ */
-/*  Archetype overrides — single attribute switches the theme  */
-/* ============================================================ */
-
-[data-archetype="sporgk"] {
-  --accent:                  #fb923c;
-  --accent-soft:             #7c2d12;
-  --accent-glow:             rgba(251, 146, 60, 0.20);
-  --radius-card:             var(--radius-none);   /* sharp 90° */
-  --background-mood-color:   #fb923c;
-  --background-mood-density: 0.06;
-}
-
-[data-archetype="elf"] {
-  --accent:                  #22d3ee;
-  --accent-soft:             #0e7490;
-  --accent-glow:             rgba(34, 211, 238, 0.20);
-  --radius-card:             var(--radius-sm);     /* 2px bevel */
-  --background-mood-color:   #22d3ee;
-  --background-mood-density: 0.04;
-}
-
-[data-archetype="vampire"] {
-  --accent:                  #a855f7;
-  --accent-soft:             #581c87;
-  --accent-glow:             rgba(168, 85, 247, 0.20);
-  --radius-card:             var(--radius-md);     /* 4px soft */
-  --background-mood-color:   #581c87;
-  --background-mood-density: 0.05;
-}
-
-/* ============================================================ */
 /*  Reduced motion                                             */
 /* ============================================================ */
 @media (prefers-reduced-motion: reduce) {

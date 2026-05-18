@@ -5,6 +5,7 @@ import { useKeyboardNav } from './hooks/useKeyboardNav'
 import { useReducedMotion } from './hooks/useReducedMotion'
 import { useFontScale } from './hooks/useFontScale'
 import { useAudio } from './hooks/useAudio'
+import { useArchetypeTheme } from './hooks/useArchetypeTheme'
 import ArchetypeSelect from './components/ArchetypeSelect'
 import MainHUD from './components/MainHUD'
 import ExecuteTerminal from './components/ExecuteTerminal'
@@ -24,6 +25,7 @@ export default function App() {
 
   useKeyboardNav()
   useAudio()
+  useArchetypeTheme()
 
   useEffect(() => {
     init()

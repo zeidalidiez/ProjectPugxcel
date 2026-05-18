@@ -34,6 +34,7 @@ export interface ArchetypeFlavor {
   structuralTemplates: StructuralTemplate[]
   anchorNames?: string[]
   abilityNames?: string[]
+  theme?: Record<string, string>
 }
 
 export const ArchetypeFlavorSchema = z.object({
@@ -65,4 +66,5 @@ export const ArchetypeFlavorSchema = z.object({
   })),
   anchorNames: z.array(z.string()).optional(),
   abilityNames: z.array(z.string()).optional(),
+  theme: z.record(z.string(), z.string()).optional(),
 })

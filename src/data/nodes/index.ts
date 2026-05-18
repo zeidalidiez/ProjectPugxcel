@@ -63,6 +63,14 @@ export function loadArchetypeFlavor(archetype: Archetype): ArchetypeFlavor {
         { kind: 'THRESHOLD', condition: 'turn', value: 10, ppBonus: 2.0 },
         { kind: 'HYBRID_BRIDGE', count: 2, ppBonus: 2.0 },
       ],
+      theme: {
+        '--accent': '#fb923c',
+        '--accent-soft': '#7c2d12',
+        '--accent-glow': 'rgba(251, 146, 60, 0.20)',
+        '--radius-card': '0',
+        '--background-mood-color': '#fb923c',
+        '--background-mood-density': '0.06',
+      },
     },
     [Archetype.ELF]: {
       id: 'elf',
@@ -96,6 +104,14 @@ export function loadArchetypeFlavor(archetype: Archetype): ArchetypeFlavor {
         { kind: 'THRESHOLD', condition: 'turn', value: 10, ppBonus: 2.0 },
         { kind: 'HYBRID_BRIDGE', count: 2, ppBonus: 2.0 },
       ],
+      theme: {
+        '--accent': '#22d3ee',
+        '--accent-soft': '#0e7490',
+        '--accent-glow': 'rgba(34, 211, 238, 0.20)',
+        '--radius-card': '2px',
+        '--background-mood-color': '#22d3ee',
+        '--background-mood-density': '0.04',
+      },
     },
     [Archetype.VAMPIRE]: {
       id: 'vampire',
@@ -129,6 +145,14 @@ export function loadArchetypeFlavor(archetype: Archetype): ArchetypeFlavor {
         { kind: 'THRESHOLD', condition: 'turn', value: 10, ppBonus: 2.0 },
         { kind: 'HYBRID_BRIDGE', count: 2, ppBonus: 2.0 },
       ],
+      theme: {
+        '--accent': '#a855f7',
+        '--accent-soft': '#581c87',
+        '--accent-glow': 'rgba(168, 85, 247, 0.20)',
+        '--radius-card': '4px',
+        '--background-mood-color': '#581c87',
+        '--background-mood-density': '0.05',
+      },
     },
   }
   return flavors[archetype]!
