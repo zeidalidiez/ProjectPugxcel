@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useGameStore } from './store'
 import { RunPhase } from './types/enums'
 import { useKeyboardNav } from './hooks/useKeyboardNav'
@@ -9,8 +9,9 @@ import ArchetypeSelect from './components/ArchetypeSelect'
 import MainHUD from './components/MainHUD'
 import ExecuteTerminal from './components/ExecuteTerminal'
 import PostRunScreen from './components/PostRunScreen'
-import ReplayViewer from './components/ReplayViewer'
 import { ErrorBoundary } from './components/ErrorBoundary'
+
+const ReplayViewer = lazy(() => import('./components/ReplayViewer'))
 
 export default function App() {
   const phase = useGameStore((s) => s.phase)
@@ -47,7 +48,9 @@ export default function App() {
   if (replayShare) {
     return (
       <ErrorBoundary>
-        <ReplayViewer shareString={replayShare} onBack={() => setReplayShare(null)} />
+        <Suspense fallback={<div className="h-full flex items-center justify-center text-terminal-text">Loading replay...</div>}>
+          <ReplayViewer shareString={replayShare} onBack={() => setReplayShare(null)} />
+        </Suspense>
       </ErrorBoundary>
     )
   }

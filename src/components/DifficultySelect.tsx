@@ -23,7 +23,7 @@ export default function DifficultySelect({ onCustomClick }: DifficultySelectProp
   return (
     <div className="flex flex-col items-center gap-2 w-full max-w-3xl">
       <div className="text-terminal-text text-xs uppercase tracking-widest">Difficulty</div>
-      <div className="flex gap-1.5 w-full justify-center">
+      <div className="flex flex-wrap gap-1.5 w-full justify-center">
         {PRESET_IDS.map((id) => {
           const display = PRESET_DISPLAY[id]
           const isSelected = selectedPresetId === id

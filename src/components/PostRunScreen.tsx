@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useGameStore } from '../store'
 import { getModifierById } from '../data/codex/modifiers'
 
@@ -10,26 +10,31 @@ export default function PostRunScreen() {
   const seed = useGameStore((s) => s.run?.seed)
   const resetRun = useGameStore((s) => s.resetRun)
   const saveBuild = useGameStore((s) => s.saveBuild)
-  const codex = useGameStore((s) => s.codex)
+  const unlockedModifiers = useGameStore((s) => s.codex.unlockedModifiers)
   const [copied, setCopied] = useState(false)
   const [buildName, setBuildName] = useState('')
   const [savingBuild, setSavingBuild] = useState(false)
+  const copyTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useEffect(() => {
+    return () => { if (copyTimer.current) clearTimeout(copyTimer.current) }
+  }, [])
 
   const latestUnlock = useMemo(() => {
-    if (codex.unlockedModifiers.length === 0) return null
-    const last = codex.unlockedModifiers[codex.unlockedModifiers.length - 1]
+    if (unlockedModifiers.length === 0) return null
+    const last = unlockedModifiers[unlockedModifiers.length - 1]
     return getModifierById(last)
-  }, [codex.unlockedModifiers])
+  }, [unlockedModifiers])
 
   function handleCopy() {
     if (!shareString) return
     navigator.clipboard.writeText(shareString)
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    copyTimer.current = setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <div className="h-full flex flex-col items-center justify-center gap-6" style={{ padding: '48px' }}>
+    <div className="h-full flex flex-col items-center justify-center gap-6 p-6 sm:p-12">
       <div className={`text-6xl font-bold ${lastResult?.pass ? 'text-terminal-pass' : 'text-terminal-fail'}`} style={{ fontFamily: 'var(--font-display)' }}>
         {lastResult?.pass && turn !== undefined && turn >= 20 ? 'VICTORY' : lastResult?.pass ? 'PASS' : 'FAIL'}
       </div>

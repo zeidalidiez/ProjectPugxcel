@@ -1,4 +1,5 @@
 import { useGameStore } from '../store'
+import { useState } from 'react'
 import { RunPhase } from '../types/enums'
 import StatPanel from './StatPanel'
 import EquipmentSlots from './EquipmentSlots'
@@ -34,13 +35,15 @@ const PHASE_HELP: Record<string, { prep: string; encounter: string }> = {
 export default function MainHUD() {
   const phase = useGameStore((s) => s.run?.phase)
   const turn = useGameStore((s) => s.run?.turn)
+  const [showLeftPanel, setShowLeftPanel] = useState(false)
+  const [showRightPanel, setShowRightPanel] = useState(false)
 
   const isDraft = phase === RunPhase.DRAFT
   const isPrep = turn !== undefined && turn <= PREP_TURNS
   const activeIdx = phase ? PHASE_INDEX[phase] : -1
 
   return (
-    <div className="h-full flex flex-col gap-2" style={{ padding: '24px' }}>
+    <div className="h-full flex flex-col gap-2 p-3 sm:p-5">
       <div className="flex items-center gap-3 px-4 py-3 rounded border border-terminal-border bg-terminal-surface">
         {isPrep && (
           <div className="bg-terminal-warn/20 text-terminal-warn text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mr-2">
@@ -84,8 +87,17 @@ export default function MainHUD() {
       </div>
       <ThreatHeatmap />
 
+      <div className="sm:hidden flex gap-2 mb-2">
+        <button onClick={() => setShowLeftPanel(!showLeftPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
+          {showLeftPanel ? 'Hide Stats' : 'Stats'}
+        </button>
+        <button onClick={() => setShowRightPanel(!showRightPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
+          {showRightPanel ? 'Hide Log' : 'Log'}
+        </button>
+      </div>
+
       <div className="flex-1 flex gap-3 min-h-0">
-        <div className="flex flex-col gap-2 w-48 shrink-0">
+        <div className={`flex-col gap-2 w-48 shrink-0 ${showLeftPanel ? 'flex' : 'hidden'} sm:flex`}>
           <StatPanel />
           <EquipmentSlots />
           <PowerPreview />
@@ -96,7 +108,7 @@ export default function MainHUD() {
           {isDraft && <StoreModal />}
         </div>
 
-        <div className="w-64 shrink-0">
+        <div className={`w-64 shrink-0 ${showRightPanel ? 'block' : 'hidden'} sm:block`}>
           <TurnHistory />
         </div>
       </div>

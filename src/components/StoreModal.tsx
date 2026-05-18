@@ -19,7 +19,7 @@ export default function StoreModal() {
   return (
     <div className="flex flex-col gap-2 p-3 border border-terminal-border rounded bg-terminal-surface relative" role="region" aria-label="Store">
       <div className="text-terminal-text text-xs uppercase tracking-widest">Store</div>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         {storeItems.map((itemId) => {
           const def = getItemById(itemId)
           if (!def) return null
@@ -56,6 +56,7 @@ export default function StoreModal() {
                     <span key={i} className="text-[8px] px-1 rounded bg-terminal-accent/10 text-terminal-accent font-mono">
                       {eff.strMult !== undefined && `×${eff.strMult}`}
                       {eff.flatBonus !== undefined && `+${eff.flatBonus}dmg`}
+                      {eff.resistance && `Null ${eff.resistance.tag}`}
                       {eff.statBonus && Object.entries(eff.statBonus).map(([k, v]) => (
                         <span key={k}>+{v} {STAT_LABELS[k as StatType]}</span>
                       ))}
@@ -98,6 +99,7 @@ export default function StoreModal() {
             <div key={i} className="text-[9px] text-terminal-text/70 mb-0.5">
               {eff.strMult !== undefined && `Weapon multiplier: ×${eff.strMult}`}
               {eff.flatBonus !== undefined && `+${eff.flatBonus} flat damage per hit`}
+              {eff.resistance && `Nullifies ${eff.resistance.tag} (−${eff.resistance.value})`}
               {eff.statBonus && Object.entries(eff.statBonus).map(([k, v]) => (
                 <div key={k}>+{v} {STAT_LABELS[k as StatType]}</div>
               ))}

@@ -1,22 +1,27 @@
-import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
+import { useState, useCallback, useRef, useMemo, useEffect, useLayoutEffect } from 'react'
+import { useShallow } from 'zustand/shallow'
 import { useGameStore } from '../store'
 import { getNodeById } from '../data/nodes'
 import { canPurchaseNode } from '../game/constellation/canPurchase'
 import { applyDiscount } from '../game/economy/cost'
 import { StatType } from '../types/enums'
-import { STAT_LABELS } from '../types/stats'
 import type { ConstellationNode } from '../types/nodes'
+import NodeTooltip from './NodeTooltip'
 import { useAudio } from '../hooks/useAudio'
 
 export default function ConstellationViewport() {
-  const constellation = useGameStore((s) => s.run?.constellation)
-  const draftedIds = useGameStore((s) => s.run?.draftedNodeIds)
-  const archetype = useGameStore((s) => s.run?.archetype)
-  const currentNodeDrafts = useGameStore((s) => s.run?.currentNodeDrafts)
-  const gold = useGameStore((s) => s.run?.gold)
-  const lck = useGameStore((s) => s.run?.stats?.[StatType.LCK]) ?? 0
+  const { constellation, draftedIds, archetype, gold, lck, currentNodeDrafts, phase } = useGameStore(
+    useShallow((s) => ({
+      constellation: s.run?.constellation,
+      draftedIds: s.run?.draftedNodeIds,
+      archetype: s.run?.archetype,
+      gold: s.run?.gold,
+      lck: s.run?.stats?.[StatType.LCK] ?? 0,
+      currentNodeDrafts: s.run?.currentNodeDrafts,
+      phase: s.run?.phase,
+    })),
+  )
   const purchaseNode = useGameStore((s) => s.purchaseNode)
-  const phase = useGameStore((s) => s.run?.phase)
 
   const [scale, setScale] = useState(0.6)
   const [offset, setOffset] = useState({ x: 100, y: 60 })
@@ -25,6 +30,13 @@ export default function ConstellationViewport() {
   const panning = useRef(false)
   const lastPos = useRef({ x: 0, y: 0 })
   const lastOffset = useRef({ x: 0, y: 0 })
+
+  useLayoutEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    setOffset({ x: rect.width / 2 - 800 * 0.6, y: rect.height / 2 - 450 * 0.6 })
+  }, [])
 
   const { playNodePurchase, playHover } = useAudio()
 
@@ -190,29 +202,15 @@ export default function ConstellationViewport() {
         const purchased = (draftedIds ?? []).includes(hoveredNode.id)
         const locked = hoveredNode.locked
         return (
-          <div className="absolute bottom-4 left-4 z-50 pointer-events-none p-3 rounded border border-terminal-accent bg-terminal-surface shadow-lg max-w-64">
-            <div className="flex items-center gap-1 mb-1">
-              {def.isAnchor && <span className="text-terminal-warn text-xs">★</span>}
-              <span className="text-terminal-text-bright font-bold text-xs">{def.name}</span>
-              <span className="text-terminal-text/40 text-[10px] ml-auto">{def.type}</span>
-            </div>
-            <p className="text-terminal-text text-[10px] leading-snug mb-2">{def.description}</p>
-            <div className="flex flex-wrap gap-1 mb-1">
-              {def.effects.map((eff, i) => (
-                <span key={i} className="text-[9px] px-1 rounded bg-terminal-accent/10 text-terminal-accent">
-                  {eff.kind === 'flat' ? '+' : ''}{eff.value} {STAT_LABELS[eff.stat]}
-                </span>
-              ))}
-            </div>
-            <div className="flex justify-between text-[10px]">
-              <span className={purchased ? 'text-terminal-accent' : locked ? 'text-terminal-fail' : purchasable ? 'text-terminal-warn' : 'text-terminal-text/40'}>
-                {purchased ? 'Purchased' : locked ? 'Locked' : purchasable ? `${price}g` : 'Unreachable'}
-              </span>
-              {currentNodeDrafts !== undefined && currentNodeDrafts > 0 && purchasable && !purchased && (
-                <span className="text-terminal-pass">Click to buy</span>
-              )}
-            </div>
-          </div>
+          <NodeTooltip
+            node={hoveredNode}
+            def={def}
+            price={price}
+            purchasable={purchasable}
+            purchased={purchased}
+            locked={locked}
+            hasDrafts={(currentNodeDrafts ?? 0) > 0}
+          />
         )
       })()}
 

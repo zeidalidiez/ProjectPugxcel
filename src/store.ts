@@ -99,6 +99,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lastCustomWeights: null,
 
   init: () => {
+    if (get().initialized) return
     const saved = loadFromDisk()
     if (saved) {
       set({

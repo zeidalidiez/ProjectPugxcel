@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useShallow } from 'zustand/shallow'
 import { useGameStore } from '../store'
 import { calculateThreshold } from '../game/economy/threshold'
+import BossTooltip from './BossTooltip'
 
 const THREAT_LABELS: Record<string, string> = {
   ARMORED: 'ARMORED',
@@ -15,9 +17,13 @@ const THREAT_LABELS: Record<string, string> = {
 const PREP_TURNS = 0
 
 export default function ForecastRadar() {
-  const encounters = useGameStore((s) => s.run?.encounters)
-  const turn = useGameStore((s) => s.run?.turn)
-  const balanceWeights = useGameStore((s) => s.run?.balanceWeights)
+  const { encounters, turn, balanceWeights } = useGameStore(
+    useShallow((s) => ({
+      encounters: s.run?.encounters,
+      turn: s.run?.turn,
+      balanceWeights: s.run?.balanceWeights,
+    })),
+  )
   const uncertaintyMode = useGameStore((s) => s.settings.uncertaintyMode)
   const [hoveredTurn, setHoveredTurn] = useState<number | null>(null)
 
@@ -36,7 +42,7 @@ export default function ForecastRadar() {
   }
 
   return (
-    <div className="flex gap-2 items-center px-3 py-1 relative" role="region" aria-label="Forecast Radar">
+    <div className="flex gap-2 items-center px-3 py-1 overflow-x-auto snap-x sm:overflow-visible relative" role="region" aria-label="Forecast Radar">
       {encounters.slice(0, 5).map((enc, i) => {
         const t = turn + i
         const isBoss = t % 5 === 0
@@ -44,7 +50,7 @@ export default function ForecastRadar() {
 
         if (uncertaintyMode && i > 1) {
           return (
-            <div key={t} className="flex flex-col items-center px-2 py-1 rounded border border-terminal-border bg-terminal-bg min-w-16 opacity-50">
+            <div key={t} className="flex flex-col items-center px-2 py-1 rounded border border-terminal-border bg-terminal-bg min-w-14 max-sm:min-w-12 opacity-50 snap-start flex-shrink-0">
               <span className={`text-xs ${isBoss ? 'text-terminal-fail' : 'text-terminal-text'}`}>T{t}</span>
               <span className="text-terminal-text/40 text-[10px]">???</span>
             </div>
@@ -68,7 +74,7 @@ export default function ForecastRadar() {
               }
             }}
             className={`
-              flex flex-col items-center px-2 py-1 rounded border min-w-16 cursor-default
+              flex flex-col items-center px-2 py-1 rounded border min-w-14 max-sm:min-w-12 cursor-default snap-start flex-shrink-0
               ${isCurrent ? 'border-terminal-accent bg-terminal-accent/10' : 'border-terminal-border bg-terminal-bg'}
               ${isBoss ? 'hover:border-terminal-fail/60' : ''}
             `}
@@ -92,41 +98,8 @@ export default function ForecastRadar() {
 
       {(() => {
         const hovered = hoveredTurn !== null ? encounters.find((_, i) => turn + i === hoveredTurn) : null
-        if (!hovered) return null
-        return (
-          <div
-            id={`boss-tooltip-${hoveredTurn}`}
-            role="tooltip"
-            className="absolute top-full left-0 mt-2 z-50 p-3 rounded border border-terminal-fail/50 bg-terminal-surface shadow-lg min-w-48"
-          >
-            <div className="text-terminal-fail text-xs font-bold uppercase tracking-wider mb-1">
-              {hovered.enemyName}
-            </div>
-            <p className="text-terminal-text text-[10px] leading-snug mb-2 italic">
-              "{hovered.flavorText}"
-            </p>
-            <div className="flex flex-col gap-0.5 text-[10px] font-mono">
-              <div className="flex justify-between">
-                <span className="text-terminal-text/60">Armor</span>
-                <span className="text-terminal-text-bright">{hovered.armor}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-terminal-text/60">Evasion</span>
-                <span className="text-terminal-text-bright">{Math.round(hovered.evasion * 100)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-terminal-text/60">INT Resist</span>
-                <span className="text-terminal-text-bright">{Math.round(hovered.intResist * 100)}%</span>
-              </div>
-              {hovered.staminaDrain > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-terminal-text/60">Stamina Drain</span>
-                  <span className="text-terminal-warn">{hovered.staminaDrain}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )
+        if (!hovered || hoveredTurn === null) return null
+        return <BossTooltip id={`boss-tooltip-${hoveredTurn}`} encounter={hovered} />
       })()}
     </div>
   )

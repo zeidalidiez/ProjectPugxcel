@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useShallow } from 'zustand/shallow'
 import { useGameStore } from '../store'
 import { StatType, ItemCategory, Archetype } from '../types/enums'
 import { calculateThreshold } from '../game/economy/threshold'
@@ -11,14 +12,17 @@ const PRIMARY_STAT: Record<Archetype, StatType> = {
 }
 
 export default function PowerPreview() {
-  const stats = useGameStore((s) => s.run?.stats)
-  const inventory = useGameStore((s) => s.run?.inventory)
-  const turn = useGameStore((s) => s.run?.turn)
-  const lck = useGameStore((s) => s.run?.stats?.[StatType.LCK]) ?? 0
-  const phase = useGameStore((s) => s.run?.phase)
-  const archetype = useGameStore((s) => s.run?.archetype)
-
-  const balanceWeights = useGameStore((s) => s.run?.balanceWeights)
+  const { stats, inventory, turn, lck, phase, archetype, balanceWeights } = useGameStore(
+    useShallow((s) => ({
+      stats: s.run?.stats,
+      inventory: s.run?.inventory,
+      turn: s.run?.turn,
+      lck: s.run?.stats?.[StatType.LCK] ?? 0,
+      phase: s.run?.phase,
+      archetype: s.run?.archetype,
+      balanceWeights: s.run?.balanceWeights,
+    })),
+  )
 
   const power = useMemo(() => {
     if (!stats || !inventory || turn === undefined || !archetype) return null

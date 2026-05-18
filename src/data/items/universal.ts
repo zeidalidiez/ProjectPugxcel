@@ -45,7 +45,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 20,
-    description: 'A battered dome helmet welded from salvage-grade plating.',
+    description: 'A battered dome helmet welded from salvage-grade plating. Nullifies KINETIC (−5).',
     effects: [{ resistance: { tag: ThreatTag.KINETIC, value: 5 } }],
   },
   {
@@ -56,7 +56,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 25,
-    description: 'Cracked visor salvaged from a derelict void-walker suit.',
+    description: 'Cracked visor salvaged from a derelict void-walker suit. Nullifies VOID (−5).',
     effects: [{ resistance: { tag: ThreatTag.VOID, value: 5 } }],
   },
   {
@@ -67,7 +67,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 25,
-    description: 'Wax-coated canvas weave. Sheds glancing blows like water.',
+    description: 'Wax-coated canvas weave. Sheds glancing blows like water. Nullifies ARMORED (−5).',
     effects: [{ resistance: { tag: ThreatTag.ARMORED, value: 5 } }],
   },
   {
@@ -78,7 +78,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 30,
-    description: 'Standard-issue void suit liner. Pressurized, padded, passable.',
+    description: 'Standard-issue void suit liner. Pressurized, padded, passable. Nullifies EVASIVE (−5).',
     effects: [{ resistance: { tag: ThreatTag.EVASIVE, value: 5 } }],
   },
   {
@@ -192,7 +192,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 45,
-    description: 'Heavier plating, proper welding. You can ram things now.',
+    description: 'Heavier plating, proper welding. You can ram things now. Nullifies KINETIC (−10).',
     effects: [{ resistance: { tag: ThreatTag.KINETIC, value: 10 } }],
   },
   {
@@ -203,7 +203,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 50,
-    description: 'Ceramic composite plate rated for asteroid-belt debris fields.',
+    description: 'Ceramic composite plate rated for asteroid-belt debris fields. Nullifies ARMORED (−10).',
     effects: [{ resistance: { tag: ThreatTag.ARMORED, value: 10 } }],
   },
   {
@@ -214,7 +214,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 50,
-    description: 'Woven from nebula-thread. Diffracts crystalline weaponry.',
+    description: 'Woven from nebula-thread. Diffracts crystalline weaponry. Nullifies CRYSTALLINE (−10).',
     effects: [{ resistance: { tag: ThreatTag.CRYSTALLINE, value: 10 } }],
   },
   {
@@ -339,7 +339,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 90,
-    description: 'Carapace harvested from an astral leviathan. Ritualistically. Respectfully.',
+    description: 'Carapace harvested from an astral leviathan. Ritualistically. Respectfully. Nullifies ARMORED (−15), VOID (−10).',
     effects: [
       { resistance: { tag: ThreatTag.ARMORED, value: 15 } },
       { resistance: { tag: ThreatTag.VOID, value: 10 } },
@@ -353,7 +353,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 100,
-    description: 'A crown pulled from the collapsing orbit of a dying binary star. Still warm.',
+    description: 'A crown pulled from the collapsing orbit of a dying binary star. Still warm. Nullifies VOID (−15), +3 INT.',
     effects: [
       { resistance: { tag: ThreatTag.VOID, value: 15 } },
       { statBonus: { [StatType.INT]: 3 } },
@@ -367,7 +367,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 95,
-    description: 'A single gauntlet cast around a still-molten asteroid core. Burns but protects.',
+    description: 'A single gauntlet cast around a still-molten asteroid core. Burns but protects. +5 STR, Nullifies KINETIC (−8).',
     effects: [
       { statBonus: { [StatType.STR]: 5 } },
       { resistance: { tag: ThreatTag.KINETIC, value: 8 } },
@@ -440,7 +440,7 @@ export const universalItems: ItemDef[] = [
     category: ItemCategory.ARMOR,
     archetype: 'universal',
     cost: 200,
-    description: 'Ceremonial plating worn by the void-lords of the outer dark. Dense. Cold. Resplendent.',
+    description: 'Ceremonial plating worn by the void-lords of the outer dark. Dense. Cold. Resplendent. Nullifies VOID (−20), EVASIVE (−15).',
     effects: [
       { resistance: { tag: ThreatTag.VOID, value: 20 } },
       { resistance: { tag: ThreatTag.EVASIVE, value: 15 } },

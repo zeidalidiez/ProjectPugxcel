@@ -53,7 +53,7 @@ export default function ExecuteTerminal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-terminal-bg/95" role="dialog" aria-label="Resolution">
-      <div className="flex flex-col gap-4 max-w-2xl w-full" style={{ padding: '40px' }} aria-live="polite">
+      <div className="flex flex-col gap-4 max-w-2xl w-full p-4 sm:p-10" aria-live="polite">
         {visibleLines.map((item) => (
           <div
             key={item.lineIndex}

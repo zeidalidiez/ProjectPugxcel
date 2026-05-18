@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/shallow'
 import { useGameStore } from '../store'
 import { StatType, STAT_TYPE_VALUES } from '../types/enums'
 import { STAT_LABELS } from '../types/stats'
@@ -11,8 +12,12 @@ const STAT_DESCRIPTIONS: Record<StatType, string> = {
 }
 
 export default function StatPanel() {
-  const stats = useGameStore((s) => s.run?.stats)
-  const baseStats = useGameStore((s) => s.run?.baseStats)
+  const { stats, baseStats } = useGameStore(
+    useShallow((s) => ({
+      stats: s.run?.stats,
+      baseStats: s.run?.baseStats,
+    })),
+  )
 
   if (!stats || !baseStats) return null
 

@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { useGameStore } from '../store'
 import { Archetype } from '../types/enums'
 import { useSeed } from '../hooks/useSeed'
 import { parseShareString, messageForError } from '../game/save/deserialize'
-import CodexModal from './CodexModal'
 import DifficultySelect from './DifficultySelect'
-import CustomDifficultyPanel from './CustomDifficultyPanel'
+import ArchetypeCard from './ArchetypeCard'
+import type { ArchetypeCardData } from './ArchetypeCard'
 
-const ARCHETYPES = [
+const CodexModal = lazy(() => import('./CodexModal'))
+const CustomDifficultyPanel = lazy(() => import('./CustomDifficultyPanel'))
+const SettingsModal = lazy(() => import('./SettingsModal'))
+
+const ARCHETYPES: ArchetypeCardData[] = [
   {
     key: Archetype.SPORGK,
     name: 'Sporgk',
@@ -40,8 +44,6 @@ const ARCHETYPES = [
 export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string) => void }) {
   const startRun = useGameStore((s) => s.startRun)
   const { dailySeed } = useSeed()
-  const settings = useGameStore((s) => s.settings)
-  const updateSettings = useGameStore((s) => s.updateSettings)
   const balanceWeights = useGameStore((s) => s.balanceWeights)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [codexOpen, setCodexOpen] = useState(false)
@@ -70,7 +72,7 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
   }
 
   return (
-    <div className="h-full flex flex-col items-center justify-center gap-8 p-12 relative">
+    <div className="h-full flex flex-col items-center justify-center gap-8 p-6 sm:p-12 relative">
       <div className="text-center">
         <h1 className="text-4xl font-bold text-terminal-text-bright tracking-widest mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           PROJECT ANTIGRAVITY
@@ -92,40 +94,11 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
         {(() => {
           const arch = ARCHETYPES[carouselIdx]
           return (
-            <button
-              onClick={() => handleSelect(arch.key)}
-              onMouseEnter={() => document.documentElement.setAttribute('data-archetype', arch.key.toLowerCase())}
-              onMouseLeave={() => document.documentElement.removeAttribute('data-archetype')}
-              className="flex flex-col items-center text-center gap-5 rounded-lg border-2 border-terminal-border hover:border-terminal-accent transition-all flex-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-terminal-accent"
-              style={{ padding: '36px 28px', backgroundColor: arch.bgTint, borderColor: 'var(--accent)', borderWidth: '1px' }}
-              aria-label={`Select ${arch.name}`}
-            >
-              <div>
-                <div className="text-terminal-text-bright font-bold text-2xl" style={{ fontFamily: 'var(--font-display)' }}>{arch.name}</div>
-                <div className="text-terminal-text text-sm mt-1">{arch.subtitle}</div>
-              </div>
-              <p className="text-terminal-text text-sm leading-relaxed max-w-sm">{arch.description}</p>
-              <div className="flex gap-2">
-                {arch.key === Archetype.SPORGK && (
-                  <>
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(251,146,60,0.2)', color: '#fb923c' }}>STR</span>
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(251,146,60,0.2)', color: '#fb923c' }}>STA</span>
-                  </>
-                )}
-                {arch.key === Archetype.ELF && (
-                  <>
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(34,211,238,0.2)', color: '#22d3ee' }}>AGI</span>
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(34,211,238,0.2)', color: '#22d3ee' }}>LCK</span>
-                  </>
-                )}
-                {arch.key === Archetype.VAMPIRE && (
-                  <>
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>INT</span>
-                    <span className="px-3 py-1 rounded-full text-xs font-mono font-bold" style={{ backgroundColor: 'rgba(168,85,247,0.2)', color: '#a855f7' }}>STA</span>
-                  </>
-                )}
-              </div>
-            </button>
+            <ArchetypeCard
+              key={arch.key}
+              arch={arch}
+              onSelect={handleSelect}
+            />
           )
         })()}
 
@@ -190,69 +163,20 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
       </button>
 
       {settingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setSettingsOpen(false)}>
-          <div className="bg-terminal-surface border border-terminal-accent rounded-lg p-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-terminal-text-bright text-lg font-bold mb-4 tracking-wider">SETTINGS</h2>
-
-            <div className="mb-5">
-              <div className="text-terminal-text text-xs mb-2 uppercase tracking-widest">Font Size</div>
-              <div className="flex gap-2">
-                {([100, 125, 150] as const).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => updateSettings({ fontSize: s })}
-                    className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
-                      settings.fontSize === s
-                        ? 'bg-terminal-accent text-black font-bold'
-                        : 'border border-terminal-border text-terminal-text hover:border-terminal-accent'
-                    }`}
-                    aria-label={`Font size ${s}%`}
-                  >
-                    {s}%
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 mb-5">
-              {[
-                { label: 'Sound', key: 'soundEnabled' as const },
-                { label: 'Music', key: 'musicEnabled' as const },
-                { label: 'Uncertainty Mode', key: 'uncertaintyMode' as const },
-                { label: 'Reduced Motion', key: 'reducedMotion' as const },
-              ].map(({ label, key }) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="text-terminal-text text-xs">{label}</span>
-                  <button
-                    onClick={() => updateSettings({ [key]: !settings[key] })}
-                    className={`relative w-10 h-5 rounded-full transition-colors ${
-                      settings[key] ? 'bg-terminal-accent' : 'bg-terminal-border'
-                    }`}
-                    role="switch"
-                    aria-checked={settings[key]}
-                    aria-label={`Toggle ${label}`}
-                  >
-                    <div
-                      className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                        settings[key] ? 'translate-x-[22px]' : 'translate-x-0.5'
-                      }`}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setSettingsOpen(false)}
-              className="w-full py-2 rounded bg-terminal-accent text-black text-sm font-bold hover:bg-terminal-accent/80 transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <Suspense fallback={null}>
+          <SettingsModal onClose={() => setSettingsOpen(false)} />
+        </Suspense>
       )}
-      {codexOpen && <CodexModal onClose={() => setCodexOpen(false)} />}
-      {customPanelOpen && <CustomDifficultyPanel onClose={() => setCustomPanelOpen(false)} />}
+      {codexOpen && (
+        <Suspense fallback={null}>
+          <CodexModal onClose={() => setCodexOpen(false)} />
+        </Suspense>
+      )}
+      {customPanelOpen && (
+        <Suspense fallback={null}>
+          <CustomDifficultyPanel onClose={() => setCustomPanelOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
