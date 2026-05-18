@@ -10,7 +10,7 @@ import NodeTooltip from './NodeTooltip'
 import { useAudio } from '../hooks/useAudio'
 
 export default function ConstellationViewport() {
-  const { constellation, draftedIds, archetype, gold, lck, currentNodeDrafts, phase } = useGameStore(
+  const { constellation, draftedIds, archetype, gold, lck, currentNodeDrafts, phase, turn } = useGameStore(
     useShallow((s) => ({
       constellation: s.run?.constellation,
       draftedIds: s.run?.draftedNodeIds,
@@ -19,6 +19,7 @@ export default function ConstellationViewport() {
       lck: s.run?.stats?.[StatType.LCK] ?? 0,
       currentNodeDrafts: s.run?.currentNodeDrafts,
       phase: s.run?.phase,
+      turn: s.run?.turn,
     })),
   )
   const purchaseNode = useGameStore((s) => s.purchaseNode)
@@ -134,6 +135,15 @@ export default function ConstellationViewport() {
     e.currentTarget.releasePointerCapture(e.pointerId)
   }, [])
 
+  const driftStars = useMemo(() =>
+    Array.from({ length: 40 }, (_, i) => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 20,
+      duration: 18 + Math.random() * 12,
+      size: Math.random() < 0.85 ? 1 : 2,
+    })), [])
+
   if (!constellation || !archetype) return null
 
   const nodes = [...constellation.nodes.values()]
@@ -147,11 +157,7 @@ export default function ConstellationViewport() {
 
   return (
     <div
-      className="relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none p-4 sm:p-6"
-      style={{
-        background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%), radial-gradient(circle at 1px 1px, rgba(251,146,60,0.03) 1px, transparent 0)',
-        backgroundSize: '100% 100%, 32px 32px',
-      }}
+      className="constellation-viewport relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none p-4 sm:p-6"
       role="region"
       aria-label="Constellation"
     >
@@ -187,10 +193,19 @@ export default function ConstellationViewport() {
               <filter id="purchasableGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="var(--color-terminal-pass, #4ade80)" floodOpacity="0.35" />
               </filter>
-              <filter id="anchorHalo" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="var(--accent)" floodOpacity="0.25" />
-              </filter>
             </defs>
+            {nodes.filter((n) => {
+              const d = constellation.defMap?.get(n.defId) ?? getNodeById(archetype, n.defId)
+              return d?.isAnchor
+            }).map((n) => (
+              <circle
+                key={`halo-${n.id}`}
+                cx={n.x} cy={n.y} r={24}
+                fill="var(--accent, #fb923c)"
+                opacity={0.15}
+                className="anchor-pulse"
+              />
+            ))}
             {nodes.flatMap((node) =>
               node.edges.map((targetId) => {
                 const target = constellation.nodes.get(targetId)
@@ -205,8 +220,18 @@ export default function ConstellationViewport() {
                     : undefined
                 const targetDist = hopDistance.get(target.id)
                 const edgeOpacity = purchased ? 1 : targetDist !== undefined
-                  ? targetDist <= 2 ? 0.55 : targetDist <= 5 ? 0.25 : 0.1
-                  : 0.05
+                  ? targetDist <= 2 ? 0.85 : targetDist <= 4 ? 0.55 : targetDist <= 7 ? 0.32 : 0.18
+                  : 0.18
+                const edgeStroke = purchased
+                  ? 'var(--color-terminal-accent)'
+                  : targetDist !== undefined && targetDist <= 2
+                    ? 'var(--accent, #fb923c)'
+                    : targetDist !== undefined && targetDist <= 4
+                      ? 'var(--accent, #fb923c)'
+                      : 'var(--color-terminal-border)'
+                const edgeStrokeOpacity = purchased ? undefined : targetDist !== undefined && targetDist <= 2
+                  ? 0.6 : targetDist !== undefined && targetDist <= 4
+                    ? 0.35 : undefined
                 return (
                   <line
                     key={`${node.id}-${targetId}`}
@@ -214,11 +239,12 @@ export default function ConstellationViewport() {
                     y1={node.y}
                     x2={target.x}
                     y2={target.y}
-                    stroke={purchased ? 'var(--color-terminal-accent)' : 'var(--color-terminal-border)'}
+                    stroke={edgeStroke}
                     strokeWidth={purchased ? 3.5 : 0.8}
                     strokeLinecap="round"
                     filter={edgeFilter}
                     opacity={edgeOpacity}
+                    strokeOpacity={edgeStrokeOpacity}
                   />
                 )
               }),
@@ -236,8 +262,8 @@ export default function ConstellationViewport() {
             const canBuy = isDraft && purchasable && !purchased && !locked && affordable && (currentNodeDrafts ?? 0) > 0
             const dist = hopDistance.get(node.id)
             const nodeOpacity = purchased ? 1 : dist !== undefined
-              ? dist <= 2 ? 0.55 : dist <= 5 ? 0.25 : 0.1
-              : 0.05
+              ? dist <= 2 ? 0.85 : dist <= 4 ? 0.55 : dist <= 7 ? 0.32 : 0.18
+              : 0.18
             const breathe = !purchased && dist !== undefined && dist <= 2
 
             return (
@@ -288,6 +314,64 @@ export default function ConstellationViewport() {
             )
           })}
         </div>
+      </div>
+
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {driftStars.map((s, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-terminal-accent/30 animate-drift"
+            style={{
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              width: s.size,
+              height: s.size,
+              animationDelay: `${s.delay}s`,
+              animationDuration: `${s.duration}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="absolute inset-0 pointer-events-none z-10">
+        {['TL', 'TR', 'BL', 'BR'].map((corner) => (
+          <svg
+            key={corner}
+            className={`absolute w-6 h-6 ${
+              corner === 'TL' ? 'top-2 left-2' :
+              corner === 'TR' ? 'top-2 right-2 rotate-90' :
+              corner === 'BL' ? 'bottom-2 left-2 -rotate-90' :
+              'bottom-2 right-2 rotate-180'
+            }`}
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M2 10 L2 2 L10 2"
+              stroke="var(--accent, #fb923c)"
+              strokeWidth="1.5"
+              fill="none"
+              opacity="0.7"
+            />
+            <circle cx="2" cy="2" r="1.5" fill="var(--accent, #fb923c)" opacity="0.9" />
+          </svg>
+        ))}
+
+        <div className="absolute top-0 left-12 right-12 h-3 flex justify-between opacity-40">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className={`w-px ${i % 3 === 0 ? 'h-3 bg-terminal-accent' : 'h-1.5 bg-terminal-text/40'}`} />
+          ))}
+        </div>
+
+        <div className="absolute top-1 left-12 text-[9px] font-mono text-terminal-accent/70 tracking-widest">
+          GRID 04-7 · LAT {Math.round(scale * 100)}
+        </div>
+        <div className="absolute bottom-1 left-12 text-[9px] font-mono text-terminal-accent/70 tracking-widest">
+          NAV LOCK · CONTACTS {nodes.length}
+        </div>
+        <div className="absolute bottom-1 right-12 text-[9px] font-mono text-terminal-accent/70 tracking-widest">
+          SYS NOMINAL · ⏵ T-{turn ?? 0}
+        </div>
+        <span className="absolute bottom-1 right-3 text-terminal-accent text-[10px] animate-pulse">_</span>
       </div>
 
       {hoveredNode && (() => {

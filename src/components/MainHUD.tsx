@@ -1,5 +1,5 @@
 import { useGameStore } from '../store'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { RunPhase } from '../types/enums'
 import StatPanel from './StatPanel'
 import EquipmentSlots from './EquipmentSlots'
@@ -11,6 +11,7 @@ import ThreatHeatmap from './ThreatHeatmap'
 import GoldDisplay from './GoldDisplay'
 import StoreModal from './StoreModal'
 import ExecuteButton from './ExecuteButton'
+import { useAudio } from '../hooks/useAudio'
 
 const RUN_PHASES = [RunPhase.FORECAST, RunPhase.DRAFT] as const
 const PHASE_INDEX: Record<string, number> = { FORECAST: 0, DRAFT: 1 }
@@ -33,10 +34,35 @@ export default function MainHUD() {
   const turn = useGameStore((s) => s.run?.turn)
   const [showLeftPanel, setShowLeftPanel] = useState(false)
   const [showLog, setShowLog] = useState(false)
+  const [typedHelp, setTypedHelp] = useState('')
+  const helpIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const { playTypewriterTick } = useAudio()
 
   const isDraft = phase === RunPhase.DRAFT
   const isPrep = turn !== undefined && turn <= PREP_TURNS
   const activeIdx = phase ? PHASE_INDEX[phase] : -1
+
+  const helpText = phase && PHASE_HELP[phase as string]
+    ? (isPrep ? PHASE_HELP[phase as string].prep : PHASE_HELP[phase as string].encounter)
+    : ''
+
+  useEffect(() => {
+    if (!helpText) { setTypedHelp(''); return }
+    setTypedHelp('')
+    if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
+    let i = 0
+    helpIntervalRef.current = setInterval(() => {
+      i++
+      setTypedHelp(helpText.slice(0, i))
+      if (i % 3 === 0) playTypewriterTick()
+      if (i >= helpText.length) {
+        if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
+      }
+    }, 35)
+    return () => {
+      if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
+    }
+  }, [helpText, playTypewriterTick])
 
   return (
     <div className="h-full flex flex-col gap-2 p-3 sm:p-5">
@@ -73,7 +99,7 @@ export default function MainHUD() {
 
       {phase && PHASE_HELP[phase as string] && (
         <div className="text-terminal-accent text-xs font-mono px-1" role="status">
-          › {isPrep ? PHASE_HELP[phase as string].prep : PHASE_HELP[phase as string].encounter}
+          › {typedHelp}<span className="animate-pulse">_</span>
         </div>
       )}
 
