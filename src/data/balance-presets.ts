@@ -14,8 +14,8 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     luckEfficacyMultiplier: 1.10,
     poolSizeMultiplier: 1.0,
     constellationLayout: 'radial',
-    nodeDensity: 1.0,
-    ringCount: 7,
+    nodeDensity: 0.6,
+    ringCount: 6,
     ringZeroNodes: 1,
   },
   normal: {
@@ -48,8 +48,8 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     luckEfficacyMultiplier: 1.0,
     poolSizeMultiplier: 1.0,
     constellationLayout: 'radial',
-    nodeDensity: 0.8,
-    ringCount: 6,
+    nodeDensity: 1.4,
+    ringCount: 8,
     ringZeroNodes: 1,
   },
   nightmare: {
@@ -65,8 +65,8 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     luckEfficacyMultiplier: 0.90,
     poolSizeMultiplier: 0.85,
     constellationLayout: 'radial',
-    nodeDensity: 0.5,
-    ringCount: 5,
+    nodeDensity: 1.8,
+    ringCount: 9,
     ringZeroNodes: 1,
   },
 }

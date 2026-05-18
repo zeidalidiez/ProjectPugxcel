@@ -97,8 +97,8 @@ function mapTemplateToNodeType(kind: string): NodeType {
   return m[kind] ?? NodeType.STANDARD
 }
 
-function ringNodeCount(ring: number, ringTotal: number, density: number): number {
-  if (ring === 0) return 1
+function ringNodeCount(ring: number, ringTotal: number, density: number, ringZeroNodes: number): number {
+  if (ring === 0) return ringZeroNodes
   const mid = ringTotal / 2
   const factor = 1 - Math.abs(ring - mid) / mid
   return Math.max(2, Math.round(NODE_DENSITY * density * (0.5 + 0.5 * factor)))
@@ -111,18 +111,21 @@ export function generateNodes(
   archetype: Archetype,
 ): NodeDef[] {
   const ringKeys = Object.keys(flavor.rings).sort((a, b) => Number(a) - Number(b))
-  const ringTotal = ringKeys.length
+  const ringTotal = Math.min(weights.ringCount, ringKeys.length)
   const structuralScale = weights.structuralNodeAvailability
 
   const ringCounts: number[] = []
   let totalNodes = 0
   for (let ri = 0; ri < ringTotal; ri++) {
-    const count = ringNodeCount(ri, ringTotal, weights.nodeDensity)
+    const count = ringNodeCount(ri, ringTotal, weights.nodeDensity, weights.ringZeroNodes)
     ringCounts.push(count)
     totalNodes += count
   }
 
-  const abilityCount = Math.max(2, Math.round(totalNodes * ABILITY_RATIO))
+  const abilityCount = Math.max(2, Math.min(
+    Math.round(totalNodes * ABILITY_RATIO),
+    ringTotal - 2,
+  ))
   const abilityNames = generateAbilityNames(flavor, rng, abilityCount)
   const anchorNames = generateAnchorNames(flavor, rng)
 

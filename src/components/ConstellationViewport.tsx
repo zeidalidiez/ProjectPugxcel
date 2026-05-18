@@ -33,10 +33,31 @@ export default function ConstellationViewport() {
 
   useLayoutEffect(() => {
     const el = containerRef.current
-    if (!el) return
+    if (!el || !constellation) return
     const rect = el.getBoundingClientRect()
-    setOffset({ x: rect.width / 2 - 800 * 0.6, y: rect.height / 2 - 450 * 0.6 })
-  }, [])
+    const allNodes = [...constellation.nodes.values()]
+    if (allNodes.length === 0) return
+    const pad = 60
+    const minX = Math.min(...allNodes.map((n) => n.x)) - pad
+    const maxX = Math.max(...allNodes.map((n) => n.x)) + pad
+    const minY = Math.min(...allNodes.map((n) => n.y)) - pad
+    const maxY = Math.max(...allNodes.map((n) => n.y)) + pad
+    const svgW = maxX - minX
+    const svgH = maxY - minY
+    const midX = (minX + maxX) / 2
+    const midY = (minY + maxY) / 2
+
+    const idealScale = Math.min(
+      rect.width / (svgW * 1.15),
+      rect.height / (svgH * 1.15),
+    )
+    const newScale = Math.max(0.6, Math.min(1.2, idealScale))
+    setScale(newScale)
+    setOffset({
+      x: rect.width / 2 - midX * newScale,
+      y: rect.height / 2 - midY * newScale,
+    })
+  }, [constellation])
 
   const { playNodePurchase, playHover } = useAudio()
 
@@ -138,7 +159,7 @@ export default function ConstellationViewport() {
                     x2={target.x}
                     y2={target.y}
                     stroke={purchased ? 'var(--color-terminal-accent)' : '#1e2d44'}
-                    strokeWidth={purchased ? 2.5 : 1}
+                    strokeWidth={purchased ? 3.5 : 0.8}
                     strokeLinecap="round"
                   />
                 )
@@ -176,8 +197,8 @@ export default function ConstellationViewport() {
                 disabled={!canBuy}
                 className={`
                   absolute rounded-full border-2 flex items-center justify-center
-                  text-[9px] font-mono font-bold transition-colors duration-150
-                  w-9 h-9 -translate-x-1/2 -translate-y-1/2
+                  text-xs font-mono font-bold transition-colors duration-150
+                  w-10 h-10 -translate-x-1/2 -translate-y-1/2
                   ${purchased ? 'bg-terminal-accent border-terminal-accent text-black' : ''}
                   ${locked ? 'bg-terminal-surface border-terminal-fail/30 text-terminal-text/30 cursor-not-allowed' : ''}
                   ${purchasable && !purchased && !locked && affordable ? 'border-terminal-pass bg-terminal-surface text-terminal-pass hover:border-terminal-accent hover:text-terminal-accent cursor-pointer' : ''}

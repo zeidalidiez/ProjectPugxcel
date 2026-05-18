@@ -4,12 +4,16 @@ import type { BalanceWeights } from '../../../types/balance'
 
 const CENTER_X = 800
 const CENTER_Y = 450
-const RADIUS_STEP = 90
+const RADIUS_STEP = 130
 const JITTER_DEG = 8
 const MAX_FORWARD_EDGES = 3
 const LATERAL_CHANCE = 0.3
-const MIN_DIST = 50
-const REPULSION_PASSES = 3
+const MIN_DIST = 75
+const REPULSION_PASSES = 5
+const SPRING_PASSES = 2
+const SPRING_FORCE = 0.15
+const IDEAL_EDGE_RATIO = 0.75
+const SPREAD_FACTOR = 1.25
 
 function toRad(deg: number): number {
   return (deg * Math.PI) / 180
@@ -109,6 +113,26 @@ export function layoutRadial(
           a.y = Math.round(a.y + ny * push)
           b.x = Math.round(b.x - nx * push)
           b.y = Math.round(b.y - ny * push)
+        }
+      }
+    }
+  }
+
+  for (let pass = 0; pass < SPRING_PASSES; pass++) {
+    for (const cn of resultNodes.values()) {
+      for (const targetId of cn.edges) {
+        const target = resultNodes.get(targetId)
+        if (!target) continue
+        const d = dist(cn, target)
+        if (d > 0) {
+          const ideal = RADIUS_STEP * IDEAL_EDGE_RATIO
+          const force = (d - ideal) * SPRING_FORCE
+          const nx = (target.x - cn.x) / d
+          const ny = (target.y - cn.y) / d
+          cn.x = Math.round(cn.x + nx * force)
+          cn.y = Math.round(cn.y + ny * force)
+          target.x = Math.round(target.x - nx * force)
+          target.y = Math.round(target.y - ny * force)
         }
       }
     }
@@ -214,6 +238,11 @@ export function layoutRadial(
     if (def?.isAnchor) {
       anchorNodeIds.push(cn.id)
     }
+  }
+
+  for (const node of resultNodes.values()) {
+    node.x = Math.round(node.x * SPREAD_FACTOR)
+    node.y = Math.round(node.y * SPREAD_FACTOR)
   }
 
   return {
