@@ -136,7 +136,7 @@ export default function ConstellationViewport() {
   }, [])
 
   const driftStars = useMemo(() =>
-    Array.from({ length: 40 }, (_, i) => ({
+    Array.from({ length: 40 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 20,
