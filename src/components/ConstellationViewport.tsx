@@ -73,6 +73,36 @@ export default function ConstellationViewport() {
     return result
   }, [constellation, draftedIds])
 
+  const hopDistance = useMemo(() => {
+    if (!constellation) return new Map<string, number>()
+    const dist = new Map<string, number>()
+    const queue: string[] = []
+    for (const id of draftedIds ?? []) {
+      if (constellation.nodes.has(id) && !dist.has(id)) {
+        dist.set(id, 0)
+        queue.push(id)
+      }
+    }
+    const startId = constellation.startNodeId
+    if (startId && !dist.has(startId)) {
+      dist.set(startId, 0)
+      queue.push(startId)
+    }
+    while (queue.length > 0) {
+      const cur = queue.shift()!
+      const d = dist.get(cur)!
+      const node = constellation.nodes.get(cur)
+      if (!node) continue
+      for (const eid of node.edges) {
+        if (!dist.has(eid)) {
+          dist.set(eid, d + 1)
+          queue.push(eid)
+        }
+      }
+    }
+    return dist
+  }, [constellation, draftedIds])
+
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -118,6 +148,10 @@ export default function ConstellationViewport() {
   return (
     <div
       className="relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none p-4 sm:p-6"
+      style={{
+        background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%), radial-gradient(circle at 1px 1px, rgba(251,146,60,0.03) 1px, transparent 0)',
+        backgroundSize: '100% 100%, 32px 32px',
+      }}
       role="region"
       aria-label="Constellation"
     >
@@ -153,6 +187,9 @@ export default function ConstellationViewport() {
               <filter id="purchasableGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="var(--color-terminal-pass, #4ade80)" floodOpacity="0.35" />
               </filter>
+              <filter id="anchorHalo" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="var(--accent)" floodOpacity="0.25" />
+              </filter>
             </defs>
             {nodes.flatMap((node) =>
               node.edges.map((targetId) => {
@@ -166,6 +203,10 @@ export default function ConstellationViewport() {
                   : (sourcePurchased && targetPurchasable)
                     ? 'url(#purchasableGlow)'
                     : undefined
+                const targetDist = hopDistance.get(target.id)
+                const edgeOpacity = purchased ? 1 : targetDist !== undefined
+                  ? targetDist <= 2 ? 0.55 : targetDist <= 5 ? 0.25 : 0.1
+                  : 0.05
                 return (
                   <line
                     key={`${node.id}-${targetId}`}
@@ -177,6 +218,7 @@ export default function ConstellationViewport() {
                     strokeWidth={purchased ? 3.5 : 0.8}
                     strokeLinecap="round"
                     filter={edgeFilter}
+                    opacity={edgeOpacity}
                   />
                 )
               }),
@@ -192,6 +234,11 @@ export default function ConstellationViewport() {
             const price = applyDiscount(def.cost, lck)
             const affordable = gold !== undefined && gold >= price
             const canBuy = isDraft && purchasable && !purchased && !locked && affordable && (currentNodeDrafts ?? 0) > 0
+            const dist = hopDistance.get(node.id)
+            const nodeOpacity = purchased ? 1 : dist !== undefined
+              ? dist <= 2 ? 0.55 : dist <= 5 ? 0.25 : 0.1
+              : 0.05
+            const breathe = !purchased && dist !== undefined && dist <= 2
 
             return (
               <button
@@ -215,6 +262,7 @@ export default function ConstellationViewport() {
                   absolute rounded-full border-2 flex items-center justify-center
                   text-xs font-mono font-bold transition-colors duration-150
                   w-10 h-10 -translate-x-1/2 -translate-y-1/2
+                  ${breathe ? 'animate-breathe' : ''}
                   ${purchased ? 'bg-terminal-accent border-terminal-accent text-black' : ''}
                   ${locked ? 'bg-terminal-surface border-terminal-fail/30 text-terminal-text/30 cursor-not-allowed' : ''}
                   ${purchasable && !purchased && !locked && affordable ? 'border-terminal-pass bg-terminal-surface text-terminal-pass hover:border-terminal-accent hover:text-terminal-accent cursor-pointer' : ''}
@@ -224,11 +272,14 @@ export default function ConstellationViewport() {
                 style={{
                   left: node.x,
                   top: node.y,
+                  opacity: nodeOpacity,
                   boxShadow: purchased
                     ? '0 0 12px var(--accent-glow)'
                     : purchasable
                       ? '0 0 8px var(--color-terminal-pass, #4ade80)'
-                      : undefined,
+                      : def.isAnchor
+                        ? '0 0 16px var(--accent-glow)'
+                        : undefined,
                 }}
                 aria-label={`${def.name}: ${def.description}. Cost: ${price}g`}
               >

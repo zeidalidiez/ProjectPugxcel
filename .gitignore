@@ -16,6 +16,7 @@ dist-ssr
 .agents/
 skills-lock.json
 Grok.MD
+Hyperagent.MD
 
 # Editor directories and files
 .vscode/*
@@ -27,4 +28,3 @@ Grok.MD
 *.njsproj
 *.sln
 *.sw?
-Grok.MD

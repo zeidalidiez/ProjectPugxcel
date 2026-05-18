@@ -17,7 +17,7 @@ export function usePhase() {
       case RunPhase.ARCHETYPE_SELECT:
         break
       case RunPhase.FORECAST:
-        advanceToPayout()
+        initDraft()
         break
       case RunPhase.PAYOUT:
         initDraft()

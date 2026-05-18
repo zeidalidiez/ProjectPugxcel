@@ -4,7 +4,6 @@ import { RunPhase } from '../types/enums'
 
 export function useKeyboardNav() {
   const phase = useGameStore((s) => s.phase)
-  const advanceToPayout = useGameStore((s) => s.advanceToPayout)
   const initDraft = useGameStore((s) => s.initDraft)
   const resetRun = useGameStore((s) => s.resetRun)
 
@@ -29,7 +28,7 @@ export function useKeyboardNav() {
 
       if (currentPhase === RunPhase.FORECAST) {
         e.preventDefault()
-        advanceToPayout()
+        initDraft()
       } else if (currentPhase === RunPhase.PAYOUT) {
         e.preventDefault()
         initDraft()

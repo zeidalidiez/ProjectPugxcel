@@ -51,3 +51,12 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.animate-breathe {
+  animation: breathe 8s infinite ease-in-out;
+}

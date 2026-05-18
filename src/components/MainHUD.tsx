@@ -12,19 +12,15 @@ import GoldDisplay from './GoldDisplay'
 import StoreModal from './StoreModal'
 import ExecuteButton from './ExecuteButton'
 
-const RUN_PHASES = [RunPhase.FORECAST, RunPhase.PAYOUT, RunPhase.DRAFT] as const
-const PHASE_INDEX: Record<string, number> = { FORECAST: 0, PAYOUT: 1, DRAFT: 2 }
+const RUN_PHASES = [RunPhase.FORECAST, RunPhase.DRAFT] as const
+const PHASE_INDEX: Record<string, number> = { FORECAST: 0, DRAFT: 1 }
 
 const PREP_TURNS = 0
 
 const PHASE_HELP: Record<string, { prep: string; encounter: string }> = {
   [RunPhase.FORECAST]: {
-    prep: 'No threats detected. Build freely. Press CONTINUE.',
-    encounter: 'Review the radar above. Plan which stats to invest. Press CONTINUE when ready.',
-  },
-  [RunPhase.PAYOUT]: {
-    prep: 'Gold received. Press BEGIN DRAFTING to enter the store.',
-    encounter: 'Gold received. Press BEGIN DRAFTING to enter the store.',
+    prep: 'No threats detected. Build freely. Press BEGIN DRAFTING.',
+    encounter: 'Review the radar above. Gold received. Press BEGIN DRAFTING when ready.',
   },
   [RunPhase.DRAFT]: {
     prep: 'Purchase 1 node (green circles) + any items. Press ADVANCE to continue.',
@@ -150,12 +146,12 @@ export default function MainHUD() {
         {phase === RunPhase.FORECAST && (
           <div>
             <button
-              onClick={() => useGameStore.getState().advanceToPayout()}
+              onClick={() => useGameStore.getState().initDraft()}
               className="w-full py-4 text-lg font-bold tracking-widest uppercase rounded bg-terminal-accent text-black hover:bg-terminal-accent/80 transition-colors"
               style={{ fontFamily: 'var(--font-display)' }}
-              aria-label="Continue to Payout — press Enter or Space"
+              aria-label="Begin Drafting — press Enter or Space"
             >
-              Continue to Payout
+              Begin Drafting
             </button>
             <div className="text-terminal-text/30 text-[10px] font-mono text-center mt-1">[Enter / Space]</div>
           </div>

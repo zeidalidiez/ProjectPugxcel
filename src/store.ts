@@ -187,8 +187,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const isPrep = nextTurn <= PREP_TURNS
     const rng = createRNG(`${run.seed}_${run.archetype}_t${nextTurn}_f`)
     const encounters = isPrep ? [] : generateEncounters(rng, nextTurn, 5)
+    const payout = isPrep ? 0 : calculatePayout(run.turn, run.stats[StatType.LCK], run.balanceWeights.perTurnPayoutMultiplier)
     set({
-      run: { ...run, turn: nextTurn, encounters, phase: RunPhase.FORECAST },
+      run: {
+        ...run,
+        gold: run.gold + payout,
+        turn: nextTurn,
+        encounters,
+        phase: RunPhase.FORECAST,
+      },
       phase: RunPhase.FORECAST,
     })
   },
