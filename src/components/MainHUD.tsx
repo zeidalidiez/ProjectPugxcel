@@ -45,24 +45,28 @@ export default function MainHUD() {
   const helpText = phase && PHASE_HELP[phase as string]
     ? (isPrep ? PHASE_HELP[phase as string].prep : PHASE_HELP[phase as string].encounter)
     : ''
+  const helpTextRef = useRef(helpText)
+  helpTextRef.current = helpText
 
   useEffect(() => {
-    if (!helpText) { setTypedHelp(''); return }
+    const text = helpTextRef.current
+    if (!text) { setTypedHelp(''); return }
     setTypedHelp('')
     if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
     let i = 0
     helpIntervalRef.current = setInterval(() => {
       i++
-      setTypedHelp(helpText.slice(0, i))
+      setTypedHelp(text.slice(0, i))
       if (i % 3 === 0) playTypewriterTick()
-      if (i >= helpText.length) {
+      if (i >= text.length) {
         if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
       }
     }, 35)
     return () => {
       if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
     }
-  }, [helpText, playTypewriterTick])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [helpText])
 
   return (
     <div className="h-full flex flex-col gap-2 p-3 sm:p-5">
