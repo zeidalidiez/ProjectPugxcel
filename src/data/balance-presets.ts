@@ -13,6 +13,10 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     perTurnPayoutMultiplier: 1.20,
     luckEfficacyMultiplier: 1.10,
     poolSizeMultiplier: 1.0,
+    constellationLayout: 'radial',
+    nodeDensity: 1.0,
+    ringCount: 7,
+    ringZeroNodes: 1,
   },
   normal: {
     curveType: 'breakpoint',
@@ -26,6 +30,10 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     perTurnPayoutMultiplier: 1.0,
     luckEfficacyMultiplier: 1.0,
     poolSizeMultiplier: 1.0,
+    constellationLayout: 'radial',
+    nodeDensity: 1.0,
+    ringCount: 7,
+    ringZeroNodes: 1,
   },
   hard: {
     curveType: 'breakpoint',
@@ -39,6 +47,10 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     perTurnPayoutMultiplier: 0.90,
     luckEfficacyMultiplier: 1.0,
     poolSizeMultiplier: 1.0,
+    constellationLayout: 'radial',
+    nodeDensity: 0.8,
+    ringCount: 6,
+    ringZeroNodes: 1,
   },
   nightmare: {
     curveType: 'breakpoint',
@@ -52,6 +64,10 @@ export const PRESETS: Record<Exclude<DifficultyPresetId, 'custom'>, BalanceWeigh
     perTurnPayoutMultiplier: 0.80,
     luckEfficacyMultiplier: 0.90,
     poolSizeMultiplier: 0.85,
+    constellationLayout: 'radial',
+    nodeDensity: 0.5,
+    ringCount: 5,
+    ringZeroNodes: 1,
   },
 }
 

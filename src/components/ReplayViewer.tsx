@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createRNG } from '../game/rng/create'
 import { generateConstellation } from '../game/constellation/generate'
+import { PRESETS } from '../data/balance-presets'
 import { canPurchaseNode } from '../game/constellation/canPurchase'
 import { purchaseNode } from '../game/constellation/purchase'
 import { generateEncounters } from '../game/resolve/encounter'
@@ -10,7 +11,6 @@ import { parseShareString, messageForError } from '../game/save/deserialize'
 import { EMPTY_STATS, addStats } from '../types/stats'
 import { Archetype, StatType, RunPhase } from '../types/enums'
 import type { RunState, CombatLogLine } from '../types/run'
-import { PRESETS } from '../data/balance-presets'
 
 interface ReplayViewerProps {
   shareString: string
@@ -51,7 +51,7 @@ export default function ReplayViewer({ shareString, onBack }: ReplayViewerProps)
       const seed = parsed.seed
       const draftSeq = parsed.draftSeq
       const rng = createRNG(seed)
-      const constellation = generateConstellation(rng, archetype)
+      const constellation = generateConstellation(rng, archetype, PRESETS.normal)
 
       let draftedIds: string[] = []
       const startId = constellation.startNodeId

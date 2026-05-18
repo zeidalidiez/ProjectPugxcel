@@ -154,6 +154,75 @@ Where `PRESET_CODE` is one of `EZ` / `NM` / `HD` / `NT` / `CS-XXXX` (custom hash
 2. **Elf (Space Pug Elf)** — AGI + LCK. Hoard early, snowball late via LCK discount.
 3. **Vampire (Space Pug Vampire)** — INT + STA. Synergy puzzle, bypass defenses.
 
+## Archetype Flavor JSON Format
+
+Archetypes are defined via JSON files in `src/data/archetypes/`. Each file specifies the archetype's identity, stat profile, word lists for procedural node generation, and structural template config.
+
+### Required fields
+
+```jsonc
+{
+  "id": "sporgk",                    // Unique ID, lowercase, used as data-archetype value
+  "name": "Sporgk",                  // Display name (shown on card)
+  "subtitle": "The Asteroid Barbarian",  // One-line subtitle
+  "description": "Brutal raiders...",     // One-sentence flavor description
+  "primaryStat": "STR",             // Damage stat — determines bypass rules. One of: STR, AGI, INT, STA, LCK
+  "secondaryStat": "STA",           // Secondary stat — shown on card badge, weighted higher in node generation. Must differ from primaryStat.
+  "statWeights": {                  // Relative frequency of each stat in generated nodes. 1.0 = baseline, 0.2 = rare.
+    "STR": 1.0, "AGI": 0.3, "STA": 0.6, "INT": 0.2, "LCK": 0.2
+  },
+  "flavor": {
+    "prefixes": ["Feral", "Cosmic", ...],   // 15-20 adjectives / modifiers
+    "cores": ["Asteroid Strike", ...],       // 30-40 complete 2-word combat phrases (the backbone of name generation)
+    "suffixes": ["Calibration", ...],        // 12-15 technique / ritual nouns
+    "templates": [                            // How to combine words into names
+      "{prefix} {core}",
+      "{core} {suffix}",
+      "{prefix} {core} {suffix}"
+    ]
+  },
+  "rings": { ... },                 // PP budget + cost range per ring (0-7), structural ratio
+  "structuralTemplates": [ ... ]    // Condition shapes for mutex / conditional / anti-synergy nodes
+}
+```
+
+### Optional fields
+
+| Field | Type | Default behavior if omitted or empty |
+|-------|------|--------------------------------------|
+| `anchorNames` | `string[]` | Auto-generated from `"{prefix} {core}"` template using the flavor word lists |
+| `abilityNames` | `string[]` | Auto-generated from `"{core} {suffix}"` template using the flavor word lists |
+
+### Anchor/Ability name generation logic
+
+```
+IF anchorNames is present AND anchorNames.length > 0:
+    → Use anchorNames exactly as provided (you curated them)
+ELSE:
+    → Generate N anchor names from template "{prefix} {core}" using flavor word lists
+    → N is determined by game balance (4-6 anchors per archetype), not by a config field
+
+IF abilityNames is present AND abilityNames.length > 0:
+    → Use abilityNames exactly as provided (you curated them)
+ELSE:
+    → Generate N ability names from template "{core} {suffix}" using flavor word lists
+    → N is proportional to total node count (~15-20% of nodes unlock abilities)
+
+All generation is seeded — same seed + same archetype = same names.
+```
+
+### Adding a new archetype
+
+1. Create `src/data/archetypes/{id}.json` with the fields above
+2. Fill in `prefixes`, `cores`, and `suffixes`
+3. Optionally provide `anchorNames` and `abilityNames` for curated names
+4. The game auto-discovers archetypes by scanning the directory — no code changes needed
+5. New archetypes automatically get: damage scaling from `primaryStat`, bypass rules (INT skips armor/evasion, STR pierces armor), stat-weighted node generation, structural nodes per `structuralTemplates`, and ring difficulty per `rings` config
+
+### Name generation anti-patterns
+
+Cores must be pre-composed meaningful phrases. Do NOT use single-word cores — a template like `{prefix} {core}` where core is "Asteroid" produces "Feral Asteroid" which reads as noun-noun, not a combat action. Cores should always be verb-noun pairs: "Asteroid Strike", "Warp-Fire Rage", "Void Breach". This avoids mad-libs-style nonsense where random word combinations produce ungrammatical results.
+
 ## Build Order Priority
 
 When working independently, follow the build order in `architecture.md`:

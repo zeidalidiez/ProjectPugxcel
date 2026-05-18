@@ -4,13 +4,14 @@ import { generateConstellation } from '../../../src/game/constellation/generate'
 import { canPurchaseNode, getPurchasableNodes } from '../../../src/game/constellation/canPurchase'
 import { purchaseNode, applyNodeEffects } from '../../../src/game/constellation/purchase'
 import { getNodeById } from '../../../src/data/nodes'
+import { PRESETS } from '../../../src/data/balance-presets'
 import { Archetype, NodeType, StatType } from '../../../src/types/enums'
 import { EMPTY_STATS } from '../../../src/types/stats'
 import type { Constellation, ConstellationNode, NodeDef } from '../../../src/types/nodes'
 
 function seededConstellation(archetype: Archetype): Constellation {
   const rng = createRNG(`purchase-test-${archetype}`)
-  return generateConstellation(rng, archetype)
+  return generateConstellation(rng, archetype, PRESETS.normal)
 }
 
 describe('canPurchaseNode', () => {
@@ -105,7 +106,7 @@ describe('purchaseNode', () => {
     const result = purchaseNode(c, [], c.startNodeId, archetype)
     expect(result).not.toBeNull()
 
-    const def = getNodeById(archetype, c.nodes.get(c.startNodeId)!.defId)!
+    const def = (c.defMap?.get(c.nodes.get(c.startNodeId)!.defId) ?? getNodeById(archetype, c.nodes.get(c.startNodeId)!.defId))!
     for (const effect of def.effects) {
       if (effect.kind === 'flat') {
         expect(result!.statGain[effect.stat]).toBeGreaterThanOrEqual(effect.value)
@@ -204,8 +205,7 @@ describe('purchaseNode', () => {
   })
 
   it('newNodeDrafts counts special extra_draft effects', () => {
-    const rng = createRNG('draft-test')
-    const c = generateConstellation(rng, Archetype.SPORGK)
+    const c = seededConstellation(Archetype.SPORGK)
     const result = purchaseNode(c, [], c.startNodeId, Archetype.SPORGK)
     expect(result).not.toBeNull()
     expect(typeof result!.newNodeDrafts).toBe('number')

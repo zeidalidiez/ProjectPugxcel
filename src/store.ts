@@ -132,7 +132,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const activeWeights = weights ?? get().balanceWeights
     const rng = createRNG(`${seed}_${archetype}`)
     const codexEffects = applyCodexModifiers(archetype, get().codex.unlockedModifiers)
-    const constellation = generateConstellation(rng, archetype, codexEffects.extraNodes)
+    const constellation = generateConstellation(rng, archetype, activeWeights, codexEffects.extraNodes)
     const encounters = 1 <= PREP_TURNS ? [] : generateEncounters(rng, 1, 5)
 
     const startNodeId = constellation.startNodeId

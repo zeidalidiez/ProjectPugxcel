@@ -1,0 +1,44 @@
+{
+  "id": "spacepugvampire",
+  "name": "Space Pug Vampire",
+  "subtitle": "Gothic Pug",
+  "description": "Gothic undead in cathedral-ships. INT + STA. Synergy puzzle.",
+  "primaryStat": "INT",
+  "secondaryStat": "STA",
+  "statWeights": { "STR": 0.2, "AGI": 0.2, "STA": 0.6, "INT": 1.0, "LCK": 0.3 },
+  "flavor": {
+    "prefixes": [
+    ],
+    "cores": [
+    ],
+    "suffixes": [
+    ],
+    "templates": [
+      "{prefix} {core}",
+      "{core} {suffix}",
+      "{prefix} {core} {suffix}"
+    ],
+    "abilityNames": [
+    ],
+    "anchorNames": [
+    ]
+  },
+  "rings": {
+    "0": { "ppBudget": 1.0, "costRange": [0, 0], "structuralRatio": 0.0 },
+    "1": { "ppBudget": 2.0, "costRange": [25, 40], "structuralRatio": 0.10 },
+    "2": { "ppBudget": 3.0, "costRange": [35, 55], "structuralRatio": 0.15 },
+    "3": { "ppBudget": 4.0, "costRange": [50, 75], "structuralRatio": 0.18 },
+    "4": { "ppBudget": 5.0, "costRange": [70, 100], "structuralRatio": 0.20 },
+    "5": { "ppBudget": 6.0, "costRange": [90, 130], "structuralRatio": 0.22 },
+    "6": { "ppBudget": 7.0, "costRange": [110, 160], "structuralRatio": 0.25 },
+    "7": { "ppBudget": 8.0, "costRange": [140, 200], "structuralRatio": 0.28 }
+  },
+  "structuralTemplates": [
+    { "kind": "CONDITIONAL", "condition": "abilities_count_below", "value": 2, "ppBonus": 1.5 },
+    { "kind": "CONDITIONAL", "condition": "stat_threshold", "stat": "INT", "value": 20, "ppBonus": 1.5 },
+    { "kind": "MUTEX", "count": 4, "ppBonus": 2.0 },
+    { "kind": "ANTI_SYNERGY", "count": 2, "ppBonus": 2.5 },
+    { "kind": "THRESHOLD", "condition": "turn", "value": 10, "ppBonus": 2.0 },
+    { "kind": "HYBRID_BRIDGE", "count": 2, "ppBonus": 2.0 }
+  ]
+}

@@ -147,7 +147,7 @@ export default function ConstellationViewport() {
           </svg>
 
           {nodes.map((node) => {
-            const def = getNodeById(archetype, node.defId)
+            const def = constellation.defMap?.get(node.defId) ?? getNodeById(archetype, node.defId)
             if (!def) return null
             const purchased = (draftedIds ?? []).includes(node.id)
             const purchasable = purchasableIds.has(node.id)

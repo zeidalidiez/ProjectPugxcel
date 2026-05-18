@@ -12,6 +12,8 @@ export interface CurveParams {
   quadraticCoeff?: number   // quadratic only
 }
 
+export type ConstellationLayout = 'left-to-right' | 'radial'
+
 export interface BalanceWeights {
   curveType: CurveType
   curve: CurveParams
@@ -24,6 +26,10 @@ export interface BalanceWeights {
   perTurnPayoutMultiplier: number
   luckEfficacyMultiplier: number
   poolSizeMultiplier: number
+  constellationLayout: ConstellationLayout
+  nodeDensity: number
+  ringCount: number
+  ringZeroNodes: number
 }
 
 const CurveParamsSchema = z.object({
@@ -46,4 +52,8 @@ export const BalanceWeightsSchema = z.object({
   perTurnPayoutMultiplier: z.number().min(0).max(5),
   luckEfficacyMultiplier: z.number().min(0).max(5),
   poolSizeMultiplier: z.number().min(0).max(5),
+  constellationLayout: z.enum(['left-to-right', 'radial']),
+  nodeDensity: z.number().min(0.2).max(5),
+  ringCount: z.number().min(4).max(10),
+  ringZeroNodes: z.number().min(1).max(5),
 })

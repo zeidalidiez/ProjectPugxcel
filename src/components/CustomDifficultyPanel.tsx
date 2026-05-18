@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { BalanceWeights, CurveType } from '../types/balance'
+import type { BalanceWeights, CurveType, ConstellationLayout } from '../types/balance'
 import { BalanceWeightsSchema } from '../types/balance'
 import { PRESETS } from '../data/balance-presets'
 import { useGameStore } from '../store'
@@ -8,7 +8,7 @@ interface CustomDifficultyPanelProps {
   onClose: () => void
 }
 
-type WeightKey = Exclude<keyof BalanceWeights, 'curveType' | 'curve'>
+type WeightKey = Exclude<keyof BalanceWeights, 'curveType' | 'curve' | 'constellationLayout'>
 
 const WEIGHT_FIELDS: { key: WeightKey; label: string; min: number; max: number; step: number }[] = [
   { key: 'bossMultiplier',            label: 'Boss Multiplier',           min: 1.0, max: 5.0, step: 0.05 },
@@ -20,6 +20,17 @@ const WEIGHT_FIELDS: { key: WeightKey; label: string; min: number; max: number; 
   { key: 'luckEfficacyMultiplier',    label: 'Luck Efficacy',             min: 0.1, max: 5.0, step: 0.05 },
   { key: 'poolSizeMultiplier',        label: 'Store Pool Size',           min: 0.2, max: 2.0, step: 0.05 },
   { key: 'structuralNodeAvailability',label: 'Node Availability',         min: 0.5, max: 2.0, step: 0.05 },
+]
+
+const CONSTELLATION_LAYOUTS: { value: ConstellationLayout; label: string }[] = [
+  { value: 'radial', label: 'Radial (center-out)' },
+  { value: 'left-to-right', label: 'Left-to-Right' },
+]
+
+const CONSTELLATION_FIELDS: { key: 'nodeDensity' | 'ringCount' | 'ringZeroNodes'; label: string; min: number; max: number; step: number }[] = [
+  { key: 'nodeDensity',  label: 'Node Density',      min: 0.2, max: 5.0, step: 0.1 },
+  { key: 'ringCount',    label: 'Ring Count',         min: 4,   max: 10,  step: 1 },
+  { key: 'ringZeroNodes',label: 'Ring 0 Nodes',       min: 1,   max: 5,   step: 1 },
 ]
 
 const CURVE_TYPES: CurveType[] = ['linear', 'breakpoint', 'quadratic']
@@ -211,6 +222,50 @@ export default function CustomDifficultyPanel({ onClose }: CustomDifficultyPanel
                 />
                 <span className="text-terminal-text-bright text-xs font-mono w-10 text-right">
                   {(weights[key] as number).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-4">
+          <div className="text-terminal-text text-xs uppercase tracking-widest mb-2">Constellation Layout</div>
+          <div className="flex gap-2">
+            {CONSTELLATION_LAYOUTS.map((cl) => (
+              <button
+                key={cl.value}
+                onClick={() => setWeights((prev) => ({ ...prev, constellationLayout: cl.value }))}
+                className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
+                  weights.constellationLayout === cl.value
+                    ? 'bg-terminal-accent text-black font-bold'
+                    : 'border border-terminal-border text-terminal-text hover:border-terminal-accent'
+                }`}
+                aria-pressed={weights.constellationLayout === cl.value}
+              >
+                {cl.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 mb-5">
+          {CONSTELLATION_FIELDS.map(({ key, label, min, max, step }) => (
+            <div key={key} className="flex items-center justify-between gap-4">
+              <label htmlFor={`const-${key}`} className="text-terminal-text text-xs flex-1">{label}</label>
+              <div className="flex items-center gap-2">
+                <input
+                  id={`const-${key}`}
+                  type="range"
+                  min={min}
+                  max={max}
+                  step={step}
+                  value={weights[key] as number}
+                  onChange={(e) => updateWeight(key, Number(e.target.value))}
+                  className="w-28 accent-terminal-accent"
+                  aria-label={label}
+                />
+                <span className="text-terminal-text-bright text-xs font-mono w-10 text-right">
+                  {key === 'nodeDensity' ? (weights[key] as number).toFixed(1) : String(weights[key])}
                 </span>
               </div>
             </div>

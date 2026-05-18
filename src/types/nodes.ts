@@ -44,4 +44,5 @@ export interface Constellation {
   nodes: Map<string, ConstellationNode>
   startNodeId: string
   anchorNodeIds: string[]
+  defMap?: Map<string, NodeDef>
 }

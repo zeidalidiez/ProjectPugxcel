@@ -32,7 +32,7 @@ export function purchaseNode(
   if (!canPurchaseNode(constellation, nodeId, purchasedIds)) return null
 
   const node = constellation.nodes.get(nodeId)!
-  const nodeDef = getNodeById(archetype, node.defId)
+  const nodeDef = constellation.defMap?.get(node.defId) ?? getNodeById(archetype, node.defId)
   if (!nodeDef) return null
 
   const statGain = computeStatGain(nodeDef)

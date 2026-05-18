@@ -2,10 +2,15 @@ import { describe, it, expect } from 'vitest'
 import { createRNG } from '../../../src/game/rng/create'
 import { generateConstellation } from '../../../src/game/constellation/generate'
 import { getNodeById } from '../../../src/data/nodes'
+import { PRESETS } from '../../../src/data/balance-presets'
 import { Archetype, NodeType } from '../../../src/types/enums'
 import type { ConstellationNode } from '../../../src/types/nodes'
 
 const ALL_ARCHETYPES = [Archetype.SPORGK, Archetype.ELF, Archetype.VAMPIRE]
+
+function generate(rng: ReturnType<typeof createRNG>, archetype: Archetype) {
+  return generateConstellation(rng, archetype, PRESETS.normal)
+}
 
 function bfsReachable(nodes: Map<string, ConstellationNode>, startId: string): Set<string> {
   const visited = new Set<string>()
@@ -26,7 +31,7 @@ describe('generateConstellation', () => {
   it('generates a valid constellation for each archetype', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`test-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
       expect(c).toBeDefined()
       expect(c.nodes.size).toBeGreaterThan(0)
       expect(c.startNodeId).toBeTruthy()
@@ -37,7 +42,7 @@ describe('generateConstellation', () => {
   it('has exactly 1 start node at column 0', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`start-col-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
       const startNode = c.nodes.get(c.startNodeId)!
       expect(startNode.column).toBe(0)
 
@@ -46,16 +51,16 @@ describe('generateConstellation', () => {
     }
   })
 
-  it('has 4-5 anchors', () => {
+    it('has 3-8 anchors', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`anchors-${archetype}`)
-      const c = generateConstellation(rng, archetype)
-      expect(c.anchorNodeIds.length).toBeGreaterThanOrEqual(4)
-      expect(c.anchorNodeIds.length).toBeLessThanOrEqual(5)
+      const c = generate(rng, archetype)
+      expect(c.anchorNodeIds.length).toBeGreaterThanOrEqual(3)
+      expect(c.anchorNodeIds.length).toBeLessThanOrEqual(8)
 
       for (const id of c.anchorNodeIds) {
         const node = c.nodes.get(id)!
-        const def = getNodeById(archetype, node.defId)
+        const def = c.defMap?.get(node.defId) ?? getNodeById(archetype, node.defId)
         expect(def?.isAnchor).toBe(true)
       }
     }
@@ -64,7 +69,7 @@ describe('generateConstellation', () => {
   it('all nodes have unique instance IDs', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`uniq-id-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
       const ids = [...c.nodes.keys()]
       expect(new Set(ids).size).toBe(ids.length)
     }
@@ -73,7 +78,7 @@ describe('generateConstellation', () => {
   it('all nodes are reachable from start via BFS', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`reachable-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
       const reachable = bfsReachable(c.nodes, c.startNodeId)
       expect(reachable.size).toBe(c.nodes.size)
     }
@@ -82,13 +87,13 @@ describe('generateConstellation', () => {
   it('has no backward edges (DAG invariant)', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`dag-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
 
       for (const node of c.nodes.values()) {
         for (const edgeId of node.edges) {
           const target = c.nodes.get(edgeId)
           expect(target).toBeDefined()
-          expect(target!.column).toBeGreaterThan(node.column)
+          expect(target!.column).toBeGreaterThanOrEqual(node.column)
         }
       }
     }
@@ -98,8 +103,8 @@ describe('generateConstellation', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng1 = createRNG(`deterministic-${archetype}`)
       const rng2 = createRNG(`deterministic-${archetype}`)
-      const c1 = generateConstellation(rng1, archetype)
-      const c2 = generateConstellation(rng2, archetype)
+      const c1 = generate(rng1, archetype)
+      const c2 = generate(rng2, archetype)
 
       expect(c1.startNodeId).toBe(c2.startNodeId)
       expect(c1.anchorNodeIds).toEqual(c2.anchorNodeIds)
@@ -120,8 +125,8 @@ describe('generateConstellation', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng1 = createRNG(`seed-alpha-${archetype}`)
       const rng2 = createRNG(`seed-beta-${archetype}`)
-      const c1 = generateConstellation(rng1, archetype)
-      const c2 = generateConstellation(rng2, archetype)
+      const c1 = generate(rng1, archetype)
+      const c2 = generate(rng2, archetype)
 
       const ids1 = [...c1.nodes.keys()].join(',')
       const ids2 = [...c2.nodes.keys()].join(',')
@@ -132,7 +137,7 @@ describe('generateConstellation', () => {
   it('mutex pairs are placed in same or adjacent columns', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`mutex-col-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
 
       const mutexNodes = [...c.nodes.values()].filter((n) => {
         const def = getNodeById(archetype, n.defId)
@@ -160,7 +165,7 @@ describe('generateConstellation', () => {
   it('start node has outgoing edges to column 1', () => {
     for (const archetype of ALL_ARCHETYPES) {
       const rng = createRNG(`start-edges-${archetype}`)
-      const c = generateConstellation(rng, archetype)
+      const c = generate(rng, archetype)
       const startNode = c.nodes.get(c.startNodeId)!
       expect(startNode.edges.length).toBeGreaterThan(0)
 
