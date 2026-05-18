@@ -48,7 +48,7 @@ export function layoutRadial(
     const defs = ringDefGroups.get(ring)!
     const shuffled = rng.shuffle([...defs])
     const baseRadius = ring * RADIUS_STEP
-    const radius = baseRadius * Math.max(1, weights.nodeDensity * 0.6)
+    const radius = baseRadius * Math.max(1, weights.nodeDensity * 0.85)
     const nodeCount = shuffled.length
 
     if (ring === 0) {
@@ -95,7 +95,7 @@ export function layoutRadial(
     ringCnLists.set(ring, ringList)
   }
 
-  const minDist = MIN_DIST / Math.max(0.5, weights.nodeDensity)
+  const minDist = MIN_DIST
   for (let pass = 0; pass < REPULSION_PASSES; pass++) {
     const allNodes = [...resultNodes.values()]
     for (let i = 0; i < allNodes.length; i++) {

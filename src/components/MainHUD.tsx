@@ -104,27 +104,27 @@ export default function MainHUD() {
 
       <div className="flex sm:hidden flex-col gap-2 border-b border-terminal-border pb-2">
         <ForecastRadar />
-        <div className="flex items-center justify-between gap-2">
-          <ThreatHeatmap />
-          <GoldDisplay />
-        </div>
+        <ThreatHeatmap />
       </div>
 
-      <div className="sm:hidden flex gap-2 mb-2">
-        <button onClick={() => setShowLeftPanel(!showLeftPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
-          {showLeftPanel ? 'Hide Stats' : 'Stats'}
-        </button>
-        <button
-          onClick={() => setShowLog(!showLog)}
-          className={`px-3 py-1 rounded border text-xs ${
-            showLog
-              ? 'bg-terminal-accent/20 border-terminal-accent text-terminal-accent'
-              : 'border-terminal-border text-terminal-text'
-          }`}
-          aria-pressed={showLog}
-        >
-          {showLog ? 'Hide Log' : 'Log'}
-        </button>
+      <div className="sm:hidden flex items-center justify-between gap-2 mb-2">
+        <GoldDisplay />
+        <div className="flex gap-2">
+          <button onClick={() => setShowLeftPanel(!showLeftPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
+            {showLeftPanel ? 'Hide Stats' : 'Stats'}
+          </button>
+          <button
+            onClick={() => setShowLog(!showLog)}
+            className={`px-3 py-1 rounded border text-xs ${
+              showLog
+                ? 'bg-terminal-accent/20 border-terminal-accent text-terminal-accent'
+                : 'border-terminal-border text-terminal-text'
+            }`}
+            aria-pressed={showLog}
+          >
+            {showLog ? 'Hide Log' : 'Log'}
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 flex gap-3 min-h-0">
