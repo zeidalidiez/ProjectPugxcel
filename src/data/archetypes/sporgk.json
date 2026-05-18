@@ -18,7 +18,7 @@
       "{core} {suffix}",
       "{prefix} {core} {suffix}"
     ],
-    "abilityNames": [
+    "abilityNames": ["Shart"
     ],
     "anchorNames": [
     ]

@@ -37,5 +37,5 @@ export function useKeyboardNav() {
 
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [phase, advanceToPayout, initDraft, resetRun])
+  }, [phase, initDraft, resetRun])
 }
