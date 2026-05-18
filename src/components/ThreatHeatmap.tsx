@@ -45,7 +45,7 @@ export default function ThreatHeatmap() {
   const summary = allThreats.slice(0, 3)
 
   return (
-    <div className="relative px-2 text-xs" aria-label="Threat Analysis">
+    <div className="relative px-2 text-xs mb-1" aria-label="Threat Analysis">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex gap-2 items-center hover:text-terminal-text-bright transition-colors cursor-pointer"

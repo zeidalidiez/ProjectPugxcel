@@ -44,7 +44,7 @@ export default function MainHUD() {
 
   return (
     <div className="h-full flex flex-col gap-2 p-3 sm:p-5">
-      <div className="flex items-center gap-3 px-4 py-3 rounded border border-terminal-border bg-terminal-surface">
+      <div className="flex items-center gap-3 px-4 py-3 rounded border border-terminal-border bg-terminal-surface mb-2">
         {isPrep && (
           <div className="bg-terminal-warn/20 text-terminal-warn text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider mr-2">
             PREPARATION

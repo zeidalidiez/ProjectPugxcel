@@ -149,7 +149,10 @@ export function layoutRadial(
     for (const cn of curNodes) {
       const def = nodes.find((n) => n.id === cn.defId)
       const isAnchorDef = def?.isAnchor ?? false
-      const edgeCount = rng.nextInt(1, Math.min(edgeMax, nextNodes.length))
+      const maxEdges = Math.min(edgeMax, nextNodes.length)
+      const edgeCount = isAnchorDef
+        ? maxEdges
+        : rng.nextInt(1, maxEdges)
 
       const candidates = [...nextNodes].sort((a, b) => {
         if (isAnchorDef) {

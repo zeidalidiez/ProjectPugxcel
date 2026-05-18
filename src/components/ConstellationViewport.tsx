@@ -117,7 +117,7 @@ export default function ConstellationViewport() {
 
   return (
     <div
-      className="relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none p-4"
+      className="relative flex-1 overflow-hidden border border-terminal-border rounded bg-terminal-bg touch-none select-none p-4 sm:p-6"
       role="region"
       aria-label="Constellation"
     >
@@ -150,12 +150,22 @@ export default function ConstellationViewport() {
               <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="var(--color-terminal-accent)" floodOpacity="0.5" />
               </filter>
+              <filter id="purchasableGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="var(--color-terminal-pass, #4ade80)" floodOpacity="0.35" />
+              </filter>
             </defs>
             {nodes.flatMap((node) =>
               node.edges.map((targetId) => {
                 const target = constellation.nodes.get(targetId)
                 if (!target) return null
                 const purchased = (draftedIds ?? []).includes(node.id) && (draftedIds ?? []).includes(target.id)
+                const sourcePurchased = (draftedIds ?? []).includes(node.id)
+                const targetPurchasable = purchasableIds.has(target.id)
+                const edgeFilter = purchased
+                  ? 'url(#nodeGlow)'
+                  : (sourcePurchased && targetPurchasable)
+                    ? 'url(#purchasableGlow)'
+                    : undefined
                 return (
                   <line
                     key={`${node.id}-${targetId}`}
@@ -166,7 +176,7 @@ export default function ConstellationViewport() {
                     stroke={purchased ? 'var(--color-terminal-accent)' : 'var(--color-terminal-border)'}
                     strokeWidth={purchased ? 3.5 : 0.8}
                     strokeLinecap="round"
-                    filter={purchased ? 'url(#nodeGlow)' : undefined}
+                    filter={edgeFilter}
                   />
                 )
               }),
@@ -214,7 +224,11 @@ export default function ConstellationViewport() {
                 style={{
                   left: node.x,
                   top: node.y,
-                  boxShadow: purchased ? '0 0 12px var(--accent-glow)' : undefined,
+                  boxShadow: purchased
+                    ? '0 0 12px var(--accent-glow)'
+                    : purchasable
+                      ? '0 0 8px var(--color-terminal-pass, #4ade80)'
+                      : undefined,
                 }}
                 aria-label={`${def.name}: ${def.description}. Cost: ${price}g`}
               >
