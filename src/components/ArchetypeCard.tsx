@@ -20,10 +20,16 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
   const flavor = loadArchetypeFlavor(arch.key)
   const primary = flavor.primaryStat
   const secondary = flavor.secondaryStat
-  const theme = flavor.theme
+  const theme = flavor.theme ?? {}
+  const accent = theme['--accent'] ?? '#fb923c'
+  const accentSoft = theme['--accent-soft'] ?? '#7c2d12'
+  const accentGlow = theme['--accent-glow'] ?? 'rgba(251,176,60,0.55)'
+  const rgbMatch = accent.match(/^#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i)
+  const bgTint = rgbMatch
+    ? `rgba(${parseInt(rgbMatch[1], 16)},${parseInt(rgbMatch[2], 16)},${parseInt(rgbMatch[3], 16)},0.06)`
+    : 'rgba(251,146,60,0.06)'
 
   function applyTheme() {
-    if (!theme) return
     for (const [key, value] of Object.entries(theme)) {
       document.documentElement.style.setProperty(key, value)
     }
@@ -31,7 +37,6 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
   }
 
   function clearTheme() {
-    if (!theme) return
     for (const key of Object.keys(theme)) {
       document.documentElement.style.removeProperty(key)
     }
@@ -46,8 +51,8 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
       className="flex flex-col items-center text-center gap-5 rounded-lg border-2 border-terminal-border hover:border-terminal-accent transition-all flex-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-terminal-accent"
       style={{
         padding: '36px 28px',
-        backgroundColor: 'var(--accent-soft, rgba(251,146,60,0.08))',
-        borderColor: 'var(--accent, #fb923c)',
+        backgroundColor: bgTint,
+        borderColor: accent,
         borderWidth: '1px',
       }}
       aria-label={`Select ${arch.name}`}
@@ -61,9 +66,9 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
         <span
           className="px-3 py-1 rounded-full text-xs font-mono font-bold"
           style={{
-            backgroundColor: 'var(--accent, #fb923c)',
+            backgroundColor: accent,
             color: '#000',
-            boxShadow: '0 0 14px var(--accent-glow, rgba(251,176,60,0.55))',
+            boxShadow: `0 0 14px ${accentGlow}`,
           }}
         >
           {primary}
@@ -71,9 +76,9 @@ export default function ArchetypeCard({ arch, onSelect }: ArchetypeCardProps) {
         <span
           className="px-3 py-1 rounded-full text-xs font-mono font-bold"
           style={{
-            backgroundColor: 'var(--accent-soft, rgba(251,146,60,0.18))',
-            color: 'var(--accent, #fb923c)',
-            boxShadow: '0 0 6px var(--accent-glow, rgba(251,176,60,0.25))',
+            backgroundColor: accentSoft,
+            color: accent,
+            boxShadow: `0 0 6px ${accentGlow}`,
           }}
         >
           {secondary}
