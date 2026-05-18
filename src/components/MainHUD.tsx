@@ -81,13 +81,12 @@ export default function MainHUD() {
         </div>
       )}
 
-      <div className="flex items-center justify-between border-b border-terminal-border pb-2">
+      <div className="hidden sm:flex items-center justify-between border-b border-terminal-border pb-2">
         <div className="flex items-center gap-3">
           <ForecastRadar />
           <ThreatHeatmap />
         </div>
         <div className="flex items-center gap-3">
-          <GoldDisplay />
           <button
             onClick={() => setShowLog(!showLog)}
             className={`px-3 py-1 rounded border text-xs font-mono transition-colors ${
@@ -99,12 +98,32 @@ export default function MainHUD() {
           >
             Log
           </button>
+          <GoldDisplay />
+        </div>
+      </div>
+
+      <div className="flex sm:hidden flex-col gap-2 border-b border-terminal-border pb-2">
+        <ForecastRadar />
+        <div className="flex items-center justify-between gap-2">
+          <ThreatHeatmap />
+          <GoldDisplay />
         </div>
       </div>
 
       <div className="sm:hidden flex gap-2 mb-2">
         <button onClick={() => setShowLeftPanel(!showLeftPanel)} className="px-3 py-1 rounded border border-terminal-border text-terminal-text text-xs">
           {showLeftPanel ? 'Hide Stats' : 'Stats'}
+        </button>
+        <button
+          onClick={() => setShowLog(!showLog)}
+          className={`px-3 py-1 rounded border text-xs ${
+            showLog
+              ? 'bg-terminal-accent/20 border-terminal-accent text-terminal-accent'
+              : 'border-terminal-border text-terminal-text'
+          }`}
+          aria-pressed={showLog}
+        >
+          {showLog ? 'Hide Log' : 'Log'}
         </button>
       </div>
 
