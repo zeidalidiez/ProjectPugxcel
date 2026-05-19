@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useGameStore } from '../store'
 import { codexModifiers, type CodexModifier } from '../data/codex/modifiers'
 import { getAllChallenges } from '../data/codex/challenges'
 import { Archetype } from '../types/enums'
+import { encodeCodexPassword, decodeCodexPassword } from '../game/save/codexPassword'
+import { saveCodex } from '../game/save/storage'
 
 const ARCH_LABELS: Record<string, string> = {
   [Archetype.SPORGK]: 'Sporgk',
@@ -31,8 +34,45 @@ function formatUnlockCondition(condition: CodexModifier['unlockCondition']): str
 
 export default function CodexModal({ onClose }: { onClose: () => void }) {
   const codex = useGameStore((s) => s.codex)
+  const [importInput, setImportInput] = useState('')
+  const [importError, setImportError] = useState('')
+  const [importSuccess, setImportSuccess] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const challenges = getAllChallenges()
+  const password = encodeCodexPassword(codex)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(password)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback for non-HTTPS or older browsers
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  function handleImport() {
+    setImportError('')
+    setImportSuccess('')
+    const input = importInput.trim()
+    if (!input) {
+      setImportError('Paste a codex password')
+      return
+    }
+    const result = decodeCodexPassword(input)
+    if (!result.ok) {
+      setImportError(result.error)
+      return
+    }
+    const newCodex = { ...codex, unlockedModifiers: [...new Set([...codex.unlockedModifiers, ...result.unlockedModifiers])] }
+    useGameStore.setState({ codex: newCodex })
+    saveCodex(newCodex)
+    setImportSuccess(`Imported ${result.unlockedModifiers.length} modifier${result.unlockedModifiers.length !== 1 ? 's' : ''}`)
+    setImportInput('')
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={onClose}>
@@ -106,7 +146,7 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <div>
+        <div className="mb-6">
           <div className="text-terminal-accent text-xs uppercase tracking-widest mb-2">
             Run History ({codex.completedRuns.length})
           </div>
@@ -127,6 +167,46 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
               ))}
             </div>
           )}
+        </div>
+
+        <div className="border-t border-terminal-border pt-4">
+          <div className="text-terminal-accent text-xs uppercase tracking-widest mb-2">Codex Password</div>
+          <p className="text-terminal-text/50 text-[10px] mb-2">
+            Copy this password to transfer your unlocked modifiers to another device. Paste a password below to restore.
+          </p>
+
+          <div className="flex gap-2 mb-3">
+            <div className="flex-1 bg-terminal-bg border border-terminal-border rounded px-3 py-1.5 text-terminal-text-bright font-mono text-sm tracking-widest select-all">
+              {password}
+            </div>
+            <button
+              onClick={handleCopy}
+              className="px-3 py-1.5 rounded border border-terminal-accent text-terminal-accent text-xs hover:bg-terminal-accent/10 transition-colors whitespace-nowrap"
+            >
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={importInput}
+              onChange={(e) => { setImportInput(e.target.value); setImportError(''); setImportSuccess('') }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleImport() }}
+              placeholder="Paste password to import..."
+              className="flex-1 px-3 py-1.5 rounded border border-terminal-border bg-terminal-bg text-terminal-text-bright text-xs font-mono outline-none focus:border-terminal-accent"
+              maxLength={12}
+            />
+            <button
+              onClick={handleImport}
+              disabled={!importInput.trim()}
+              className="px-3 py-1.5 rounded border border-terminal-accent text-terminal-accent text-xs hover:bg-terminal-accent/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+            >
+              Import
+            </button>
+          </div>
+          {importError && <p className="text-terminal-fail text-[10px] mt-1">{importError}</p>}
+          {importSuccess && <p className="text-terminal-pass text-[10px] mt-1">{importSuccess}</p>}
         </div>
       </div>
     </div>

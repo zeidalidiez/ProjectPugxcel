@@ -6,7 +6,7 @@ There is no combat to simulate — only a build to assemble and a brutal thresho
 
 ## What it is
 
-- **20 turns per run, ~20-30 min wall-clock**
+- **Runtime varies with difficulty** — higher difficulties demand more nodes, more decisions, and tighter resource management."
 - **3 archetypes**: Sporgk (Space Orc Pug, STR+STA), Space Pug Elf (AGI+LCK), Space Pug Vampire (INT+STA)
 - **Procedural constellation skill tree** — each run generates a unique ring-based radial galaxy map from seed. Node count scales with difficulty from ~20 (Easy) to ~100+ (Nightmare).
 - **Structural depth nodes** — conditionals, mutex pairs, anti-synergies, threshold gates, hybrid bridges (20-28% of tree depending on ring)
