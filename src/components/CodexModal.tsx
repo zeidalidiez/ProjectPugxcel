@@ -201,8 +201,5 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
       </div>
       {ToastComponent}
     </div>
-      {ToastComponent}
-    </div>
-    </div>
   )
 }
