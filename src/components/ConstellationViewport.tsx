@@ -375,7 +375,7 @@ export default function ConstellationViewport() {
       </div>
 
       {hoveredNode && (() => {
-        const def = getNodeById(archetype, hoveredNode.defId)
+        const def = constellation.defMap?.get(hoveredNode.defId) ?? getNodeById(archetype, hoveredNode.defId)
         if (!def) return null
         const price = applyDiscount(def.cost, lck)
         const purchasable = purchasableIds.has(hoveredNode.id)
