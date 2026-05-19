@@ -36,7 +36,7 @@ function formatUnlockCondition(condition: CodexModifier['unlockCondition']): str
 export default function CodexModal({ onClose }: { onClose: () => void }) {
   const codex = useGameStore((s) => s.codex)
   const [importInput, setImportInput] = useState('')
-  const { toast, showToast, ToastComponent } = useToast()
+  const { showToast, ToastComponent } = useToast()
 
   const challenges = getAllChallenges()
   const password = encodeCodexPassword(codex)
