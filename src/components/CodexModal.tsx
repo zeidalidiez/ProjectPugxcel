@@ -5,6 +5,7 @@ import { getAllChallenges } from '../data/codex/challenges'
 import { Archetype } from '../types/enums'
 import { encodeCodexPassword, decodeCodexPassword } from '../game/save/codexPassword'
 import { saveCodex } from '../game/save/storage'
+import { useToast } from './Toast'
 
 const ARCH_LABELS: Record<string, string> = {
   [Archetype.SPORGK]: 'Sporgk',
@@ -35,9 +36,7 @@ function formatUnlockCondition(condition: CodexModifier['unlockCondition']): str
 export default function CodexModal({ onClose }: { onClose: () => void }) {
   const codex = useGameStore((s) => s.codex)
   const [importInput, setImportInput] = useState('')
-  const [importError, setImportError] = useState('')
-  const [importSuccess, setImportSuccess] = useState('')
-  const [copied, setCopied] = useState(false)
+  const { toast, showToast, ToastComponent } = useToast()
 
   const challenges = getAllChallenges()
   const password = encodeCodexPassword(codex)
@@ -45,32 +44,25 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(password)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // Fallback for non-HTTPS or older browsers
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
+    } catch { /* fallback */ }
+    showToast('Password copied', 'success')
   }
 
   function handleImport() {
-    setImportError('')
-    setImportSuccess('')
     const input = importInput.trim()
     if (!input) {
-      setImportError('Paste a codex password')
+      showToast('Paste a codex password', 'error')
       return
     }
     const result = decodeCodexPassword(input)
     if (!result.ok) {
-      setImportError(result.error)
+      showToast(result.error, 'error')
       return
     }
     const newCodex = { ...codex, unlockedModifiers: [...new Set([...codex.unlockedModifiers, ...result.unlockedModifiers])] }
     useGameStore.setState({ codex: newCodex })
     saveCodex(newCodex)
-    setImportSuccess(`Imported ${result.unlockedModifiers.length} modifier${result.unlockedModifiers.length !== 1 ? 's' : ''}`)
+    showToast(`Imported ${result.unlockedModifiers.length} modifier${result.unlockedModifiers.length !== 1 ? 's' : ''}`, 'success')
     setImportInput('')
   }
 
@@ -183,7 +175,7 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
               onClick={handleCopy}
               className="px-3 py-1.5 rounded border border-terminal-accent text-terminal-accent text-xs hover:bg-terminal-accent/10 transition-colors whitespace-nowrap"
             >
-              {copied ? 'Copied' : 'Copy'}
+              Copy
             </button>
           </div>
 
@@ -191,7 +183,7 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
             <input
               type="text"
               value={importInput}
-              onChange={(e) => { setImportInput(e.target.value); setImportError(''); setImportSuccess('') }}
+              onChange={(e) => setImportInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleImport() }}
               placeholder="Paste password to import..."
               className="flex-1 px-3 py-1.5 rounded border border-terminal-border bg-terminal-bg text-terminal-text-bright text-xs font-mono outline-none focus:border-terminal-accent"
@@ -205,10 +197,12 @@ export default function CodexModal({ onClose }: { onClose: () => void }) {
               Import
             </button>
           </div>
-          {importError && <p className="text-terminal-fail text-[10px] mt-1">{importError}</p>}
-          {importSuccess && <p className="text-terminal-pass text-[10px] mt-1">{importSuccess}</p>}
         </div>
       </div>
+      {ToastComponent}
+    </div>
+      {ToastComponent}
+    </div>
     </div>
   )
 }
