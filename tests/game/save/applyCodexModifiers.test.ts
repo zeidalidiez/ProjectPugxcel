@@ -1,22 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { applyCodexModifiers } from '../../../src/game/save/codex'
 import { Archetype, StatType } from '../../../src/types/enums'
-import type { CodexModifier } from '../../../src/data/codex/modifiers'
-import { EMPTY_STATS } from '../../../src/types/stats'
-
-function makeModifier(overrides: Partial<CodexModifier> & { id: string }): CodexModifier {
-  return {
-    name: 'Test',
-    description: 'Test modifier',
-    unlockCondition: { type: 'reach_turn', value: 1 },
-    effect: { type: 'stat_boost', statBonus: 0 },
-    ...overrides,
-  } as CodexModifier
-}
 
 describe('applyCodexModifiers', () => {
   it('stat_boost adds to primary stat for each archetype', () => {
-    const result = applyCodexModifiers(Archetype.SPORGK, ['mod_test'])
     // Uses the real modifier lookup — we test with empty array since we can't inject fake IDs
     const empty = applyCodexModifiers(Archetype.SPORGK, [])
     expect(empty.bonusStats).toBeDefined()

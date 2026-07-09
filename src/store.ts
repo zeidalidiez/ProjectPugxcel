@@ -12,14 +12,20 @@ import { canPurchaseNode } from './game/constellation/canPurchase'
 import { purchaseNode } from './game/constellation/purchase'
 import { generateStore } from './game/economy/store'
 import { calculatePayout } from './game/economy/payout'
-import { applyDiscount } from './game/economy/cost'
+import { applyDiscount, getNodePurchasePrice } from './game/economy/cost'
 import { generateEncounters } from './game/resolve/encounter'
 import { resolve } from './game/resolve/resolve'
 import { encodeShareString, createCompletedRun } from './game/save/serialize'
 import { checkCodexUnlocks, applyCodexModifiers } from './game/save/codex'
 import { loadFromDisk, saveCodex, saveSettings } from './game/save/storage'
+import {
+  constellationSeed,
+  forecastSeed,
+  storeSeed,
+  executeSeed,
+  normalizeSeed,
+} from './game/save/runSeed'
 import { getItemById } from './data/items'
-import { getNodeById } from './data/nodes'
 import { PRESETS, DEFAULT_PRESET } from './data/balance-presets'
 
 const PREP_TURNS = 0
@@ -130,10 +136,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   startRun: (seed, archetype, weights) => {
     const activeWeights = weights ?? get().balanceWeights
-    const rng = createRNG(`${seed}_${archetype}`)
+    const canonicalSeed = normalizeSeed(seed)
+    const rng = createRNG(constellationSeed(canonicalSeed, archetype))
     const codexEffects = applyCodexModifiers(archetype, get().codex.unlockedModifiers)
     const constellation = generateConstellation(rng, archetype, activeWeights, codexEffects.extraNodes)
-    const encounters = 1 <= PREP_TURNS ? [] : generateEncounters(rng, 1, 5)
+    // Turn-1 encounters use the same forecast seed slice as later turns / replay (not residual constellation RNG)
+    const encounters =
+      1 <= PREP_TURNS
+        ? []
+        : generateEncounters(createRNG(forecastSeed(canonicalSeed, archetype, 1)), 1, 5)
 
     const startNodeId = constellation.startNodeId
     const startNode = constellation.nodes.get(startNodeId)
@@ -143,7 +154,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const startingGold = Math.floor((80 + codexEffects.bonusGold) * activeWeights.startingGoldMultiplier)
 
     const run: RunState = {
-      seed,
+      seed: canonicalSeed,
       archetype,
       turn: 1,
       phase: RunPhase.FORECAST,
@@ -185,7 +196,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!run) return
     const nextTurn = run.turn + 1
     const isPrep = nextTurn <= PREP_TURNS
-    const rng = createRNG(`${run.seed}_${run.archetype}_t${nextTurn}_f`)
+    const rng = createRNG(forecastSeed(run.seed, run.archetype, nextTurn))
     const encounters = isPrep ? [] : generateEncounters(rng, nextTurn, 5)
     const payout = isPrep ? 0 : calculatePayout(run.turn, run.stats[StatType.LCK], run.balanceWeights.perTurnPayoutMultiplier)
     set({
@@ -217,7 +228,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   initDraft: () => {
     const run = get().run
     if (!run) return
-    const rng = createRNG(`${run.seed}_${run.archetype}_t${run.turn}_s`)
+    const rng = createRNG(storeSeed(run.seed, run.archetype, run.turn))
     const extraItems = applyCodexModifiers(run.archetype, get().codex.unlockedModifiers).extraItems
     const storeItems = generateStore(rng, run.turn, run.archetype, extraItems, run.balanceWeights.poolSizeMultiplier)
     const drafts = 1 + run.extraNodeDrafts
@@ -239,13 +250,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const run = get().run
     if (!run || run.phase !== RunPhase.DRAFT) return false
     if (!canPurchaseNode(run.constellation, nodeId, run.draftedNodeIds)) return false
-    const result = purchaseNode(run.constellation, run.draftedNodeIds, nodeId, run.archetype)
-    if (!result) return false
-    const nodeDef = getNodeById(run.archetype, result.node.defId)
-    const baseCost = nodeDef?.cost ?? 50
-    const price = applyDiscount(baseCost, run.stats[StatType.LCK])
-    if (run.gold < price) return false
     if (run.currentNodeDrafts <= 0) return false
+
+    const luckEff = run.balanceWeights.luckEfficacyMultiplier
+    const price = getNodePurchasePrice(
+      run.constellation,
+      nodeId,
+      run.archetype,
+      run.stats[StatType.LCK],
+      luckEff,
+    )
+    if (price === null || run.gold < price) return false
+
+    const conditionCtx = {
+      turn: run.turn,
+      stats: run.stats,
+      inventory: run.inventory,
+      goldHeld: run.gold,
+    }
+    const result = purchaseNode(
+      run.constellation,
+      run.draftedNodeIds,
+      nodeId,
+      run.archetype,
+      conditionCtx,
+    )
+    if (!result) return false
 
     const newStats = addStats(run.stats, result.statGain)
     const newBaseStats = addStats(run.baseStats, result.statGain)
@@ -289,7 +319,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!itemDef) return false
     if (!run.storeItems.includes(itemId)) return false
 
-    const price = applyDiscount(itemDef.cost, run.stats[StatType.LCK])
+    const luckEff = run.balanceWeights.luckEfficacyMultiplier
+    const itemPower = run.balanceWeights.itemPowerMultiplier
+    const price = applyDiscount(itemDef.cost, run.stats[StatType.LCK], luckEff)
     if (run.gold < price) return false
 
     if (itemDef.statRequirements) {
@@ -324,13 +356,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     let newStats = { ...run.stats }
 
+    const scaleStatBonus = (bonus: Partial<Record<StatType, number>>) => {
+      const scaled: Partial<Record<StatType, number>> = {}
+      for (const [k, v] of Object.entries(bonus)) {
+        if (v !== undefined) scaled[k as StatType] = Math.round(v * itemPower)
+      }
+      return scaled
+    }
+
     for (const eq of equipped) {
       const oldDef = getItemById(eq.defId)
       if (oldDef) {
         for (const effect of oldDef.effects) {
           if (effect.statBonus) {
-            for (const [statKey, val] of Object.entries(effect.statBonus)) {
-              newStats[statKey as StatType] = newStats[statKey as StatType] - val
+            for (const [statKey, val] of Object.entries(scaleStatBonus(effect.statBonus))) {
+              newStats[statKey as StatType] = newStats[statKey as StatType] - (val as number)
             }
           }
         }
@@ -345,7 +385,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     for (const effect of itemDef.effects) {
       if (effect.statBonus) {
-        newStats = addStats(newStats, effect.statBonus)
+        newStats = addStats(newStats, scaleStatBonus(effect.statBonus))
       }
     }
 
@@ -370,7 +410,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   execute: () => {
     const run = get().run
     if (!run || run.phase !== RunPhase.DRAFT) return
-    const rng = createRNG(`${run.seed}_${run.archetype}_t${run.turn}_ex`)
+    const rng = createRNG(executeSeed(run.seed, run.archetype, run.turn))
     const { result, log } = resolve(run, rng)
 
     set({
@@ -392,11 +432,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const completed = createCompletedRun(run)
     completed.shareString = shareString
 
+    // gearEverEquipped: true when the run has any items in inventory
     const newUnlocks = checkCodexUnlocks(
       completed,
       get().codex,
       run.stats,
-      run.inventory.length === 0,
+      run.inventory.length > 0,
     )
     const newCodex: CodexState = {
       ...get().codex,
@@ -431,7 +472,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   getRng: () => {
     const run = get().run
     if (!run) return createRNG('default')
-    return createRNG(`${run.seed}_${run.archetype}`)
+    return createRNG(constellationSeed(run.seed, run.archetype))
   },
 
   getPurchasableNodeIds: () => {
@@ -449,9 +490,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
   canAffordNode: (nodeId) => {
     const run = get().run
     if (!run) return false
-    const node = run.constellation.nodes.get(nodeId)
-    if (!node) return false
-    const price = applyDiscount(30 + node.column * 15, run.stats[StatType.LCK])
+    const price = getNodePurchasePrice(
+      run.constellation,
+      nodeId,
+      run.archetype,
+      run.stats[StatType.LCK],
+      run.balanceWeights.luckEfficacyMultiplier,
+    )
+    if (price === null) return false
     return run.gold >= price
   },
 
@@ -460,7 +506,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!run) return false
     const itemDef = getItemById(itemId)
     if (!itemDef) return false
-    const price = applyDiscount(itemDef.cost, run.stats[StatType.LCK])
+    const price = applyDiscount(
+      itemDef.cost,
+      run.stats[StatType.LCK],
+      run.balanceWeights.luckEfficacyMultiplier,
+    )
     return run.gold >= price
   },
 

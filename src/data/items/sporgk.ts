@@ -151,4 +151,17 @@ export const sporgkItems: ItemDef[] = [
     effects: [{ grantsAbility: 'sporgk_ab_warp_annihilate' }],
     statRequirements: { [StatType.STA]: 20 },
   },
+
+  // Codex unlock target
+  {
+    id: 'sporgk_item_warp_fuel',
+    name: 'Warp-Fuel Tank',
+    tier: ItemTier.T2,
+    slot: ItemSlot.BODY,
+    category: ItemCategory.ARMOR,
+    archetype: Archetype.SPORGK,
+    cost: 70,
+    description: 'A jury-rigged fuel bladder. Smells like victory and solvent. Codex-unlocked.',
+    effects: [{ statBonus: { [StatType.STR]: 3, [StatType.STA]: 2 } }],
+  },
 ]

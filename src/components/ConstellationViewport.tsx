@@ -3,14 +3,26 @@ import { useShallow } from 'zustand/shallow'
 import { useGameStore } from '../store'
 import { getNodeById } from '../data/nodes'
 import { canPurchaseNode } from '../game/constellation/canPurchase'
-import { applyDiscount } from '../game/economy/cost'
+import { getNodePurchasePrice } from '../game/economy/cost'
 import { StatType } from '../types/enums'
 import type { ConstellationNode } from '../types/nodes'
 import NodeTooltip from './NodeTooltip'
 import { useAudio } from '../hooks/useAudio'
 
+/** Deterministic drift particles (avoid Math.random in render). */
+const DRIFT_STARS = Array.from({ length: 40 }, (_, i) => {
+  const n = (i * 7919 + 104729) % 10000
+  return {
+    x: (n % 1000) / 10,
+    y: ((n * 7) % 1000) / 10,
+    delay: (n % 200) / 10,
+    duration: 18 + (n % 120) / 10,
+    size: n % 20 < 17 ? 1 : 2,
+  }
+})
+
 export default function ConstellationViewport() {
-  const { constellation, draftedIds, archetype, gold, lck, currentNodeDrafts, phase, turn } = useGameStore(
+  const { constellation, draftedIds, archetype, gold, lck, currentNodeDrafts, phase, turn, luckEff } = useGameStore(
     useShallow((s) => ({
       constellation: s.run?.constellation,
       draftedIds: s.run?.draftedNodeIds,
@@ -20,6 +32,7 @@ export default function ConstellationViewport() {
       currentNodeDrafts: s.run?.currentNodeDrafts,
       phase: s.run?.phase,
       turn: s.run?.turn,
+      luckEff: s.run?.balanceWeights?.luckEfficacyMultiplier ?? 1,
     })),
   )
   const purchaseNode = useGameStore((s) => s.purchaseNode)
@@ -135,14 +148,7 @@ export default function ConstellationViewport() {
     e.currentTarget.releasePointerCapture(e.pointerId)
   }, [])
 
-  const driftStars = useMemo(() =>
-    Array.from({ length: 40 }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 20,
-      duration: 18 + Math.random() * 12,
-      size: Math.random() < 0.85 ? 1 : 2,
-    })), [])
+  const driftStars = DRIFT_STARS
 
   if (!constellation || !archetype) return null
 
@@ -257,7 +263,7 @@ export default function ConstellationViewport() {
             const purchased = (draftedIds ?? []).includes(node.id)
             const purchasable = purchasableIds.has(node.id)
             const locked = node.locked
-            const price = applyDiscount(def.cost, lck)
+            const price = getNodePurchasePrice(constellation, node.id, archetype, lck, luckEff) ?? def.cost
             const affordable = gold !== undefined && gold >= price
             const canBuy = isDraft && purchasable && !purchased && !locked && affordable && (currentNodeDrafts ?? 0) > 0
             const dist = hopDistance.get(node.id)
@@ -377,7 +383,7 @@ export default function ConstellationViewport() {
       {hoveredNode && (() => {
         const def = constellation.defMap?.get(hoveredNode.defId) ?? getNodeById(archetype, hoveredNode.defId)
         if (!def) return null
-        const price = applyDiscount(def.cost, lck)
+        const price = getNodePurchasePrice(constellation, hoveredNode.id, archetype, lck, luckEff) ?? def.cost
         const purchasable = purchasableIds.has(hoveredNode.id)
         const purchased = (draftedIds ?? []).includes(hoveredNode.id)
         const locked = hoveredNode.locked

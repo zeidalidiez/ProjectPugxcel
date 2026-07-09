@@ -24,6 +24,8 @@ export function getAnchors(archetype: Archetype): NodeDef[] {
 }
 
 export function getNodesByColumn(_archetype: Archetype, _column: number): NodeDef[] {
+  void _archetype
+  void _column
   return []
 }
 

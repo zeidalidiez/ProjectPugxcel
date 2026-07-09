@@ -3,6 +3,7 @@ import type { PRNG } from '../../types/rng'
 import type { NodeDef, NodeEffect, NodeCondition } from '../../types/nodes'
 import type { ArchetypeFlavor } from '../../types/archetype-flavor'
 import type { BalanceWeights } from '../../types/balance'
+import { getArchetypeAbilityIds } from '../../data/abilities'
 
 const ANCHOR_COUNT = 5
 const ABILITY_RATIO = 0.18
@@ -122,11 +123,16 @@ export function generateNodes(
     totalNodes += count
   }
 
+  const catalogAbilityIds = getArchetypeAbilityIds(archetype)
   const abilityCount = Math.max(2, Math.min(
     Math.round(totalNodes * ABILITY_RATIO),
     ringTotal - 2,
+    catalogAbilityIds.length,
   ))
-  const abilityNames = generateAbilityNames(flavor, rng, abilityCount)
+  // Prefer real ability catalog IDs so resolve can fire them; flavor names for display only
+  const abilityUnlockIds = catalogAbilityIds.length > 0
+    ? rng.shuffle([...catalogAbilityIds]).slice(0, abilityCount)
+    : generateAbilityNames(flavor, rng, abilityCount)
   const anchorNames = generateAnchorNames(flavor, rng)
 
   const abilityRings: number[] = []
@@ -194,10 +200,19 @@ export function generateNodes(
       }
 
       let unlocksAbility: string | undefined
-      if (abilityRings.includes(ri) && abilityIdx < abilityNames.length && !isRing0) {
-        unlocksAbility = abilityNames[abilityIdx]
+      if (abilityRings.includes(ri) && abilityIdx < abilityUnlockIds.length && !isRing0) {
+        unlocksAbility = abilityUnlockIds[abilityIdx]
         abilityIdx++
       }
+
+      // Scale PP budget by nodePowerMultiplier (integer stat points)
+      const powerScaledEffects = weights.nodePowerMultiplier !== 1
+        ? effects.map((e) =>
+            e.kind === 'flat'
+              ? { ...e, value: Math.max(1, Math.round(e.value * weights.nodePowerMultiplier)) }
+              : e,
+          )
+        : effects
 
       const id = `${archetype.toLowerCase()}_r${ri}_n${globalIdx}`
       result.push({
@@ -207,7 +222,7 @@ export function generateNodes(
         type: nodeType,
         archetype,
         cost,
-        effects,
+        effects: powerScaledEffects,
         mutexPairId,
         condition,
         unlocksAbility,

@@ -11,7 +11,7 @@ interface NodeTooltipProps {
   hasDrafts: boolean
 }
 
-export default function NodeTooltip({ node: _node, def, price, purchasable, purchased, locked, hasDrafts }: NodeTooltipProps) {
+export default function NodeTooltip({ def, price, purchasable, purchased, locked, hasDrafts }: NodeTooltipProps) {
   return (
     <div className="absolute bottom-4 left-4 z-50 pointer-events-none p-3 rounded border border-terminal-accent bg-terminal-surface shadow-lg max-w-64">
       <div className="flex items-center gap-1 mb-1">

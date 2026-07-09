@@ -109,7 +109,7 @@ export const codexModifiers: CodexModifier[] = [
     name: 'Golden Paws',
     description: 'Start runs with +25 gold and +1 LCK.',
     unlockCondition: { type: 'reach_turn', value: 8 },
-    effect: { type: 'start_gold', value: 25 },
+    effect: { type: 'start_gold', value: 25, statBonus: 1, stat: StatType.LCK },
   },
   {
     id: 'mod_endurance',

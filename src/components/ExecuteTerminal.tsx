@@ -8,10 +8,10 @@ export default function ExecuteTerminal() {
   const lastResult = useGameStore((s) => s.run?.lastResult)
   const { advance } = usePhase()
 
+  const logKey = combatLog?.map((l) => l.text).join('\n') ?? ''
   const [displayedCharCount, setDisplayedCharCount] = useState(0)
 
   useEffect(() => {
-    setDisplayedCharCount(0)
     if (!combatLog || combatLog.length === 0) return
 
     const totalChars = combatLog.reduce((sum, line) => sum + line.text.length, 0)
@@ -26,7 +26,7 @@ export default function ExecuteTerminal() {
     }, 25)
 
     return () => clearInterval(interval)
-  }, [combatLog])
+  }, [combatLog, logKey])
 
   useEffect(() => {
     if (!combatLog || !lastResult) return
@@ -40,7 +40,8 @@ export default function ExecuteTerminal() {
   if (!combatLog || combatLog.length === 0) return null
 
   const totalChars = combatLog.reduce((sum, line) => sum + line.text.length, 0)
-  let remaining = displayedCharCount
+  // When logKey changes, interval restarts from 0; clamp display for safety
+  let remaining = Math.min(displayedCharCount, totalChars)
   const visibleLines: Array<{ line: (typeof combatLog)[number]; visibleText: string; lineIndex: number }> = []
 
   for (let idx = 0; idx < combatLog.length; idx++) {

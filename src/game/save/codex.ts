@@ -89,15 +89,19 @@ export function applyCodexModifiers(
     .sort((a, b) => a.id.localeCompare(b.id))
 
   for (const mod of sorted) {
+    // Optional statBonus on any effect type (e.g. start_gold + LCK)
+    if (mod.effect.statBonus) {
+      const stat = mod.effect.stat
+        ? (mod.effect.stat as StatType)
+        : archetype === Archetype.SPORGK ? StatType.STR
+        : archetype === Archetype.ELF ? StatType.AGI
+        : StatType.INT
+      result.bonusStats[stat] = (result.bonusStats[stat] ?? 0) + mod.effect.statBonus
+    }
+
     switch (mod.effect.type) {
       case 'stat_boost': {
-        if (!mod.effect.statBonus) break
-        const stat = mod.effect.stat
-          ? (mod.effect.stat as StatType)
-          : archetype === Archetype.SPORGK ? StatType.STR
-          : archetype === Archetype.ELF ? StatType.AGI
-          : StatType.INT
-        result.bonusStats[stat] = (result.bonusStats[stat] ?? 0) + mod.effect.statBonus
+        // statBonus already applied above when present
         break
       }
       case 'start_gold': {
@@ -112,8 +116,11 @@ export function applyCodexModifiers(
       }
       case 'add_item_to_pool': {
         if (!mod.effect.itemId) break
+        // Skip archetype-specific items that don't match (unless universal)
         const item = getItemById(mod.effect.itemId)
-        if (item) result.extraItems.push(item)
+        if (!item) break
+        if (item.archetype !== 'universal' && item.archetype !== archetype) break
+        result.extraItems.push(item)
         break
       }
     }

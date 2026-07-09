@@ -18,8 +18,9 @@ function distance(a: ConstellationNode, b: ConstellationNode): number {
 export function layoutLeftToRight(
   rng: PRNG,
   nodes: NodeDef[],
-  _weights: BalanceWeights,
+  weights: BalanceWeights,
 ): Constellation {
+  void weights
   const columnGroups = new Map<number, NodeDef[]>()
   for (const node of nodes) {
     const col = node.column

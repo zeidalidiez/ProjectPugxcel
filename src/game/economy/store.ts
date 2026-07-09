@@ -40,7 +40,8 @@ export function generateStore(
   return result.slice(0, maxItems)
 }
 
-export function getStoreItems(storeItemIds: string[], _archetype: Archetype): ItemDef[] {
+export function getStoreItems(storeItemIds: string[], archetype: Archetype): ItemDef[] {
+  void archetype
   return storeItemIds
     .map((id) => getItemById(id))
     .filter((item): item is ItemDef => item !== undefined)

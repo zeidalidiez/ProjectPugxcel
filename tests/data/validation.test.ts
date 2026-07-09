@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { getNodePool, getAnchors } from '../../src/data/nodes'
 import { getItemPool } from '../../src/data/items'
 import { getAbilityById, allAbilities } from '../../src/data/abilities'
-import { Archetype, StatType, NodeType } from '../../src/types/enums'
+import { Archetype, NodeType } from '../../src/types/enums'
 import { ALL_STATS } from '../../src/types/stats'
 
 const ALL_ARCHETYPES = [Archetype.SPORGK, Archetype.ELF, Archetype.VAMPIRE]
@@ -136,9 +136,9 @@ describe('Item pools', () => {
 })
 
 describe('Abilities', () => {
-  it('has 15-25 abilities', () => {
+  it('has 15-40 abilities (node unlocks + item-granted)', () => {
     expect(allAbilities.length).toBeGreaterThanOrEqual(15)
-    expect(allAbilities.length).toBeLessThanOrEqual(25)
+    expect(allAbilities.length).toBeLessThanOrEqual(40)
   })
 
   it('has all unique IDs', () => {

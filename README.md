@@ -6,12 +6,12 @@ There is no combat to simulate — only a build to assemble and a brutal thresho
 
 ## What it is
 
-- **Runtime varies with difficulty** — higher difficulties demand more nodes, more decisions, and tighter resource management."
+- **Runtime varies with difficulty** — higher difficulties demand more nodes, more decisions, and tighter resource management.
 - **3 archetypes**: Sporgk (Space Orc Pug, STR+STA), Space Pug Elf (AGI+LCK), Space Pug Vampire (INT+STA)
 - **Procedural constellation skill tree** — each run generates a unique ring-based radial galaxy map from seed. Node count scales with difficulty from ~20 (Easy) to ~100+ (Nightmare).
-- **Structural depth nodes** — conditionals, mutex pairs, anti-synergies, threshold gates, hybrid bridges (20-28% of tree depending on ring)
-- **Codex meta-progression** — modifiers unlock across runs and feed back into future RNG pools
-- **Deterministic by seed** — same seed + archetype + weights = byte-identical run. Share strings let others replay your run.
+- **Structural depth nodes** — conditionals and thresholds gate purchase; mutex pairs lock alternatives; anti-synergy reduces stacked bonuses
+- **Codex meta-progression** — modifiers unlock across runs and feed back into future RNG pools (stats, gold, extra nodes/items)
+- **Deterministic by seed** — same seed + archetype + weights = byte-identical run. Share strings let others replay your run (named presets; custom weights fall back to Normal on import).
 
 ## Galaxy Map
 
@@ -43,14 +43,14 @@ The constellation is a ring-based radial skill tree centered at the viewport. Ke
 
 ## Turn Structure
 
-Simplified 3-beat flow per turn (PAYOUT was dead air — now merged):
+Simplified flow per turn (gold from the previous turn deposits when entering FORECAST):
 
 ```
-BRIEFING (FORECAST)  →  gold auto-deposits, threat radar visible
+FORECAST   →  threat radar visible; gold already deposited on turn advance
   ↓  [Begin Drafting]
-DRAFT                 →  purchase 1 node + items from store
+DRAFT      →  purchase 1 node (real def cost after LCK discount) + items from store
   ↓  [Execute]
-EXECUTE → STINGER     →  damage resolves against encounter, PASS/FAIL screen
+STINGER    →  damage resolves against encounter threshold — PASS/FAIL screen
 ```
 
 Keyboard shortcuts: Enter or Space advances through phases. `[Enter / Space]` hints glow in the archetype accent color.
@@ -59,12 +59,13 @@ Keyboard shortcuts: Enter or Space advances through phases. `[Enter / Space]` hi
 
 See [`docs/game-mechanics.md`](docs/game-mechanics.md) for the full combat reference. Quick summary:
 
-- **Damage**: `STR × weaponMult + flatBonuses` per attack. Attacks per turn = `1 + AGI/5`.
-- **INT bypass**: Vampire's INT bypasses armor, evasion, and INT resist entirely.
-- **Stamina abilities**: Unlocked via constellation nodes. Consume STA to fire. `maxStamina = 10 + STA/2`.
-- **Crits**: LCK × 2% chance, max 50%.
-- **Thresholds**: Curve-based (linear/breakpoint/quadratic). Boss multiplier every 5 turns, final boss on turn 20.
-- **Stinger**: PASS/FAIL/BARELY variants with per-archetype flavor text.
+- **Damage**: primary-stat × weaponMult + flatBonuses per attack. Attacks per turn = `⌊1 + AGI/5⌋`.
+- **INT bypass**: Vampire's INT bypasses armor and evasion.
+- **Stamina abilities**: Unlocked via constellation nodes and some items. Consume STA to fire. `maxStamina = 10 + STA/2`.
+- **Crits**: LCK × 2% × luckEfficacyMultiplier, cap 50%.
+- **Thresholds**: Curve-based (linear/breakpoint/quadratic) from difficulty weights. Boss multiplier every 5 turns, final boss on turn 20.
+- **Stinger**: PASS/FAIL/BARELY variants.
+- **Difficulty power knobs**: `itemPowerMultiplier`, `nodePowerMultiplier`, and `luckEfficacyMultiplier` apply at runtime (not cosmetic).
 
 ## Difficulty
 
@@ -82,13 +83,13 @@ Custom difficulty exposes 14 sliders including `nodeDensity` (0.2–5.0), `ringC
 ## Stack
 
 - TypeScript (strict mode)
-- React 18 + Vite
+- React 19 + Vite 8
 - Tailwind CSS v4 (CSS variable-driven theming)
 - Zustand (state) + Zod (schema validation)
 - `seedrandom` for deterministic RNG
 - Howler.js for audio
 - Bungee + JetBrains Mono + Orbitron + Inter (Google Fonts)
-- Vitest (280 tests)
+- Vitest (full suite — run `npm test` for current count)
 
 ## Getting started
 
@@ -96,7 +97,7 @@ Custom difficulty exposes 14 sliders including `nodeDensity` (0.2–5.0), `ringC
 npm install
 npm run dev          # local dev server with HMR
 npm run build        # production build
-npm test             # run the full Vitest suite (280 tests)
+npm test             # run the full Vitest suite
 npm run test:watch   # tests in watch mode
 npm run typecheck    # tsc --noEmit
 npm run lint         # eslint
@@ -124,7 +125,7 @@ npm run lint         # eslint
   store.ts            Zustand store
   App.tsx
   main.tsx
-/tests                Vitest specs mirroring /src/game (280 tests)
+/tests                Vitest specs mirroring /src/game
 /docs                 Modder and design references
   game-mechanics.md    Full combat, constellation, economy, balance reference
   balance-guidelines.md PP system, slot identity, anti-patterns
@@ -146,7 +147,12 @@ Same seed + same archetype + same balance weights + same draft sequence = byte-i
 
 ## Status
 
-Phase 2B complete — procedural constellation, radial layout with physics, distance-tiered map, campy sci-fi HUD chrome, archetype theming. Heading toward launch infrastructure (Steam page, trailer, demo deploy).
+Core systems are playable and covered by Vitest: procedural constellation, shared node pricing, ability catalog wiring (nodes + items), Codex unlocks that apply on `startRun`, difficulty power/economy multipliers, and share-string replay for named presets. Remaining product work is polish/launch (visual refresh depth, Steam page, trailer, demo deploy) — not core loop integrity.
+
+## Known limits
+
+- Custom difficulty share codes (`CS-XXXX`) cannot reconstruct full custom weights from the hash alone; replay falls back to Normal weights for custom codes.
+- Seeds are normalized to 8 alphanumeric characters for the share/RNG envelope (see `normalizeSeed`).
 
 ## License
 

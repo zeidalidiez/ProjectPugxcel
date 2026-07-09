@@ -22,7 +22,7 @@ describe('balance-presets', () => {
   })
 
   it('all presets produce thresholds within sensible bounds turns 1-20', () => {
-    for (const [_key, preset] of Object.entries(PRESETS)) {
+    for (const preset of Object.values(PRESETS)) {
       for (let turn = 1; turn <= 20; turn++) {
         const threshold = computeThreshold(turn, preset)
         expect(threshold).toBeGreaterThan(0)
@@ -32,7 +32,7 @@ describe('balance-presets', () => {
   })
 
   it('boss turns produce higher thresholds than adjacent turns', () => {
-    for (const [_key, preset] of Object.entries(PRESETS)) {
+    for (const preset of Object.values(PRESETS)) {
       const boss5 = computeThreshold(5, preset)
       const turn4 = computeThreshold(4, preset)
       const turn6 = computeThreshold(6, preset)

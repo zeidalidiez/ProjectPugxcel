@@ -983,6 +983,19 @@ export const sporgkNodes: NodeDef[] = [
     ],
   }),
 
+  // Codex unlock — add_node_to_pool target
+  node('berserker_rite', {
+    name: 'Berserker Rite',
+    description: 'A forbidden rite that floods the hull with warp-rage. Unlocked via Codex.',
+    cost: 90,
+    column: 4,
+    rarity: 80,
+    effects: [
+      { stat: StatType.STR, value: 5, kind: 'flat' },
+      { stat: StatType.STA, value: 2, kind: 'flat' },
+    ],
+  }),
+
   node('c7_final_threshold', {
     name: 'Final Threshold Breach',
     description: 'The end-boss looms. Your body, knowing this is the last war, transcends every limitation it once accepted.',

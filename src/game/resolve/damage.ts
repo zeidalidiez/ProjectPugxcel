@@ -12,6 +12,8 @@ export interface DamageInput {
   evadePayload: boolean[]
   getItemDef: (defId: string) => ItemDef | undefined
   primaryStat?: StatType
+  /** Scales weapon flat bonuses and strMult contribution from items. */
+  itemPowerMultiplier?: number
 }
 
 export interface DamageResult {
@@ -27,8 +29,16 @@ const RESISTANCE_THREAT_MAP: Partial<Record<ThreatTag, string>> = {
 }
 
 export function computeDamage(input: DamageInput): DamageResult {
-  const { stats, encounter, inventory, critPayload, evadePayload, getItemDef, primaryStat = StatType.STR } =
-    input
+  const {
+    stats,
+    encounter,
+    inventory,
+    critPayload,
+    evadePayload,
+    getItemDef,
+    primaryStat = StatType.STR,
+    itemPowerMultiplier = 1.0,
+  } = input
 
   let strMult = 1.0
   let flatBonuses = 0
@@ -42,8 +52,13 @@ export function computeDamage(input: DamageInput): DamageResult {
 
     if (def.category === ItemCategory.WEAPON) {
       for (const effect of def.effects) {
-        if (effect.strMult !== undefined) strMult = effect.strMult
-        if (effect.flatBonus !== undefined) flatBonuses += effect.flatBonus
+        if (effect.strMult !== undefined) {
+          // Scale weapon mult deviation from 1.0 by item power
+          strMult = 1 + (effect.strMult - 1) * itemPowerMultiplier
+        }
+        if (effect.flatBonus !== undefined) {
+          flatBonuses += effect.flatBonus * itemPowerMultiplier
+        }
         if (effect.resistance) {
           const target = RESISTANCE_THREAT_MAP[effect.resistance.tag]
           if (target && encounter.threatTags.includes(effect.resistance.tag)) {
@@ -53,7 +68,9 @@ export function computeDamage(input: DamageInput): DamageResult {
       }
     } else {
       for (const effect of def.effects) {
-        if (effect.flatBonus !== undefined) flatBonuses += effect.flatBonus
+        if (effect.flatBonus !== undefined) {
+          flatBonuses += effect.flatBonus * itemPowerMultiplier
+        }
         if (effect.resistance) {
           const target = RESISTANCE_THREAT_MAP[effect.resistance.tag]
           if (target && encounter.threatTags.includes(effect.resistance.tag)) {

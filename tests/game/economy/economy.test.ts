@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { calculatePayout } from '../../../src/game/economy/payout'
 import { applyDiscount } from '../../../src/game/economy/cost'
 import { generateStore, getStoreItems } from '../../../src/game/economy/store'
 import { createRNG } from '../../../src/game/rng/create'
 import { Archetype, ItemTier } from '../../../src/types/enums'
-import { getItemPool } from '../../../src/data/items'
+
 
 // ── compile-time guard: verify the formula produces integer outputs ──
 
@@ -96,9 +96,6 @@ describe('generateStore', () => {
   })
 
   it('no T4 before turn 8', () => {
-    const pool = getItemPool(Archetype.SPORGK)
-    const t4Ids = new Set(pool.filter((i) => i.tier === ItemTier.T4).map((i) => i.id))
-
     for (let turn = 1; turn < 8; turn++) {
       const rng = createRNG(`no-t4-turn${turn}`)
       const ids = generateStore(rng, turn, Archetype.SPORGK)
@@ -154,7 +151,6 @@ describe('generateStore', () => {
   })
 
   it('valid turn slots for turn < 8 match [T1,T2,T3,T1,T2]', () => {
-    const pool = getItemPool(Archetype.SPORGK)
     for (let turn = 1; turn < 8; turn++) {
       const rng = createRNG(`slots-early-${turn}`)
       const ids = generateStore(rng, turn, Archetype.SPORGK)

@@ -12,7 +12,6 @@ import type { ItemDef, InventoryItem } from '../../../src/types/items'
 import type { AbilityDef } from '../../../src/types/abilities'
 import type { Encounter } from '../../../src/types/encounters'
 import type { RunState } from '../../../src/types/run'
-import type { Constellation } from '../../../src/types/nodes'
 
 // ---------------------------------------------------------------------------
 // Test helpers

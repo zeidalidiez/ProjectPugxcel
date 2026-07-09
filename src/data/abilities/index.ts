@@ -244,8 +244,171 @@ export const allAbilities: AbilityDef[] = [
     bypassEvasion: true,
     description: 'Become indistinguishable from the void itself. No armor, no evasion, no resistance — only end.',
   },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ITEM-GRANTED ABILITIES — must match grantsAbility on item defs
+  // ═══════════════════════════════════════════════════════════════════
+
+  {
+    id: 'sporgk_ab_asteroid_cleave',
+    name: 'Asteroid Cleave',
+    staCost: 4,
+    baseDamage: 22,
+    maxFires: 3,
+    scalingStat: StatType.STR,
+    scalingFactor: 0.35,
+    bypassArmor: false,
+    bypassEvasion: false,
+    description: 'Channel asteroid mass through your weapon for a devastating cleave.',
+  },
+  {
+    id: 'sporgk_ab_warp_annihilate',
+    name: 'Warp Annihilate',
+    staCost: 7,
+    baseDamage: 48,
+    maxFires: 2,
+    scalingStat: StatType.STR,
+    scalingFactor: 0.55,
+    bypassArmor: false,
+    bypassEvasion: false,
+    description: 'Detonate a stolen warp core. Sector-scale violence.',
+  },
+  {
+    id: 'elf_ab_crystal_prism',
+    name: 'Crystal Prism',
+    staCost: 4,
+    baseDamage: 18,
+    maxFires: 4,
+    scalingStat: StatType.AGI,
+    scalingFactor: 0.4,
+    bypassArmor: false,
+    bypassEvasion: true,
+    description: 'Split your strike into a prismatic volley that ignores evasion.',
+  },
+  {
+    id: 'vamp_ab_void_whisper',
+    name: 'Void Whisper',
+    staCost: 3,
+    baseDamage: 16,
+    maxFires: 4,
+    scalingStat: StatType.INT,
+    scalingFactor: 0.35,
+    bypassArmor: true,
+    bypassEvasion: true,
+    description: 'A soft word from the void. Armor and evasion mean nothing.',
+  },
+  {
+    id: 'vamp_ab_soul_rend',
+    name: 'Soul Rend',
+    staCost: 5,
+    baseDamage: 30,
+    maxFires: 3,
+    scalingStat: StatType.INT,
+    scalingFactor: 0.5,
+    bypassArmor: true,
+    bypassEvasion: false,
+    description: 'Tear essence free of the body. Armor cannot hold a soul.',
+  },
+  {
+    id: 'vamp_ab_cathedral_bolt',
+    name: 'Cathedral Bolt',
+    staCost: 5,
+    baseDamage: 34,
+    maxFires: 2,
+    scalingStat: StatType.INT,
+    scalingFactor: 0.55,
+    bypassArmor: true,
+    bypassEvasion: true,
+    description: 'A bolt from the cathedral-ship`s apex spire.',
+  },
+  {
+    id: 'vamp_ab_life_siphon',
+    name: 'Life Siphon',
+    staCost: 4,
+    baseDamage: 24,
+    maxFires: 3,
+    scalingStat: StatType.INT,
+    scalingFactor: 0.45,
+    bypassArmor: true,
+    bypassEvasion: false,
+    description: 'Drain vitality through the void tether.',
+  },
+  {
+    id: 'ab_warphowl',
+    name: 'Warphowl',
+    staCost: 3,
+    baseDamage: 12,
+    maxFires: 4,
+    scalingStat: StatType.STR,
+    scalingFactor: 0.25,
+    bypassArmor: false,
+    bypassEvasion: false,
+    description: 'Sonic howl tuned to dying stars.',
+  },
+  {
+    id: 'ab_gravity_well',
+    name: 'Gravity Well',
+    staCost: 5,
+    baseDamage: 28,
+    maxFires: 2,
+    scalingStat: StatType.STR,
+    scalingFactor: 0.4,
+    bypassArmor: false,
+    bypassEvasion: false,
+    description: 'Collapse local space into a crushing well.',
+  },
+  {
+    id: 'ab_nova_stim',
+    name: 'Nova Stim',
+    staCost: 4,
+    baseDamage: 20,
+    maxFires: 3,
+    scalingStat: StatType.AGI,
+    scalingFactor: 0.35,
+    bypassArmor: false,
+    bypassEvasion: true,
+    description: 'Stimulant burst that outpaces evasion.',
+  },
+  {
+    id: 'ab_nova_burst',
+    name: 'Nova Burst',
+    staCost: 6,
+    baseDamage: 40,
+    maxFires: 2,
+    scalingStat: StatType.INT,
+    scalingFactor: 0.5,
+    bypassArmor: true,
+    bypassEvasion: false,
+    description: 'A miniature nova detonation.',
+  },
+  {
+    id: 'ab_singularity',
+    name: 'Singularity',
+    staCost: 8,
+    baseDamage: 55,
+    maxFires: 1,
+    scalingStat: StatType.INT,
+    scalingFactor: 0.7,
+    bypassArmor: true,
+    bypassEvasion: true,
+    description: 'Uncage a harvested singularity. One activation ends arguments.',
+  },
 ]
 
 export function getAbilityById(id: string): AbilityDef | undefined {
   return allAbilities.find((a) => a.id === id)
+}
+
+/** Ability IDs belonging to an archetype (node-unlock catalog, not item-only). */
+export function getArchetypeAbilityIds(archetype: string): string[] {
+  const prefix =
+    archetype === 'SPORGK' || archetype === 'sporgk' ? 'sporgk_'
+    : archetype === 'ELF' || archetype === 'elf' ? 'elf_'
+    : archetype === 'VAMPIRE' || archetype === 'vampire' ? 'vamp_'
+    : ''
+  if (!prefix) return []
+  // Exclude item-granted ids (contain `_ab_`) from procedural node unlocks
+  return allAbilities
+    .filter((a) => a.id.startsWith(prefix) && !a.id.includes('_ab_'))
+    .map((a) => a.id)
 }

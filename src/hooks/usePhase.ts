@@ -7,7 +7,6 @@ export function usePhase() {
   const lastResultPass = useGameStore((s) => s.run?.lastResult?.pass)
   const turn = useGameStore((s) => s.run?.turn)
   const advanceToForecast = useGameStore((s) => s.advanceToForecast)
-  const advanceToPayout = useGameStore((s) => s.advanceToPayout)
   const initDraft = useGameStore((s) => s.initDraft)
   const execute = useGameStore((s) => s.execute)
   const endRun = useGameStore((s) => s.endRun)
@@ -39,7 +38,7 @@ export function usePhase() {
       case RunPhase.POST_RUN:
         break
     }
-  }, [phase, lastResultPass, turn, advanceToForecast, advanceToPayout, initDraft, execute, endRun])
+  }, [phase, lastResultPass, turn, advanceToForecast, initDraft, execute, endRun])
 
   const isTransitioning = phase === RunPhase.STINGER
 

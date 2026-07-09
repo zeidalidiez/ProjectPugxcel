@@ -10,6 +10,7 @@ export default function StoreModal() {
   const storeItems = useGameStore((s) => s.run?.storeItems)
   const archetype = useGameStore((s) => s.run?.archetype)
   const lck = useGameStore((s) => s.run?.stats?.[StatType.LCK]) ?? 0
+  const luckEff = useGameStore((s) => s.run?.balanceWeights?.luckEfficacyMultiplier) ?? 1
   const purchaseItem = useGameStore((s) => s.purchaseItem)
   const canAffordItem = useGameStore((s) => s.canAffordItem)
   const [hoveredDef, setHoveredDef] = useState<ItemDef | null>(null)
@@ -23,7 +24,7 @@ export default function StoreModal() {
         {storeItems.map((itemId) => {
           const def = getItemById(itemId)
           if (!def) return null
-          const price = applyDiscount(def.cost, lck)
+          const price = applyDiscount(def.cost, lck, luckEff)
           const affordable = canAffordItem(itemId)
 
           return (

@@ -1008,4 +1008,29 @@ export const vampireNodes: NodeDef[] = [
       { stat: StatType.STA, value: 4, kind: 'flat' },
     ],
   }),
+
+  // Codex unlock — add_node_to_pool targets
+  node('lich_ascendant', {
+    name: 'Lich Ascendant',
+    description: 'Shed the last pretense of mortality. Codex-unlocked void mastery.',
+    cost: 120,
+    column: 5,
+    rarity: 85,
+    effects: [
+      { stat: StatType.INT, value: 6, kind: 'flat' },
+      { stat: StatType.STA, value: 3, kind: 'flat' },
+    ],
+  }),
+
+  node('entropic_cascade', {
+    name: 'Entropic Cascade',
+    description: 'Chain entropy through the hull. Codex-unlocked advanced node.',
+    cost: 110,
+    column: 5,
+    rarity: 80,
+    effects: [
+      { stat: StatType.INT, value: 5, kind: 'flat' },
+      { stat: StatType.STA, value: 2, kind: 'flat' },
+    ],
+  }),
 ]

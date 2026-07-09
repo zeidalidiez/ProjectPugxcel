@@ -5,7 +5,7 @@ import { getAllChallenges } from '../data/codex/challenges'
 import { Archetype } from '../types/enums'
 import { encodeCodexPassword, decodeCodexPassword } from '../game/save/codexPassword'
 import { saveCodex } from '../game/save/storage'
-import { useToast } from './Toast'
+import { useToast } from '../hooks/useToast'
 
 const ARCH_LABELS: Record<string, string> = {
   [Archetype.SPORGK]: 'Sporgk',

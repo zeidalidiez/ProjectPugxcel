@@ -4,6 +4,7 @@ import type { DifficultyPresetId, BalanceWeights } from '../../types/balance'
 import { Archetype } from '../../types/enums'
 import type { ConstellationNode } from '../../types/nodes'
 import { PRESETS } from '../../data/balance-presets'
+import { normalizeSeed } from './runSeed'
 
 const ARCH_MAP: Record<string, string> = {
   [Archetype.SPORGK]: 'SPRGK',
@@ -87,8 +88,7 @@ function resolvePresetCode(weights: BalanceWeights): string {
 
 export function encodeShareString(state: RunState): string {
   const arch = ARCH_MAP[state.archetype] ?? state.archetype
-  const seedAlpha = state.seed.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-  const seed8 = seedAlpha.slice(0, 8)
+  const seed8 = normalizeSeed(state.seed)
 
   const sortedNodes = getSortedNodeList(state.constellation.nodes)
 
@@ -110,16 +110,18 @@ export function encodeShareString(state: RunState): string {
 
 export function createCompletedRun(state: RunState): CompletedRun {
   const shareString = encodeShareString(state)
+  // Use lastResult.pass only — endRun calls this before setting runEnded.
+  // deficit is threshold - total (negative when ahead); store signed margin for history.
+  const deficit = state.lastResult?.deficit ?? 0
+  const margin = state.lastResult ? -deficit : 0
 
   return {
     id: crypto.randomUUID(),
     seed: state.seed,
     archetype: state.archetype,
     turnReached: state.turn,
-    passed: !state.runEnded || (state.lastResult?.pass ?? false),
-    deficitOrMargin: state.lastResult
-      ? (state.lastResult.pass ? state.lastResult.deficit : state.lastResult.deficit)
-      : 0,
+    passed: state.lastResult?.pass ?? false,
+    deficitOrMargin: margin,
     draftedNodeIds: [...state.draftedNodeIds],
     shareString,
     timestamp: Date.now(),

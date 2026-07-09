@@ -45,28 +45,27 @@ export default function MainHUD() {
   const helpText = phase && PHASE_HELP[phase as string]
     ? (isPrep ? PHASE_HELP[phase as string].prep : PHASE_HELP[phase as string].encounter)
     : ''
-  const helpTextRef = useRef(helpText)
-  helpTextRef.current = helpText
 
   useEffect(() => {
-    const text = helpTextRef.current
-    if (!text) { setTypedHelp(''); return }
-    setTypedHelp('')
+    if (!helpText) return
     if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
     let i = 0
+    // Async first update avoids cascading setState-in-effect
     helpIntervalRef.current = setInterval(() => {
       i++
-      setTypedHelp(text.slice(0, i))
+      setTypedHelp(helpText.slice(0, i))
       if (i % 3 === 0) playTypewriterTick()
-      if (i >= text.length) {
+      if (i >= helpText.length) {
         if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
       }
     }, 35)
     return () => {
       if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [helpText])
+  }, [helpText, playTypewriterTick])
+
+  // Derive empty help when no text without effect setState
+  const displayHelp = helpText ? typedHelp : ''
 
   return (
     <div className="h-full flex flex-col gap-2 p-3 sm:p-5">
@@ -103,7 +102,7 @@ export default function MainHUD() {
 
       {phase && PHASE_HELP[phase as string] && (
         <div className="text-terminal-accent text-xs font-mono px-1" role="status">
-          › {typedHelp}<span className="animate-pulse">_</span>
+          › {displayHelp}<span className="animate-pulse">_</span>
         </div>
       )}
 

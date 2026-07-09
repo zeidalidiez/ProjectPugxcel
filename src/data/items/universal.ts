@@ -472,4 +472,28 @@ export const universalItems: ItemDef[] = [
     effects: [{ grantsAbility: 'ab_singularity' }],
     statRequirements: { [StatType.INT]: 18 },
   },
+
+  // Codex unlock targets
+  {
+    id: 'item_void_knuckles',
+    name: 'Void Knuckles',
+    tier: ItemTier.T2,
+    slot: ItemSlot.PAWS,
+    category: ItemCategory.WEAPON,
+    archetype: 'universal',
+    cost: 55,
+    description: 'Bare-knuckle void plating. For runs that refuse gear until the end — then hit harder.',
+    effects: [{ strMult: 1.5 }, { flatBonus: 4 }],
+  },
+  {
+    id: 'item_draft_token',
+    name: 'Draft Token',
+    tier: ItemTier.T2,
+    slot: ItemSlot.ARTIFACT,
+    category: ItemCategory.TRINKET,
+    archetype: 'universal',
+    cost: 60,
+    description: 'A stamped token that bends constellation protocol. Grants an extra node draft.',
+    effects: [{ extraNodeDraft: true }, { statBonus: { [StatType.LCK]: 1 } }],
+  },
 ]

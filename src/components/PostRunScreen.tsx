@@ -46,8 +46,8 @@ export default function PostRunScreen() {
         {lastResult && (
           <div className="text-terminal-text text-sm">
             {lastResult.pass
-              ? `Margin: +${lastResult.deficit}`
-              : `Deficit: -${Math.abs(lastResult.deficit)}`}
+              ? `Margin: +${Math.max(0, lastResult.damageDealt - lastResult.threshold)}`
+              : `Deficit: ${Math.max(0, lastResult.threshold - lastResult.damageDealt)}`}
           </div>
         )}
       </div>

@@ -975,6 +975,31 @@ export const elfNodes: NodeDef[] = [
     rarity: 50,
   }),
 
+  // Codex unlock — add_node_to_pool targets
+  node('starweaver', {
+    name: 'Star-Weaver',
+    description: 'Thread starlight into your constellation. Codex-unlocked advanced node.',
+    cost: 95,
+    column: 4,
+    effects: [
+      { stat: StatType.AGI, value: 4, kind: 'flat' },
+      { stat: StatType.LCK, value: 4, kind: 'flat' },
+    ],
+    rarity: 80,
+  }),
+
+  node('prismatic_lens', {
+    name: 'Prismatic Lens',
+    description: 'A focusing crystal that refracts luck into pure motion. Codex-unlocked.',
+    cost: 110,
+    column: 5,
+    effects: [
+      { stat: StatType.AGI, value: 3, kind: 'flat' },
+      { stat: StatType.LCK, value: 5, kind: 'flat' },
+    ],
+    rarity: 80,
+  }),
+
   // Standard capstones
   node('perfect_crystalline_form', {
     name: 'Perfect Crystalline Form',

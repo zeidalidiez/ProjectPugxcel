@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 interface ToastProps {
   message: string
@@ -6,7 +6,7 @@ interface ToastProps {
   onDone: () => void
 }
 
-function Toast({ message, variant, onDone }: ToastProps) {
+export default function Toast({ message, variant, onDone }: ToastProps) {
   useEffect(() => {
     const id = setTimeout(onDone, 3000)
     return () => clearTimeout(id)
@@ -23,16 +23,4 @@ function Toast({ message, variant, onDone }: ToastProps) {
       {message}
     </div>
   )
-}
-
-export function useToast() {
-  const [toast, setToast] = useState<{ message: string; variant: 'success' | 'error' } | null>(null)
-
-  return {
-    toast,
-    showToast: (message: string, variant: 'success' | 'error' = 'success') => setToast({ message, variant }),
-    ToastComponent: toast ? (
-      <Toast message={toast.message} variant={toast.variant} onDone={() => setToast(null)} />
-    ) : null,
-  }
 }

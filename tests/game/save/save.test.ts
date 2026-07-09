@@ -179,7 +179,7 @@ describe('createCompletedRun', () => {
         damageDealt: 500,
         threshold: 400,
         deficit: 100,
-        stingerVariant: 'PASS' as any,
+        stingerVariant: 'PASS' as const,
       },
     })
     const run = createCompletedRun(state)
@@ -195,7 +195,7 @@ describe('createCompletedRun', () => {
         damageDealt: 200,
         threshold: 400,
         deficit: 200,
-        stingerVariant: 'FAIL' as any,
+        stingerVariant: 'FAIL' as const,
       },
     })
     const run = createCompletedRun(state)
@@ -276,8 +276,8 @@ describe('parseShareString', () => {
   })
 
   it('returns error for null/undefined input', () => {
-    expect(parseShareString(null as any).ok).toBe(false)
-    expect(parseShareString(undefined as any).ok).toBe(false)
+    expect(parseShareString(null as unknown as string).ok).toBe(false)
+    expect(parseShareString(undefined as unknown as string).ok).toBe(false)
   })
 
   it('preserves draft sequence with multiple slashes', () => {

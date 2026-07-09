@@ -63,8 +63,8 @@ export function parseShareString(shareStr: string): ParseResult {
 
   // Determine if new format (4 parts: ANTIGRAV/ARCH-SEED/PRESET/DRAFT)
   // or legacy format (3 parts: ANTIGRAV/ARCH-SEED/DRAFT)
-  let presetId: DifficultyPresetId = 'normal'
   let draftSeq: string
+  let presetId: DifficultyPresetId
 
   // Strict preset code: 2 uppercase letters (EZ/NM/HD/NT or any future 2-letter code) OR CS-prefixed custom hash
   const PRESET_CODE_RE = /^([A-Z]{2}|CS-[A-Z0-9]+)$/
@@ -79,12 +79,8 @@ export function parseShareString(shareStr: string): ParseResult {
       presetId = 'custom'
     } else {
       const resolved = REV_PRESET_CODE[presetSegment]
-      if (resolved) {
-        presetId = resolved
-      } else {
-        // Unknown 2-letter preset code (forward compat for future presets) — treat as normal
-        presetId = 'normal'
-      }
+      // Unknown 2-letter preset code (forward compat) — treat as normal
+      presetId = resolved ?? 'normal'
     }
   } else {
     // Legacy 3-part format OR segment 3 is not a valid preset code — treat as legacy.

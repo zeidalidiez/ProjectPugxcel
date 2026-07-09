@@ -6,6 +6,7 @@ import { getAbilityById } from '../../data/abilities'
 import { getItemById } from '../../data/items'
 import { computeDamage } from './damage'
 import { fireAbilities, getMaxStamina } from './abilities'
+import { critChanceFromLuck } from '../economy/luck'
 
 const PRIMARY_STAT: Record<Archetype, StatType> = {
   [Archetype.SPORGK]: StatType.STR,
@@ -20,8 +21,10 @@ export function resolve(
   const encounter = state.encounters[0]
   const log: CombatLogLine[] = []
 
+  const luckEff = state.balanceWeights?.luckEfficacyMultiplier ?? 1.0
+  const itemPower = state.balanceWeights?.itemPowerMultiplier ?? 1.0
   const attacks = Math.floor(1 + state.stats.AGI / 5)
-  const critChance = Math.min(state.stats.LCK * 0.02, 0.5)
+  const critChance = critChanceFromLuck(state.stats.LCK, luckEff)
 
   const critPayload: boolean[] = []
   const evadePayload: boolean[] = []
@@ -38,6 +41,7 @@ export function resolve(
     evadePayload,
     getItemDef: getItemById,
     primaryStat: PRIMARY_STAT[state.archetype],
+    itemPowerMultiplier: itemPower,
   })
   log.push(...damageResult.lines)
 

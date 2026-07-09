@@ -4,6 +4,11 @@ import { EMPTY_STATS } from '../../types/stats'
 import { getNodeById } from '../../data/nodes'
 import { Archetype, NodeType } from '../../types/enums'
 import { canPurchaseNode } from './canPurchase'
+import {
+  applyAntiSynergyPenalty,
+  canPurchaseWithCondition,
+  type ConditionContext,
+} from './conditions'
 
 export interface PurchaseResult {
   node: ConstellationNode
@@ -11,6 +16,16 @@ export interface PurchaseResult {
   abilityUnlocked: string | null
   mutexLockedNodeId: string | null
   newNodeDrafts: number
+}
+
+export function resolveNodeDef(
+  constellation: Constellation,
+  nodeId: string,
+  archetype: Archetype,
+): NodeDef | undefined {
+  const node = constellation.nodes.get(nodeId)
+  if (!node) return undefined
+  return constellation.defMap?.get(node.defId) ?? getNodeById(archetype, node.defId)
 }
 
 function computeStatGain(nodeDef: NodeDef): StatBlock {
@@ -28,6 +43,7 @@ export function purchaseNode(
   purchasedIds: string[],
   nodeId: string,
   archetype: Archetype,
+  conditionCtx?: ConditionContext,
 ): PurchaseResult | null {
   if (!canPurchaseNode(constellation, nodeId, purchasedIds)) return null
 
@@ -35,7 +51,18 @@ export function purchaseNode(
   const nodeDef = constellation.defMap?.get(node.defId) ?? getNodeById(archetype, node.defId)
   if (!nodeDef) return null
 
-  const statGain = computeStatGain(nodeDef)
+  if (conditionCtx && !canPurchaseWithCondition(nodeDef, conditionCtx)) {
+    return null
+  }
+
+  let statGain = computeStatGain(nodeDef)
+
+  if (conditionCtx) {
+    const ownedDefs = purchasedIds
+      .map((id) => resolveNodeDef(constellation, id, archetype))
+      .filter((d): d is NodeDef => d !== undefined)
+    statGain = applyAntiSynergyPenalty(statGain, nodeDef, ownedDefs)
+  }
 
   const abilityUnlocked = nodeDef.unlocksAbility ?? null
 
@@ -43,7 +70,8 @@ export function purchaseNode(
   if (nodeDef.type === NodeType.MUTEX && nodeDef.mutexPairId) {
     const pairNode = [...constellation.nodes.values()].find((n) => {
       if (n.id === nodeId) return false
-      const pd = getNodeById(archetype, n.defId)
+      const pd =
+        constellation.defMap?.get(n.defId) ?? getNodeById(archetype, n.defId)
       return pd?.mutexPairId === nodeDef.mutexPairId
     })
     if (pairNode) {
