@@ -1,5 +1,5 @@
 import { useGameStore } from '../store'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { RunPhase } from '../types/enums'
 import StatPanel from './StatPanel'
 import EquipmentSlots from './EquipmentSlots'
@@ -29,14 +29,35 @@ const PHASE_HELP: Record<string, { prep: string; encounter: string }> = {
   },
 }
 
+/** Typewriter line — remount via key when text changes so it always starts clean. */
+function TypewriterHelp({ text }: { text: string }) {
+  const [typed, setTyped] = useState('')
+  const { playTypewriterTick } = useAudio()
+
+  useEffect(() => {
+    let i = 0
+    // playTypewriterTick is stable (useCallback); only restart when `text` changes
+    const id = setInterval(() => {
+      i += 1
+      setTyped(text.slice(0, i))
+      if (i % 3 === 0) playTypewriterTick()
+      if (i >= text.length) clearInterval(id)
+    }, 35)
+    return () => clearInterval(id)
+  }, [text, playTypewriterTick])
+
+  return (
+    <div className="text-terminal-accent text-xs font-mono px-1" role="status">
+      › {typed}<span className="animate-pulse">_</span>
+    </div>
+  )
+}
+
 export default function MainHUD() {
   const phase = useGameStore((s) => s.run?.phase)
   const turn = useGameStore((s) => s.run?.turn)
   const [showLeftPanel, setShowLeftPanel] = useState(false)
   const [showLog, setShowLog] = useState(false)
-  const [typedHelp, setTypedHelp] = useState('')
-  const helpIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const { playTypewriterTick } = useAudio()
 
   const isDraft = phase === RunPhase.DRAFT
   const isPrep = turn !== undefined && turn <= PREP_TURNS
@@ -45,27 +66,6 @@ export default function MainHUD() {
   const helpText = phase && PHASE_HELP[phase as string]
     ? (isPrep ? PHASE_HELP[phase as string].prep : PHASE_HELP[phase as string].encounter)
     : ''
-
-  useEffect(() => {
-    if (!helpText) return
-    if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
-    let i = 0
-    // Async first update avoids cascading setState-in-effect
-    helpIntervalRef.current = setInterval(() => {
-      i++
-      setTypedHelp(helpText.slice(0, i))
-      if (i % 3 === 0) playTypewriterTick()
-      if (i >= helpText.length) {
-        if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
-      }
-    }, 35)
-    return () => {
-      if (helpIntervalRef.current) clearInterval(helpIntervalRef.current)
-    }
-  }, [helpText, playTypewriterTick])
-
-  // Derive empty help when no text without effect setState
-  const displayHelp = helpText ? typedHelp : ''
 
   return (
     <div className="h-full flex flex-col gap-2 p-3 sm:p-5">
@@ -100,11 +100,7 @@ export default function MainHUD() {
         </div>
       </div>
 
-      {phase && PHASE_HELP[phase as string] && (
-        <div className="text-terminal-accent text-xs font-mono px-1" role="status">
-          › {displayHelp}<span className="animate-pulse">_</span>
-        </div>
-      )}
+      {helpText ? <TypewriterHelp key={helpText} text={helpText} /> : null}
 
       <div className="hidden sm:flex items-center justify-between border-b border-terminal-border pb-2">
         <div className="flex items-center gap-3">

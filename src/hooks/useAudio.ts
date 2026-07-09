@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useGameStore } from '../store'
 import { RunPhase } from '../types/enums'
 import { audioEngine } from '../sound/engine'
@@ -28,11 +28,17 @@ export function useAudio() {
     prevPhase.current = phase
   }, [phase, lastResult])
 
+  const playNodePurchase = useCallback(() => audioEngine.playSfx('purchase_node'), [])
+  const playItemPurchase = useCallback(() => audioEngine.playSfx('purchase_gear'), [])
+  const playClick = useCallback(() => audioEngine.playSfx('click'), [])
+  const playHover = useCallback(() => audioEngine.playSfx('hover'), [])
+  const playTypewriterTick = useCallback(() => audioEngine.playTypewriterTick(), [])
+
   return {
-    playNodePurchase: () => audioEngine.playSfx('purchase_node'),
-    playItemPurchase: () => audioEngine.playSfx('purchase_gear'),
-    playClick: () => audioEngine.playSfx('click'),
-    playHover: () => audioEngine.playSfx('hover'),
-    playTypewriterTick: () => audioEngine.playTypewriterTick(),
+    playNodePurchase,
+    playItemPurchase,
+    playClick,
+    playHover,
+    playTypewriterTick,
   }
 }
