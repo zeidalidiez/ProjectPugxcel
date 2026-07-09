@@ -2,35 +2,62 @@ import { useState } from 'react'
 import { useGameStore } from '../store'
 import { getItemById } from '../data/items'
 import { applyDiscount } from '../game/economy/cost'
+import { getEquippedInSlot } from '../game/economy/itemPurchase'
 import { StatType } from '../types/enums'
 import { STAT_LABELS } from '../types/stats'
 import type { ItemDef } from '../types/items'
+import EquipCompareModal from './EquipCompareModal'
 
 export default function StoreModal() {
   const storeItems = useGameStore((s) => s.run?.storeItems)
+  const inventory = useGameStore((s) => s.run?.inventory) ?? []
   const archetype = useGameStore((s) => s.run?.archetype)
   const lck = useGameStore((s) => s.run?.stats?.[StatType.LCK]) ?? 0
   const luckEff = useGameStore((s) => s.run?.balanceWeights?.luckEfficacyMultiplier) ?? 1
   const purchaseItem = useGameStore((s) => s.purchaseItem)
   const canAffordItem = useGameStore((s) => s.canAffordItem)
   const [hoveredDef, setHoveredDef] = useState<ItemDef | null>(null)
+  const [pendingReplace, setPendingReplace] = useState<{
+    itemId: string
+    equipped: ItemDef
+    incoming: ItemDef
+    price: number
+  } | null>(null)
 
   if (!storeItems || storeItems.length === 0 || !archetype) return null
+
+  function requestPurchase(itemId: string) {
+    const def = getItemById(itemId)
+    if (!def) return
+    if (!canAffordItem(itemId)) return
+
+    const price = applyDiscount(def.cost, lck, luckEff)
+    const equippedInv = getEquippedInSlot(inventory, def.slot)
+    if (equippedInv) {
+      const equippedDef = getItemById(equippedInv.defId)
+      if (equippedDef) {
+        setPendingReplace({ itemId, equipped: equippedDef, incoming: def, price })
+        return
+      }
+    }
+    purchaseItem(itemId)
+  }
 
   return (
     <div className="flex flex-col gap-2 p-3 border border-terminal-border rounded bg-terminal-surface relative" role="region" aria-label="Store">
       <div className="text-terminal-text text-xs uppercase tracking-widest">Store</div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-        {storeItems.map((itemId) => {
+        {storeItems.map((itemId, listingIndex) => {
           const def = getItemById(itemId)
           if (!def) return null
           const price = applyDiscount(def.cost, lck, luckEff)
           const affordable = canAffordItem(itemId)
+          const slotOccupied = Boolean(getEquippedInSlot(inventory, def.slot))
 
           return (
             <button
-              key={itemId}
-              onClick={() => purchaseItem(itemId)}
+              key={`${itemId}-${listingIndex}`}
+              onClick={() => requestPurchase(itemId)}
               onMouseEnter={() => setHoveredDef(def)}
               onMouseLeave={() => setHoveredDef(null)}
               disabled={!affordable}
@@ -41,7 +68,7 @@ export default function StoreModal() {
                 ${def.tier !== 'T4' && def.tier !== 'T3' ? 'border-terminal-border' : ''}
                 ${affordable ? 'hover:border-terminal-accent cursor-pointer' : 'opacity-40 cursor-not-allowed'}
               `}
-              aria-label={`${def.name}: ${def.description}. Cost: ${price}g`}
+              aria-label={`${def.name}: ${def.description}. Cost: ${price}g${slotOccupied ? '. Replaces equipped gear.' : ''}`}
             >
               <div className="flex justify-between items-start">
                 <span className="text-terminal-text-bright font-bold text-[11px] leading-tight">{def.name}</span>
@@ -79,7 +106,10 @@ export default function StoreModal() {
               )}
 
               <div className="flex justify-between items-center mt-auto">
-                <span className="text-terminal-text/50 text-[9px]">{def.slot}</span>
+                <span className="text-terminal-text/50 text-[9px]">
+                  {def.slot}
+                  {slotOccupied ? ' · replace' : ''}
+                </span>
                 <span className={`font-mono text-[11px] ${affordable ? 'text-terminal-warn' : 'text-terminal-fail'}`}>
                   {price}g
                 </span>
@@ -89,7 +119,7 @@ export default function StoreModal() {
         })}
       </div>
 
-      {hoveredDef && (
+      {hoveredDef && !pendingReplace && (
         <div className="absolute bottom-full left-4 mb-2 z-50 pointer-events-none p-3 rounded border border-terminal-accent bg-terminal-surface shadow-lg max-w-64">
           <div className="flex items-center gap-1 mb-1">
             <span className="text-terminal-text-bright font-bold text-xs">{hoveredDef.name}</span>
@@ -117,6 +147,19 @@ export default function StoreModal() {
             </div>
           )}
         </div>
+      )}
+
+      {pendingReplace && (
+        <EquipCompareModal
+          equipped={pendingReplace.equipped}
+          incoming={pendingReplace.incoming}
+          price={pendingReplace.price}
+          onCancel={() => setPendingReplace(null)}
+          onConfirm={() => {
+            purchaseItem(pendingReplace.itemId)
+            setPendingReplace(null)
+          }}
+        />
       )}
     </div>
   )

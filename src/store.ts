@@ -13,6 +13,10 @@ import { purchaseNode } from './game/constellation/purchase'
 import { generateStore } from './game/economy/store'
 import { calculatePayout } from './game/economy/payout'
 import { applyDiscount, getNodePurchasePrice } from './game/economy/cost'
+import {
+  removeFirstStoreListing,
+  inventoryAfterEquip,
+} from './game/economy/itemPurchase'
 import { generateEncounters } from './game/resolve/encounter'
 import { resolve } from './game/resolve/resolve'
 import { encodeShareString, createCompletedRun } from './game/save/serialize'
@@ -334,18 +338,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const slot = itemDef.slot
     const equipped = run.inventory.filter((i) => i.slot === slot && i.equipped)
 
-    const newInventory: InventoryItem[] = [...run.inventory]
-    for (const eq of equipped) {
-      const idx = newInventory.findIndex((i) => i.instanceId === eq.instanceId)
-      if (idx !== -1) newInventory[idx] = { ...newInventory[idx], equipped: false }
-    }
-
-    newInventory.push({
+    const nextItem: InventoryItem = {
       defId: itemId,
       instanceId: nextInstanceId(),
       slot: itemDef.slot,
       equipped: true,
-    })
+    }
+    // Replace: drop previously equipped piece in this slot (do not keep as junk)
+    const newInventory = inventoryAfterEquip(run.inventory, nextItem)
 
     let newAbilities = run.abilities
     for (const effect of itemDef.effects) {
@@ -394,6 +394,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (effect.extraNodeDraft) newExtraDrafts++
     }
 
+    // One purchase consumes the store listing so the same offer cannot be bought again
+    const newStoreItems = removeFirstStoreListing(run.storeItems, itemId)
+
     set({
       run: {
         ...run,
@@ -402,6 +405,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         abilities: newAbilities,
         stats: newStats,
         extraNodeDrafts: newExtraDrafts,
+        storeItems: newStoreItems,
       },
     })
     return true
