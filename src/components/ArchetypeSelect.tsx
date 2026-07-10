@@ -10,6 +10,7 @@ import type { ArchetypeCardData } from './ArchetypeCard'
 const CodexModal = lazy(() => import('./CodexModal'))
 const CustomDifficultyPanel = lazy(() => import('./CustomDifficultyPanel'))
 const SettingsModal = lazy(() => import('./SettingsModal'))
+const LearnToPlayModal = lazy(() => import('./LearnToPlayModal'))
 
 const ARCHETYPES: ArchetypeCardData[] = [
   {
@@ -48,6 +49,7 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [codexOpen, setCodexOpen] = useState(false)
   const [customPanelOpen, setCustomPanelOpen] = useState(false)
+  const [learnOpen, setLearnOpen] = useState(false)
   const [shareInput, setShareInput] = useState('')
   const [shareError, setShareError] = useState('')
   const [carouselIdx, setCarouselIdx] = useState(0)
@@ -146,13 +148,22 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
       </div>
       {shareError && <p className="text-terminal-fail text-xs">{shareError}</p>}
 
-      <button
-        onClick={() => setCodexOpen(true)}
-        className="absolute bottom-4 left-4 px-3 py-1.5 rounded border border-terminal-border text-terminal-text/60 text-xs hover:text-terminal-text-bright hover:border-terminal-accent transition-colors"
-        aria-label="Open Codex"
-      >
-        Codex
-      </button>
+      <div className="absolute bottom-4 left-4 flex items-center gap-2">
+        <button
+          onClick={() => setLearnOpen(true)}
+          className="px-3 py-1.5 rounded border border-terminal-accent text-terminal-accent text-xs hover:bg-terminal-accent/10 transition-colors"
+          aria-label="Learn to Play"
+        >
+          Learn to Play
+        </button>
+        <button
+          onClick={() => setCodexOpen(true)}
+          className="px-3 py-1.5 rounded border border-terminal-border text-terminal-text/60 text-xs hover:text-terminal-text-bright hover:border-terminal-accent transition-colors"
+          aria-label="Open Codex"
+        >
+          Codex
+        </button>
+      </div>
 
       <button
         onClick={() => setSettingsOpen(true)}
@@ -175,6 +186,11 @@ export default function ArchetypeSelect({ onReplay }: { onReplay: (share: string
       {customPanelOpen && (
         <Suspense fallback={null}>
           <CustomDifficultyPanel onClose={() => setCustomPanelOpen(false)} />
+        </Suspense>
+      )}
+      {learnOpen && (
+        <Suspense fallback={null}>
+          <LearnToPlayModal onClose={() => setLearnOpen(false)} />
         </Suspense>
       )}
     </div>
